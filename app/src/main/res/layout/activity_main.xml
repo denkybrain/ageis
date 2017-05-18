@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.denky.ageis.MainActivity"
+    android:background="@color/white"
+    >
+
+    <LinearLayout
+        android:id="@+id/universe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:id="@+id/gotoBar"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+
+            android:layout_marginLeft="5dp"
+
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center"
+            >
+            <ImageView
+                android:id="@+id/homeBtn"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/home"
+                android:layout_marginLeft="5dp"
+                />
+            <EditText
+                android:textColorHint="@color/grey"
+                android:hint="Search or Input URL"
+                android:layout_width="280dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/uri"
+                android:imeOptions="actionGo"
+                android:inputType="text"
+                android:paddingLeft="15dp"
+                android:textColor="@color/black"
+             />
+            <ImageView
+                android:id="@+id/lockBtn"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/lock"
+                />
+        </LinearLayout>
+        <!--
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="뒤로"
+                android:id="@+id/left"
+                android:layout_weight="0.56" />
+
+            <Button
+                android:layout_width="204dp"
+                android:layout_height="wrap_content"
+                android:text="앞으로"
+                android:id="@+id/right" />
+        </LinearLayout>
+        -->
+        <WebView
+        android:layout_width="match_parent"
+        android:layout_height="343dp"
+        android:id="@+id/wv"
+        android:layout_weight="0.67" />
+    </LinearLayout>
+    <!--
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F3F3F3"
+        android:paddingLeft="20dp"
+        android:hint="              Search or Input URL"
+        android:drawableStart="@drawable/record"
+        android:drawableLeft="@drawable/record"
+        android:layout_gravity="center"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
+        />
+</LinearLayout>
+-->
+
+</RelativeLayout>
