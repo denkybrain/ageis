@@ -86,9 +86,8 @@
 
         <WebView
         android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:id="@+id/wv"
-        android:layout_weight="0.67" />
+        android:layout_height="match_parent"
+        android:id="@+id/wv" />
     </LinearLayout>
     <!--
 <LinearLayout

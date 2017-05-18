@@ -1,5 +1,9 @@
 package com.example.denky.ageis;
 
+/**
+ * Created by denky on 2017-05-14.
+ */
+
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -19,27 +23,28 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-public class MainActivity extends AppCompatActivity {
-    Button go, right, left;
-    EditText uri;
-    WebView wv;
-    WebSettings wvSettings;
-    View.OnClickListener cl;
-    String weburi;
-    ProgressBar progressBar;
-    InputMethodManager imm;
-    ImageView homeBtn , lockBtn;
-    String urlHint ="Search or Input URL";
-    String startURL = "http://denkybrain.cafe24.com/ageis/main.php";
-    String country[]
-            ={".com",".co.kr"};
-    String fileformat[]
-            =
-            {".php",".html"};
-    LinearLayout gotoBar, universe;
-    boolean securityMode = false;
-    ///변수 초기화 끝
 
+// overloading
+public class MainActivity extends AppCompatActivity {
+    private Button go, right, left;
+    private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
+    private WebView wv;
+    private WebSettings wvSettings; //webview setting 객체임. 편리하게 쓰려고 만듬
+    private View.OnClickListener cl; //여러 개의 클릭 리스너를 switch로 처리하려고 만듬
+    private String weburi;
+    public ProgressBar progressBar;
+    private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
+    private ImageView homeBtn , lockBtn;
+    private String uriHint ="Search or Input URI";
+    private String securityHint = "Security Mode";
+    private String startURL = "http://denkybrain.cafe24.com/ageis/main.php";
+    private String country[]
+            =   {".com",".co.kr"};
+    private String fileformat[]
+            =   {".php",".html"};
+    private LinearLayout gotoBar, universe;
+    boolean securityMode = false;
+    /*************** 변수 초기화 끝 ******************/
 
     class MyWeb extends WebViewClient {
         @Override
@@ -51,21 +56,131 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon){
             super.onPageStarted(view, url, favicon);
+            String wvUri = wv.getUrl().toString();
+            if(!wvUri.equals(startURL)) //초기화면에는 프로그래스 바를 표현하지않음
             progressBar.setVisibility(View.VISIBLE);
+
+            if(wvUri.equals(startURL)){ //초기 화면이면 uri창을 비움
+                uri.setText("");
+            }else{ //초기 화면이 아니면
+                if(wvUri.startsWith("http://")){//http://로 시작하면
+                    if(wvUri.endsWith("/"))
+                        uri.setText(wvUri.substring(7, wv.getUrl().length()-1));
+                    else
+                        uri.setText(wvUri.substring(7, wv.getUrl().length()));
+                }
+                if(wvUri.startsWith("https://")){//암호화한 정보 전송규약 https일 경우
+                    if(wvUri.endsWith("/"))
+                        uri.setText(wvUri.substring(8, wv.getUrl().length()-1));
+                    else
+                        uri.setText(wvUri.substring(8, wv.getUrl().length()));
+                }
+            }
         }
 
         //웹페이지 로딩 종료시 호출
         @Override
         public void onPageFinished(WebView view, String url){
             super.onPageFinished(view, url);
+
             progressBar.setVisibility(View.INVISIBLE);
         }
     }
-    // overloading
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+       // getSupportActionBar().setDisplayShowHomeEnabled(true); -> 하면 오류걸림. 아이콘 설정 코드였는데 현재 버전 API에서 제공 안 하는듯.
+        // 아이콘 설정하려면 그냥 Manifest.xml만 건들면 댐
+        imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        //right = (Button) findViewById(R.id.right);
+        //left = (Button) findViewById(R.id.left);
+        uri = (EditText) findViewById(R.id.uri);
+        wv = (WebView) findViewById(R.id.wv);
+        homeBtn = (ImageView)findViewById(R.id.homeBtn);
+        lockBtn = (ImageView)findViewById(R.id.lockBtn);
+        gotoBar = (LinearLayout)findViewById(R.id.gotoBar);
+        universe = (LinearLayout)findViewById(R.id.universe);
+        wv.setWebViewClient(new MyWeb());
+        wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                progressBar.setProgress(newProgress);
+            }
+
+        });
+        wvSettings = wv.getSettings();
+        wvSettings.setJavaScriptEnabled(true);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
+        progressBar.setVisibility(View.INVISIBLE);
+        goToURL(startURL); //처음 화면 로딩
+        uri.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    imm.hideSoftInputFromWindow(uri.getWindowToken(), 0);
+                    goToURL();
+                }
+                return false;
+            }
+        });
+
+        cl = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()){
+                    case R.id.homeBtn : //홈버튼 이벤트 처리
+                        goToURL(startURL);
+                        uri.setText("");
+                        break;
+                    /*case R.id.left :
+                        wv.goBack();
+                        break;
+                    case R.id.right :
+                        wv.goForward();
+                        break;
+                        */
+                    case R.id.lockBtn :
+                        if(securityMode == false) {
+                            uri.setHint(securityHint); //시큐리티 모드
+                            uri.setBackgroundResource(R.color.supergrey);
+                            uri.setTextColor(Color.WHITE);
+                            lockBtn.setImageResource(R.drawable.returnbtn);
+                            gotoBar.setBackgroundResource(R.color.supergrey);
+                            homeBtn.setImageResource(R.drawable.home2);
+                            universe.setBackgroundResource(R.color.supergrey);
+                            securityMode = true;
+                        }
+                        else{
+                            //기본 모드
+                            uri.setHint(uriHint);
+                            uri.setBackgroundResource(R.color.white);
+                            uri.setTextColor(Color.BLACK);
+                            lockBtn.setImageResource(R.drawable.lock);
+                            homeBtn.setImageResource(R.drawable.home);
+                            gotoBar.setBackgroundResource(R.color.white);
+                            universe.setBackgroundResource(R.color.white);
+                            securityMode = false;
+                        }
+                        break;
+                }
+
+            }
+        };
+        lockBtn.setOnClickListener(cl);
+        homeBtn.setOnClickListener(cl);
+        //go.setOnClickListener(cl);
+        //right.setOnClickListener(cl);
+        //left.setOnClickListener(cl);
+    }
 
     void goToURL(String link){ // go to link by calling
         wv.loadUrl(link);
     }
+
     void goToURL(){ //go to with the uri.getText
         weburi = uri.getText().toString();
         if (weburi.startsWith("http://")) {
@@ -100,108 +215,6 @@ public class MainActivity extends AppCompatActivity {
             wv.goBack();
         }
         //뒤로 가기 버튼을 누른 후에
-         uri.setText(""); //텍스트를 비운다
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-       // getSupportActionBar().setDisplayShowHomeEnabled(true);
-        imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        //go = (Button) findViewById(R.id.go);
-        //right = (Button) findViewById(R.id.right);
-        //left = (Button) findViewById(R.id.left);
-        uri = (EditText) findViewById(R.id.uri);
-        wv = (WebView) findViewById(R.id.wv);
-        homeBtn = (ImageView)findViewById(R.id.homeBtn);
-        lockBtn = (ImageView)findViewById(R.id.lockBtn);
-        gotoBar = (LinearLayout)findViewById(R.id.gotoBar);
-        universe = (LinearLayout)findViewById(R.id.universe);
-        wv.setWebViewClient(new MyWeb());
-        wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                progressBar.setProgress(newProgress);
-            }
-
-        });
-        wvSettings = wv.getSettings();
-        wvSettings.setJavaScriptEnabled(true);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
-        progressBar.setVisibility(View.INVISIBLE);
-        goToURL(startURL); //처음 화면 로딩
-        uri.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    imm.hideSoftInputFromWindow(uri.getWindowToken(), 0);
-                    goToURL();
-                }
-                return false;
-            }
-        });
-        homeBtn.setOnClickListener(new View.OnClickListener() {//home button click
-            @Override
-            public void onClick(View v) {
-                goToURL(startURL);
-                uri.setText("");
-            }
-        });
-        lockBtn.setOnClickListener(new View.OnClickListener() {//home button click
-            @Override
-            public void onClick(View v) {
-                if(securityMode == false) {
-                    uri.setHint("Security Mode"); //시큐리티 모드
-                    uri.setBackgroundResource(R.color.supergrey);
-                    uri.setTextColor(Color.WHITE);
-                    lockBtn.setImageResource(R.drawable.returnbtn);
-                    gotoBar.setBackgroundResource(R.color.supergrey);
-                    homeBtn.setImageResource(R.drawable.home2);
-                    universe.setBackgroundResource(R.color.supergrey);
-                    securityMode = true;
-                }
-                else{
-                    //기본 모드
-                    uri.setHint(urlHint);
-                    uri.setBackgroundResource(R.color.white);
-                    uri.setTextColor(Color.BLACK);
-                    lockBtn.setImageResource(R.drawable.lock);
-                    homeBtn.setImageResource(R.drawable.home);
-                    gotoBar.setBackgroundResource(R.color.white);
-                    universe.setBackgroundResource(R.color.white);
-                    securityMode = false;
-                }
-            }
-        });
-
-        cl = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*switch (v.getId()){
-                    case R.id.go :
-                        weburi = uri.getText().toString();
-                        if(weburi.startsWith("http://")) {
-                            wv.loadUrl(weburi);
-                        } else {
-                            wv.loadUrl("http://" + weburi); }
-                        break;
-                    case R.id.left :
-                        wv.goBack();
-                        break;
-
-                    case R.id.right :
-                        wv.goForward();
-                        break;
-
-                }
-                */
-            }
-        };
-        //go.setOnClickListener(cl);
-        //right.setOnClickListener(cl);
-        //left.setOnClickListener(cl);
+        uri.setText(""); //텍스트를 비운다
     }
 }
