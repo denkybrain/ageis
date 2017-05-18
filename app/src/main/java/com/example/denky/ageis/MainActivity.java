@@ -1,11 +1,15 @@
 package com.example.denky.ageis;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -13,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 public class MainActivity extends AppCompatActivity {
     Button go, right, left;
@@ -21,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     WebSettings wvSettings;
     View.OnClickListener cl;
     String weburi;
+    ProgressBar progressBar;
     InputMethodManager imm;
     ImageView homeBtn , lockBtn;
     String urlHint ="Search or Input URL";
@@ -40,6 +46,19 @@ public class MainActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             // TODO Auto-generated method stub
             return super.shouldOverrideUrlLoading(view, url);
+        }
+        //웹 페이지 로딩 시작시 호출
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon){
+            super.onPageStarted(view, url, favicon);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        //웹페이지 로딩 종료시 호출
+        @Override
+        public void onPageFinished(WebView view, String url){
+            super.onPageFinished(view, url);
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
     // overloading
@@ -86,8 +105,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+       // getSupportActionBar().setDisplayShowHomeEnabled(true);
         imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         //go = (Button) findViewById(R.id.go);
         //right = (Button) findViewById(R.id.right);
@@ -99,9 +120,18 @@ public class MainActivity extends AppCompatActivity {
         gotoBar = (LinearLayout)findViewById(R.id.gotoBar);
         universe = (LinearLayout)findViewById(R.id.universe);
         wv.setWebViewClient(new MyWeb());
+        wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                progressBar.setProgress(newProgress);
+            }
+
+        });
         wvSettings = wv.getSettings();
         wvSettings.setJavaScriptEnabled(true);
-
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
+        progressBar.setVisibility(View.INVISIBLE);
         goToURL(startURL); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -117,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 goToURL(startURL);
+                uri.setText("");
             }
         });
         lockBtn.setOnClickListener(new View.OnClickListener() {//home button click
