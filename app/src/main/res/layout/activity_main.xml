@@ -38,21 +38,33 @@
             <EditText
                 android:textColorHint="@color/grey"
                 android:hint="Search or Input URL"
-                android:layout_width="280dp"
+                android:layout_width="245dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/uri"
                 android:imeOptions="actionGo"
                 android:inputType="text"
                 android:paddingLeft="15dp"
+                android:textSize="18dp"
                 android:textColor="@color/black"
              />
+
+
             <ImageView
                 android:id="@+id/lockBtn"
                 android:layout_marginTop="8dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/lock"
+                android:layout_marginRight="5dp"
                 />
+            <ImageView
+                android:id="@+id/settingBtn"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/setting"
+                />
+
         </LinearLayout>
         <!--
         <LinearLayout
