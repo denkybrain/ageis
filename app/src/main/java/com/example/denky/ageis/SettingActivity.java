@@ -45,7 +45,7 @@ import java.io.IOException;
 import static com.example.denky.ageis.R.id.newWindowOn;
 
 public class SettingActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+    GoogleApiClient.OnConnectionFailedListener{
 
     CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
     TextView googleAsynText;
