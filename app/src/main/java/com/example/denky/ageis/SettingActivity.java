@@ -4,12 +4,14 @@ package com.example.denky.ageis;
  * Created by denky on 2017-05-19.
  */
 
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,14 +42,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static com.example.denky.ageis.MainActivity.setting_adblock;
-import static com.example.denky.ageis.MainActivity.setting_cache;
-import static com.example.denky.ageis.MainActivity.setting_fileAccess;
-import static com.example.denky.ageis.MainActivity.setting_history;
-import static com.example.denky.ageis.MainActivity.setting_javascript;
-import static com.example.denky.ageis.MainActivity.setting_newWindow;
-import static com.example.denky.ageis.MainActivity.setting_proxy;
-import static com.example.denky.ageis.MainActivity.setting_vulnerable;
 import static com.example.denky.ageis.R.id.newWindowOn;
 
 public class SettingActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -56,6 +50,16 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
     TextView googleAsynText;
     private GoogleApiClient mGoogleApiClient;
+
+    private boolean useJavaScript=Settings.useJavaScript;
+    private boolean permissionStartNewWindow=Settings.permissionStartNewWindow;
+    private boolean permissionFileDownload=Settings.permissionFileDownload;
+    private boolean permissionAppCache=Settings.permissionAppCache;
+    private boolean useVulnerabilityFindAlgorithm=Settings.useVulnerabilityFindAlgorithm;
+    private boolean useProxyServer=Settings.useProxyServer;
+    private boolean permissionAutoRemoveHistory=Settings.permissionAutoRemoveHistory;
+    private boolean useAdBlock=Settings.useAdBlock;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,46 +73,72 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         cb6 = (CheckBox)findViewById(R.id.proxyOn);
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
         cb8 = (CheckBox)findViewById(R.id.adBlockOn);
-        cb1.setChecked(setting_javascript);
-        cb2.setChecked(setting_newWindow);
-        cb3.setChecked(setting_fileAccess);
-        cb4.setChecked(setting_cache);
-        cb5.setChecked(setting_vulnerable);
-        cb6.setChecked(setting_proxy);
-        cb7.setChecked(setting_history);
-        cb8.setChecked(setting_adblock);
+        cb1.setChecked(Settings.useJavaScript);
+        cb2.setChecked(Settings.permissionStartNewWindow);
+        cb3.setChecked(Settings.permissionFileDownload);
+        cb4.setChecked(Settings.permissionAppCache);
+        cb5.setChecked(Settings.useVulnerabilityFindAlgorithm);
+        cb6.setChecked(Settings.useProxyServer);
+        cb7.setChecked(Settings.permissionAutoRemoveHistory);
+        cb8.setChecked(Settings.useAdBlock);
+
     }
 
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면
-        //settingSave();
-        finish();//액티비티 다운
+        DialogMaker maker=new DialogMaker();
+        Callback callback_positive=new Callback() {
+            @Override
+            public void callbackMethod() {
+                Settings.useJavaScript=useJavaScript;
+                Settings.permissionStartNewWindow=permissionStartNewWindow;
+                Settings.permissionFileDownload=permissionFileDownload;
+                Settings.permissionAppCache=permissionAppCache;
+                Settings.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
+                Settings.useProxyServer=useProxyServer;
+                Settings.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
+                Settings.useAdBlock=useAdBlock;
+
+                Settings.saveSettings();
+                finish();
+            }
+        };
+        Callback callback_negative=new Callback() {
+            @Override
+            public void callbackMethod() {
+                finish();
+            }
+        };
+
+        maker.setValue("설정을 저장하시겠습니까?", "예", "아니오", callback_positive, callback_negative);
+        maker.show(getSupportFragmentManager(), "Dialog");
+
     }
     public void clickedPermission(View v){
         switch (v.getId()){
             case R.id.javascriptCheck :
-                setting_javascript = cb1.isChecked();
+                useJavaScript = cb1.isChecked();
                 break;
             case R.id.newWindowOn :
-                setting_newWindow = cb2.isChecked();
+                permissionStartNewWindow = cb2.isChecked();
                 break;
             case R.id.fileDownloadOn :
-                setting_fileAccess = cb3.isChecked();
+                permissionFileDownload = cb3.isChecked();
                 break;
             case R.id.cacheOn :
-                setting_cache = cb4.isChecked();
+                permissionAppCache = cb4.isChecked();
                 break;
             case R.id.webvulnearableToolOn :
-                setting_vulnerable = cb5.isChecked();
+                useVulnerabilityFindAlgorithm = cb5.isChecked();
                 break;
             case R.id.proxyOn :
-                setting_proxy = cb6.isChecked();
+                useProxyServer = cb6.isChecked();
                 break;
             case R.id.historyDelOn :
-                setting_history = cb7.isChecked();
+                permissionAutoRemoveHistory = cb7.isChecked();
                 break;
             case R.id.adBlockOn :
-                setting_adblock = cb8.isChecked();
+               useAdBlock = cb8.isChecked();
                 break;
             case R.id.googleBtn :
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -123,6 +153,10 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             case R.id.googleDeleteBtn :
                 break;
 
+            case R.id.settingInit:
+                Settings.restoreSetting();
+                finish();
+                break;
         }
     }
 
@@ -140,6 +174,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+    /*
     protected void settingSave()  {
 
         File folder ;
@@ -194,4 +229,5 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             }
         }
     }
+    */
 }

@@ -4,11 +4,15 @@ package com.example.denky.ageis;
  * Created by denky on 2017-05-14.
  */
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,14 +29,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 
 // overloading
 public class MainActivity extends AppCompatActivity {
+    /*
     static public boolean setting_javascript = true;
     static public boolean setting_newWindow = true;
     static public boolean setting_fileAccess = false;
@@ -41,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     static public boolean setting_adblock = true;
     static public boolean setting_proxy = false;
     static public boolean setting_history = true;
+    */
+
     private Button go, right, left;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private WebView wv;
@@ -57,8 +69,15 @@ public class MainActivity extends AppCompatActivity {
             =   {".com",".co.kr"};
     private String fileformat[]
             =   {".php",".html"};
-    private LinearLayout gotoBar, universe;
+    private LinearLayout  universe;
+    private RelativeLayout gotoBar;
+
     boolean securityMode = false;
+
+    static final int STORAGE_READ_PERMISSON=100;
+    static final int STORAGE_WRITE_PERMISSON=101;
+
+    final Activity thisActivity=this;
     /*************** 변수 초기화 끝 ******************/
 
     class MyWeb extends WebViewClient {
@@ -68,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
             return super.shouldOverrideUrlLoading(view, url);
         }
         private void setter(){
-            wvSettings.setJavaScriptEnabled(setting_javascript);
-            wvSettings.setSupportMultipleWindows(setting_newWindow);
-            wvSettings.setAppCacheEnabled(setting_cache);
-            wvSettings.setAllowFileAccess(setting_fileAccess);
+            wvSettings.setJavaScriptEnabled(Settings.useJavaScript);
+            wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
+            wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
+            wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
         }
 
         //웹 페이지 로딩 시작시 호출
@@ -114,6 +133,15 @@ public class MainActivity extends AppCompatActivity {
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //get needed permission
+        getPermission();
+
+        //load Settings
+        if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
+            Settings.getInstance();
+        }
+
         //settingRead();
        // getSupportActionBar().setDisplayShowHomeEnabled(true); -> 하면 오류걸림. 아이콘 설정 코드였는데 현재 버전 API에서 제공 안 하는듯.
         // 아이콘 설정하려면 그냥 Manifest.xml만 건들면 댐
@@ -124,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         wv = (WebView) findViewById(R.id.wv);
         homeBtn = (ImageView)findViewById(R.id.homeBtn);
         lockBtn = (ImageView)findViewById(R.id.lockBtn);
-        gotoBar = (LinearLayout)findViewById(R.id.gotoBar);
+        gotoBar = (RelativeLayout)findViewById(R.id.gotoBar);
         universe = (LinearLayout)findViewById(R.id.universe);
         settingBtn = (ImageView)findViewById(R.id.settingBtn);
         MyWeb wvWeb = new MyWeb();
@@ -157,11 +185,25 @@ public class MainActivity extends AppCompatActivity {
         cl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.homeBtn : //홈버튼 이벤트 처리
-                        goToURL(startURL);
-                        uri.setText("");
-                        break;
+
+
+                if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
+                    DialogMaker maker=new DialogMaker();
+                    Callback shutdown=new Callback() {
+                        @Override
+                        public void callbackMethod() {
+                            System.exit(0);
+                        }
+                    };
+                    maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
+                    maker.show(getSupportFragmentManager(), "TAG");
+                }else{
+
+                    switch (v.getId()){
+                        case R.id.homeBtn : //홈버튼 이벤트 처리
+                            goToURL(startURL);
+                            uri.setText("");
+                            break;
                     /*case R.id.left :
                         wv.goBack();
                         break;
@@ -169,35 +211,36 @@ public class MainActivity extends AppCompatActivity {
                         wv.goForward();
                         break;
                         */
-                    case R.id.lockBtn :
-                        if(securityMode == false) {
-                            uri.setHint(securityHint); //시큐리티 모드
-                            uri.setBackgroundResource(R.color.supergrey);
-                            uri.setTextColor(Color.WHITE);
-                            lockBtn.setImageResource(R.drawable.returnbtn);
-                            gotoBar.setBackgroundResource(R.color.supergrey);
-                            homeBtn.setImageResource(R.drawable.home2);
-                            settingBtn.setImageResource(R.drawable.setting2);
-                            universe.setBackgroundResource(R.color.supergrey);
-                            securityMode = true;
-                        }
-                        else{
-                            //기본 모드
-                            uri.setHint(uriHint);
-                            uri.setBackgroundResource(R.color.white);
-                            uri.setTextColor(Color.BLACK);
-                            lockBtn.setImageResource(R.drawable.lock);
-                            homeBtn.setImageResource(R.drawable.home);
-                            settingBtn.setImageResource(R.drawable.setting);
-                            gotoBar.setBackgroundResource(R.color.white);
-                            universe.setBackgroundResource(R.color.white);
-                            securityMode = false;
-                        }
-                        break;
-                    case R.id.settingBtn :
-                        Intent appSetting = new Intent(MainActivity.this, SettingActivity.class);
-                        startActivity(appSetting);
-                        break;
+                        case R.id.lockBtn :
+                            if(securityMode == false) {
+                                uri.setHint(securityHint); //시큐리티 모드
+                                uri.setBackgroundResource(R.color.supergrey);
+                                uri.setTextColor(Color.WHITE);
+                                lockBtn.setImageResource(R.drawable.returnbtn);
+                                gotoBar.setBackgroundResource(R.color.supergrey);
+                                homeBtn.setImageResource(R.drawable.home2);
+                                settingBtn.setImageResource(R.drawable.setting2);
+                                universe.setBackgroundResource(R.color.supergrey);
+                                securityMode = true;
+                            }
+                            else{
+                                //기본 모드
+                                uri.setHint(uriHint);
+                                uri.setBackgroundResource(R.color.white);
+                                uri.setTextColor(Color.BLACK);
+                                lockBtn.setImageResource(R.drawable.lock);
+                                homeBtn.setImageResource(R.drawable.home);
+                                settingBtn.setImageResource(R.drawable.setting);
+                                gotoBar.setBackgroundResource(R.color.white);
+                                universe.setBackgroundResource(R.color.white);
+                                securityMode = false;
+                            }
+                            break;
+                        case R.id.settingBtn :
+                            Intent appSetting = new Intent(MainActivity.this, SettingActivity.class);
+                            startActivity(appSetting);
+                            break;
+                    }
                 }
 
             }
@@ -209,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
         //right.setOnClickListener(cl);
         //left.setOnClickListener(cl);
     }
+
 
     void goToURL(String link){ // go to link by calling
         wv.loadUrl(link);
@@ -277,4 +321,59 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    public void getPermission(){
+
+        final int permissonCheck_readStorage= ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
+        final int permissonCheck_writeStorage= ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
+        if(permissonCheck_readStorage==PackageManager.PERMISSION_DENIED || permissonCheck_writeStorage==PackageManager.PERMISSION_DENIED){
+            DialogMaker maker=new DialogMaker();
+            Callback shutdown=new Callback() {
+                @Override
+                public void callbackMethod() {
+                    System.exit(0);
+                }
+            };
+
+            Callback agree=new Callback(){
+                @Override
+                public void callbackMethod() {
+                    //storage read permission
+                    if(permissonCheck_readStorage == PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(getApplicationContext(), "저장소 읽기 권한 있음", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "저장소 읽기 권한 없음", Toast.LENGTH_SHORT).show();
+                        if(ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, READ_EXTERNAL_STORAGE)){
+                            Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 읽기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
+                            ActivityCompat.requestPermissions(thisActivity, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
+                        }else{
+                            ActivityCompat.requestPermissions(thisActivity, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
+                        }
+                    }
+
+                    //storage write permission
+                    if(permissonCheck_writeStorage == PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 있음", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 없음", Toast.LENGTH_SHORT).show();
+                        if(ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, WRITE_EXTERNAL_STORAGE)){
+                            Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 쓰기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
+                            ActivityCompat.requestPermissions(thisActivity, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
+                        }else{
+                            ActivityCompat.requestPermissions(thisActivity, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
+                        }
+                    }
+
+                }
+            };
+            String neededPermission="Read/Write Storage Permission";
+
+            maker.setValue("다음의 권한을 취득해야 합니다.\n\n-"+neededPermission+"\n\n모든 권한을 취득하지 않으면 앱 사용이 불가능합니다.\n\n모든 권한 획득 후, 앱 재시작이 필요합니다.\n\n","알겠습니다", "앱 종료", agree, shutdown);
+            maker.show(getSupportFragmentManager(), "FRAG");
+        }
+
+
+
+    }
+
 }
