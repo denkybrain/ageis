@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
             };
             String neededPermission="Read/Write Storage Permission";
 
-            maker.setValue("다음의 권한을 취득해야 합니다.\n\n-"+neededPermission+"\n\n모든 권한을 취득하지 않으면 앱 사용이 불가능합니다.\n\n모든 권한 획득 후, 앱 재시작이 필요합니다.\n\n","알겠습니다", "앱 종료", agree, shutdown);
+            maker.setValue("다음의 권한을 취득해야 합니다.\n\n-"+neededPermission+"\n\n모든 권한을 취득하지 않으면 앱 사용이 불가능합니다.","알겠습니다", "앱 종료", agree, shutdown);
             maker.show(getSupportFragmentManager(), "FRAG");
         }
 
