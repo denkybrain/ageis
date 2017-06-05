@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -29,9 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileReader;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -136,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         //load Settings
         if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
-            Settings.updateSettings();
+            Settings.loadSettings();
         }
 
         //settingRead();
@@ -277,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private long time=0;
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면 뒤로감
         if (wv.getUrl().equals(startURL)) {//현재가 초기 페이지면 앱을 종료
@@ -284,39 +281,19 @@ public class MainActivity extends AppCompatActivity {
                 wv.clearHistory();
                 wv.clearCache(true);
             }
-            super.onBackPressed();
+            //뒤로가기 버튼을 두 번 눌러야 종료됨.
+            if(System.currentTimeMillis()-time>=1500){
+                time=System.currentTimeMillis();
+                Toast.makeText(getApplicationContext(),"뒤로 버튼을 한번 더 누르면 종료합니다.",Toast.LENGTH_SHORT).show();
+            }else if(System.currentTimeMillis()-time<1500){
+                finish();
+                super.onBackPressed();
+            }
         } else { //현재가 초기 페이지가 아니라 로딩 페이지면 앱을 종료하지않고 뒤로감
             wv.goBack();
         }
         //뒤로 가기 버튼을 누른 후에
         uri.setText(""); //텍스트를 비운다
-    }
-
-    public void settingRead(){
-        File file = new File("setting/file.txt") ;
-        FileReader fr = null ;
-        int data ;
-        char ch ;
-        String text = "";
-
-        try {
-            // open file.
-            fr = new FileReader(file) ;
-
-            // read file.
-            while ((data = fr.read()) != -1) {
-                // TODO : use data
-                ch = (char) data ;
-                text+=ch;
-
-            }
-            Log.d("file reader", text);
-            fr.close() ;
-        } catch (Exception e) {
-            Log.d("file read", "failed");
-        }
-
-
     }
 
     public void getPermission(){
@@ -364,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
             };
             String neededPermission="Read/Write Storage Permission";
 
-            maker.setValue("다음의 권한을 취득해야 합니다.\n\n-"+neededPermission+"\n\n모든 권한을 취득하지 않으면 앱 사용이 불가능합니다.\n\n모든 권한 획득 후, 앱 재시작이 필요합니다.\n\n","알겠습니다", "앱 종료", agree, shutdown);
+            maker.setValue("다음의 권한을 취득해야 합니다.\n\n-"+neededPermission+"\n\n모든 권한을 취득하지 않으면 앱 사용이 불가능합니다.\n\n","알겠습니다", "앱 종료", agree, shutdown);
             maker.show(getSupportFragmentManager(), "FRAG");
         }
 

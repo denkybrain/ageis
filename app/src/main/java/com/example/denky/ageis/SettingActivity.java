@@ -4,51 +4,24 @@ package com.example.denky.ageis;
  * Created by denky on 2017-05-19.
  */
 
-import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
-
-import org.w3c.dom.Text;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import static com.example.denky.ageis.R.id.newWindowOn;
 
 public class SettingActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener{
 
     CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
-    TextView googleAsynText;
+    TextView googleAsyncText;
     private GoogleApiClient mGoogleApiClient;
 
     private boolean useJavaScript=Settings.useJavaScript;
@@ -64,7 +37,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitiy_setting);
-        googleAsynText = (TextView)findViewById(R.id.googleBtn);
+
+        googleAsyncText = (TextView)findViewById(R.id.googleBtn);
         cb1 = (CheckBox)findViewById(R.id.javascriptCheck);
         cb2 = (CheckBox)findViewById(R.id.newWindowOn);
         cb3 = (CheckBox)findViewById(R.id.fileDownloadOn);
@@ -73,6 +47,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         cb6 = (CheckBox)findViewById(R.id.proxyOn);
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
         cb8 = (CheckBox)findViewById(R.id.adBlockOn);
+
         cb1.setChecked(Settings.useJavaScript);
         cb2.setChecked(Settings.permissionStartNewWindow);
         cb3.setChecked(Settings.permissionFileDownload);
@@ -90,14 +65,14 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         Callback callback_positive=new Callback() {
             @Override
             public void callbackMethod() {
-                Settings.useJavaScript=useJavaScript;
-                Settings.permissionStartNewWindow=permissionStartNewWindow;
-                Settings.permissionFileDownload=permissionFileDownload;
-                Settings.permissionAppCache=permissionAppCache;
-                Settings.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
-                Settings.useProxyServer=useProxyServer;
-                Settings.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
-                Settings.useAdBlock=useAdBlock;
+                Settings.useJavaScript=cb1.isChecked();
+                Settings.permissionStartNewWindow=cb2.isChecked();
+                Settings.permissionFileDownload=cb3.isChecked();
+                Settings.permissionAppCache=cb4.isChecked();
+                Settings.useVulnerabilityFindAlgorithm=cb5.isChecked();
+                Settings.useProxyServer=cb6.isChecked();
+                Settings.permissionAutoRemoveHistory=cb7.isChecked();
+                Settings.useAdBlock=cb8.isChecked();
 
                 Settings.saveSettings();
                 finish();
@@ -162,7 +137,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        googleAsynText.setText("현재 로그인 상태입니다.");
+        googleAsyncText.setText("현재 로그인 상태입니다.");
     }
 
     @Override
