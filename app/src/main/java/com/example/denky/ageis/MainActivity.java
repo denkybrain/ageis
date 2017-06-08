@@ -7,9 +7,7 @@ package com.example.denky.ageis;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,38 +20,25 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.example.denky.ageis.ReferenceString.securityMode;
+import static com.example.denky.ageis.ReferenceString.startURL;
 
 
 // overloading
 public class MainActivity extends AppCompatActivity {
-    /*
-    static public boolean setting_javascript = true;
-    static public boolean setting_newWindow = true;
-    static public boolean setting_fileAccess = false;
-    static public boolean setting_cache = true;
-    static public boolean setting_vulnerable = true;
-    static public boolean setting_adblock = true;
-    static public boolean setting_proxy = false;
-    static public boolean setting_history = true;
-    */
 
-    private Button go, right, left;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
-    private WebView wv;
+    private CustomizedWebView  wv;
     private WebSettings wvSettings; //webview setting 객체임. 편리하게 쓰려고 만듬
     private View.OnClickListener cl; //여러 개의 클릭 리스너를 switch로 처리하려고 만듬
     private String weburi;
@@ -63,92 +48,20 @@ public class MainActivity extends AppCompatActivity {
     private ImageView homeBtn , lockBtn, settingBtn, renewBtn;
     private String uriHint ="Search or Input URI";
     private String securityHint = "Security Mode";
-    private String startURL = "http://denkybrain.cafe24.com/ageis/main.php";
-    private String country[]
-            =   {".com",".co.kr", "go.kr"};
-    private String fileformat[]
-            =   {".php",".html", ".jsp"};
     private LinearLayout  universe;
     private RelativeLayout gotoBar;
-
-    boolean securityMode = false;
-
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
 
     final Activity thisActivity=this;
     /*************** 변수 초기화 끝 ******************/
-
-    class MyWeb extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // TODO Auto-generated method stub
-            return super.shouldOverrideUrlLoading(view, url);
-        }
-        private void setter(){
-            wvSettings.setJavaScriptEnabled(Settings.useJavaScript);
-            wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
-            wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
-            wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
-        }
-
-        //웹 페이지 로딩 시작시 호출
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon){
-            setter();
-            super.onPageStarted(view, url, favicon);
-            String wvUri = getUri();
-            progressBar.setVisibility(View.VISIBLE);
-            if(wvUri.equals(startURL)){ //초기 화면이면 uri창을 비움
-                setUri("");
-            }else{ //초기 화면이 아니면
-                parseUri(wvUri);
-            }
-        }
-        private void parseUri(String wvUri){
-            if(securityMode == false) {
-                if (wvUri.startsWith("http://")) {//http://로 시작하면
-                    if (wvUri.endsWith("/"))
-                        setUri(wvUri.substring(7, wv.getUrl().length() - 1));
-                    else
-                        setUri(wvUri.substring(7, wv.getUrl().length()));
-                }
-                if (wvUri.startsWith("https://")) {//암호화한 정보 전송규약 https일 경우
-                    if (wvUri.endsWith("/"))
-                        setUri(wvUri.substring(8, wv.getUrl().length() - 1));
-                    else
-                        setUri(wvUri.substring(8, wv.getUrl().length()));
-                }
-            }
-            else if(securityMode == true)
-            {
-                setUri("");
-            }
-        }
-        //웹페이지 로딩 종료시 호출
-        @Override
-        public void onPageFinished(WebView view, String url){
-            super.onPageFinished(view, url);
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private void setUri(String str){
-        uri.setText(str);
-    }
-    private String getUri(){
-        return  uri.getText().toString();
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //get needed permission
         getPermission();
-
         //load Settings
         if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             Settings.loadSettings();
@@ -159,35 +72,38 @@ public class MainActivity extends AppCompatActivity {
         // 아이콘 설정하려면 그냥 Manifest.xml만 건들면 댐
         imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) findViewById(R.id.uri);
-        wv = (WebView) findViewById(R.id.wv);
+        wv = (CustomizedWebView) findViewById(R.id.wv);
+        //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
+        wv.constructor(weburi, uri);
         homeBtn = (ImageView)findViewById(R.id.homeBtn);
         lockBtn = (ImageView)findViewById(R.id.lockBtn);
         gotoBar = (RelativeLayout)findViewById(R.id.gotoBar);
         universe = (LinearLayout)findViewById(R.id.universe);
         settingBtn = (ImageView)findViewById(R.id.settingBtn);
         renewBtn = (ImageView)findViewById(R.id.renewBtn);
-        MyWeb wvWeb = new MyWeb();
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi
+        wvSettings = wv.getSettings();
+        CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 progressBar.setProgress(newProgress);
             }
-
         });
-        wvSettings = wv.getSettings();
-        wvWeb.setter();
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        wvWeb.setWebView();
+
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
         progressBar.setVisibility(View.INVISIBLE);
-        goToURL(startURL); //처음 화면 로딩
+        wv.goToURL(startURL); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     imm.hideSoftInputFromWindow(uri.getWindowToken(), 0);
-                    goToURL();
+                    wv.goToURL();
                 }
                 return false;
             }
@@ -210,15 +126,15 @@ public class MainActivity extends AppCompatActivity {
 
                     switch (v.getId()){
                         case R.id.homeBtn : //홈버튼 이벤트 처리
-                            goToURL(startURL);
-                            setUri("");
+                            wv.goToURL(startURL);
+                            wv.setUri("");
                             break;
                         case R.id.lockBtn :
                             if(securityMode == false) {
                                 uri.setHint(securityHint); //시큐리티 모드
                                 uri.setBackgroundResource(R.color.supergrey);
                                 uri.setTextColor(Color.WHITE);
-                                setUri("");
+                                wv.setUri("");
                                 lockBtn.setImageResource(R.drawable.lockwhite);
                                 renewBtn.setImageResource(R.drawable.returnbtn);
                                 gotoBar.setBackgroundResource(R.color.supergrey);
@@ -229,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             else{
                                 //기본 모드
-                                goToURL(startURL);
+                                wv.goToURL(startURL);
                                 uri.setHint(uriHint);
                                 uri.setBackgroundResource(R.color.white);
                                 uri.setTextColor(Color.BLACK);
@@ -247,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(appSetting);
                             break;
                         case R.id.renewBtn :
-                            goToURL();
+                            wv.renew();
                             break;
                     }
                 }
@@ -261,36 +177,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    void goToURL(String link){ // go to link by calling
-        wv.loadUrl(link);
-    }
-
-    void goToURL(){ //go to with the uri.getText
-        weburi = getUri();
-        if (weburi.startsWith("http://")) {
-            wv.loadUrl(weburi);
-        } else {
-            for(int i = 0 ; i < country.length; i++){
-                if(weburi.endsWith(country[i])){
-                    wv.loadUrl("http://"+weburi);
-                    return ;
-                }
-            }
-            for(int i = 0; i < fileformat.length; i++){
-                if(weburi.endsWith(fileformat[i])){
-                    wv.loadUrl("http://"+weburi);
-                    return ;
-                }
-            }
-            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 검색으로 치부함
-            wv.loadUrl("https://www.google.co.kr/search?q=" + weburi);
-        }
-    }
-
     private long time=0;
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면 뒤로감
-        if (getUri().equals(startURL)) {//현재가 초기 페이지면 앱을 종료
+        if (wv.getUrl().equals(startURL)) {//현재가 초기 페이지면 앱을 종료
             if(securityMode == true) { //시큐리티 모드면 웹뷰의 기록을 파괴하고 어플 종료
                 wv.clearHistory();
                 wv.clearCache(true);
@@ -306,9 +196,8 @@ public class MainActivity extends AppCompatActivity {
         } else { //현재가 초기 페이지가 아니라 로딩 페이지면 앱을 종료하지않고 뒤로감
             WebBackForwardList list = wv.copyBackForwardList();
             wv.goBackOrForward(-(list.getCurrentIndex()));
+            wv.setUri(wv.getUrl()); //텍스트를 비운다
         }
-        //뒤로 가기 버튼을 누른 후에
-        setUri(""); //텍스트를 비운다
     }
 
     public void getPermission(){

@@ -77,7 +77,9 @@
                 android:textColor="@color/black"
                 android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@+id/renewBtn"
-                android:layout_toStartOf="@+id/renewBtn" />
+                android:layout_toStartOf="@+id/renewBtn"
+                android:selectAllOnFocus="true"
+                />
 
         </RelativeLayout>
         <ProgressBar
@@ -88,7 +90,7 @@
             android:layout_height="wrap_content"
             style="@android:style/Widget.ProgressBar.Horizontal" />
         <!-- 웹뷰 확장 -->
-        <com.example.denky.ageis.ObservableWebView
+        <com.example.denky.ageis.CustomizedWebView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

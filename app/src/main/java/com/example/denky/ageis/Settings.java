@@ -17,8 +17,6 @@ import java.io.Serializable;
 
 public class Settings{
     static final String TAG="SETTING";
-
-
     //Setting Value
     public static boolean useJavaScript=true;
     public static boolean permissionStartNewWindow=true;
