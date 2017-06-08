@@ -38,7 +38,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitiy_setting);
 
-        googleAsyncText = (TextView)findViewById(R.id.googleBtn);
+       // googleAsyncText = (TextView)findViewById(R.id.googleBtn);
         cb1 = (CheckBox)findViewById(R.id.javascriptCheck);
         cb2 = (CheckBox)findViewById(R.id.newWindowOn);
         cb3 = (CheckBox)findViewById(R.id.fileDownloadOn);
@@ -115,7 +115,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             case R.id.adBlockOn :
                useAdBlock = cb8.isChecked();
                 break;
-            case R.id.googleBtn :
+           /* case R.id.googleBtn :
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
@@ -127,7 +127,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 break;
             case R.id.googleDeleteBtn :
                 break;
-
+*/
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
