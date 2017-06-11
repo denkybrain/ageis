@@ -54,13 +54,13 @@ public class CustomizedWebView extends WebView {
     public String getUriTextString(){
         return  uri.getText().toString();
     }
-    void goToURL(String link){ // go to link by calling
+    public void goToURL(String link){ // go to link by calling
         wv.loadUrl(link);
     }
-    void renew(){
+    public void renew(){
         goToURL();
     }
-    void goToURL(){ //go to with the uri.getText
+    public void goToURL(){ //go to with the uri.getText
         weburi = getUriTextString();
         if(weburi.equals("")){
             loadUrl(startURL);

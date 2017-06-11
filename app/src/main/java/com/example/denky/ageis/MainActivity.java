@@ -9,16 +9,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -33,33 +32,47 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.example.denky.ageis.ReferenceString.securityHint;
 import static com.example.denky.ageis.ReferenceString.securityMode;
 import static com.example.denky.ageis.ReferenceString.startURL;
-
+import static com.example.denky.ageis.ReferenceString.uriHint;
 
 // overloading
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
 
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private CustomizedWebView  wv;
     private WebSettings wvSettings; //webview setting 객체임. 편리하게 쓰려고 만듬
     private View.OnClickListener cl; //여러 개의 클릭 리스너를 switch로 처리하려고 만듬
-    private String weburi;
-    private String realUri = "";
+    private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
     private ImageView homeBtn , lockBtn, settingBtn, renewBtn;
-    private String uriHint ="Search or Input URI";
-    private String securityHint = "Security Mode";
     private LinearLayout  universe;
     private RelativeLayout gotoBar;
+    private ImageDownload imgDownloader = new ImageDownload();
+    private ProcessContext processContext;
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
-
-    final Activity thisActivity =   this;
+    final Activity thisActivity =  this;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Toast Img_toast;
+            switch (msg.what) {
+                case 0  :
+                    Img_toast = Toast.makeText(getApplicationContext(), "이미지 다운로드 시작", Toast.LENGTH_SHORT);
+                    Img_toast.show();
+                    break;
+                case 1 :
+                    Img_toast = Toast.makeText(getApplicationContext(), "이미지 다운로드 종료", Toast.LENGTH_LONG);
+                    Img_toast.show();
+                    break;
+            }
+          }
+    };
 
 
     @Override
@@ -86,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         settingBtn = (ImageView)findViewById(R.id.settingBtn);
         renewBtn = (ImageView)findViewById(R.id.renewBtn);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-         wvSettings = wv.getSettings();
+        wvSettings = wv.getSettings();
         CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
@@ -95,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setProgress(newProgress);
             }
         });
+        wv.setLongClickable(true);
+        wv.setOnLongClickListener(this);
+        processContext = new ProcessContext(wv, handler);
+        registerForContextMenu(wv);
         wvWeb.setWebView();
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
@@ -160,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case R.id.settingBtn :
-                            Log.d("result", "눌러줘서 고마워");
                             Intent appSetting = new Intent(MainActivity.this, SettingActivity.class);
                             startActivity(appSetting);
                             break;
@@ -177,16 +193,48 @@ public class MainActivity extends AppCompatActivity {
         settingBtn.setOnClickListener(cl);
         renewBtn.setOnClickListener(cl);
     }
+    /* context Menu */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        // API버전 올라가서 컨텍스트 메뉴 열 때마다 실행되는 콜벡 함수
+        switch (processContext.getMenuBtnVolume()){
+            case 0 : //이미지나 하이퍼링크가 아니면 컨텍스트 메뉴를 실행하지않음
+                break;
+            case 2 : //image
+                menu.setHeaderTitle(processContext.getContextTitle());
+                menu.add(0,1,100,processContext.getContextfirstMenu());
+                menu.add(0,1,100,processContext.getContextsecondMenu());
+                break;
+            case 3 : //anchor image or anchor tag
+                menu.setHeaderTitle(processContext.getContextTitle());
+                menu.add(0,1,100,processContext.getContextfirstMenu());
+                menu.add(0,1,100,processContext.getContextsecondMenu());
+                menu.add(0,1,100,processContext.getContextthirdMenu());
+                break;
+        }
+    }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        Log.d("widae", "메뉴가 안 생기노 ?");
-        return super.onCreateOptionsMenu(menu);
+    public boolean onContextItemSelected(MenuItem item) {
+        // 롱클릭했을 때 나오는 context Menu 의 항목을 선택(클릭) 했을 때 호출
+        processContext.onContextItemSelected(item.getItemId());
+        return super.onContextItemSelected(item);
+    }
+    /* context Menu */
+    @Override
+    public boolean onLongClick(View v) {
+        if (v == wv) { //웹 뷰에서의 롱 터치일 때만 실행
+
+         // Log.d("widae", "long click listener activated");
+            WebView.HitTestResult hitTestResult = wv.getHitTestResult();
+            processContext.longClickEvent(hitTestResult, hitTestResult.getExtra());
+        }
+        return false;
     }
 
     private long time=0;
+
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면 뒤로감
         if (wv.getUrl().equals(startURL)) {//현재가 초기 페이지면 앱을 종료

@@ -53,7 +53,7 @@ class CustomizedWebViewClient extends WebViewClient {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
-        setWebView();
+        setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
         super.onPageStarted(view, url, favicon);
         progressBar.setVisibility(View.VISIBLE);
     }
