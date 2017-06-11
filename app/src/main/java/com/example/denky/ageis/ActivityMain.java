@@ -18,6 +18,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -40,6 +41,7 @@ import java.io.File;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.URL_SECURITY_MODE_HINT;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
@@ -55,13 +57,14 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn, renewBtn;
+    private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
     private LinearLayout  universe;
     private RelativeLayout gotoBar;
     private ProcessContext processContext;
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
     final Activity THIS_ACTIVITY =  this;
+    DisplayMetrics displayMetrics = new DisplayMetrics();
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -80,7 +83,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                     //intent_text.putExtra(Intent.EXTRA_SUBJECT, "url");
                     intent_text.setType("text/plain");
                     intent_text.putExtra(Intent.EXTRA_TEXT, processContext.getUrl());
-                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다."));
+                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다"));
                     break;
                 case 3 : //이미지 공유
                     Intent intent = new Intent(Intent.ACTION_SEND);
@@ -89,7 +92,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                     Uri uri = Uri.fromFile(new File(processContext.getLastDownloadFile()));
                     intent.putExtra(Intent.EXTRA_STREAM, uri);
                     intent.setType("image/*");
-                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다."));
+                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다"));
                     break;
                 case 4 :
                     Img_toast = Toast.makeText(getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
@@ -99,10 +102,17 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                     //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
                     ClipboardManager clipBoard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
                     clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                    Img_toast = Toast.makeText(getApplicationContext(), "주소가 복사되었습니다.", Toast.LENGTH_LONG);
+                    Img_toast = Toast.makeText(getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
                     Img_toast.show();
                     break;
-
+                case  6:
+                    Img_toast = Toast.makeText(getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
+                    Img_toast.show();
+                    break;
+                case  7:
+                    Img_toast = Toast.makeText(getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
+                    Img_toast.show();
+                    break;
             }
         }
     };
@@ -118,12 +128,12 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
         if(ContextCompat.checkSelfPermission(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             Settings.loadSettings();
         }
-
+        ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         //settingRead();
         imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) findViewById(R.id.uri);
         wv = (CustomizedWebView) findViewById(R.id.wv);
-        wv.constructor(weburi, uri);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
+        wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)findViewById(R.id.homeBtn);
         lockBtn = (ImageView)findViewById(R.id.lockBtn);
         gotoBar = (RelativeLayout)findViewById(R.id.gotoBar);
@@ -131,7 +141,16 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
         settingBtn = (ImageView)findViewById(R.id.settingBtn);
         renewBtn = (ImageView)findViewById(R.id.renewBtn);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        screenshotBtn = (ImageView)findViewById(R.id.screenBtn);
         wvSettings = wv.getSettings();
+
+        /* display의 가로 세로 구하기 */
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;// 가로
+        int height = displayMetrics.heightPixels;// 세로
+        DEVICE_HEIGHT = height;
+        /* */
+
         CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
@@ -189,6 +208,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                                 renewBtn.setImageResource(R.drawable.returnbtn);
                                 gotoBar.setBackgroundResource(R.color.supergrey);
                                 homeBtn.setImageResource(R.drawable.home2);
+                                screenshotBtn.setImageResource(R.drawable.screenwhite);
                                 settingBtn.setImageResource(R.drawable.setting2);
                                 universe.setBackgroundResource(R.color.supergrey);
                                 SECURITY_MODE_STATE = true;
@@ -205,6 +225,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                                 gotoBar.setBackgroundResource(R.color.white);
                                 universe.setBackgroundResource(R.color.white);
                                 renewBtn.setImageResource(R.drawable.returnbtnblack);
+                                screenshotBtn.setImageResource(R.drawable.screenbtn);
                                 SECURITY_MODE_STATE = false;
                             }
                             break;
@@ -215,6 +236,9 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                         case R.id.renewBtn :
                             wv.renew();
                             break;
+                        case R.id.screenBtn :
+                            wv.onSavePageAllScreenShot();
+                            break;
                     }
                 }
 
@@ -224,6 +248,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
         renewBtn.setOnClickListener(cl);
+        screenshotBtn.setOnClickListener(cl);
     }
     /* context Menu */
     @Override

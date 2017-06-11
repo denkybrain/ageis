@@ -41,6 +41,8 @@ class CustomizedWebViewClient extends WebViewClient {
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
         wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
+        wvSettings.setBuiltInZoomControls(true);
+        wvSettings.setSupportZoom(true);
         if(Settings.permissionAppCache == false)
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         else
