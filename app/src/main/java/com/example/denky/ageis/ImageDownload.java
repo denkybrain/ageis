@@ -22,13 +22,18 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
     private String fileName;
     private final String SAVE_FOLDER = "/save_folder";
     public Handler handler;
+    public ProcessContext processContext; //processContext 객체에 접근가능함
+    public boolean share = false;
+    private String savedPath ="";
+
+    private void sendMsg(int msgType){
+        Message msg = handler.obtainMessage();
+        msg.what = msgType; //다운을 시작한다고 토스트를 띄움
+        handler.sendMessage(msg);
+    }
+
     @Override
     protected Void doInBackground(String... params) {
-         /* show toast through main-activity hanlder */
-        Message msg = handler.obtainMessage();
-        msg.what = 0;
-        handler.sendMessage(msg);
-        /* show toast through main-activity hanlder */
         //다운로드 경로를 지정
         String savePath = Environment.getExternalStorageDirectory().toString() + SAVE_FOLDER;
         File dir = new File(savePath);
@@ -44,10 +49,17 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
         //웹 서버 쪽 파일이 있는 경로
         String fileUrl = params[0];
         //다운로드 폴더에 동일한 파일명이 존재하는지 확인
-        if (new File(savePath + "/" + fileName).exists() == false) {
-        } else {
-        }
         String localPath = savePath + "/" + fileName + ".jpg";
+        Log.d("widae", "이미지 다운 접근! from : "+fileUrl);
+        /*
+        if (new File(localPath).exists() == true) { //이미 파일이 존재하면
+            Log.d("widae", "이미 파일이 존재한다 게이야! ");
+            sendMsg(4);
+            processContext.setLastDownloadFile(localPath);
+            return null; //백그라운드 작업 종료
+        }
+        */
+        sendMsg(0); //이미지 다운 시작
         try {
             URL imgUrl = new URL(fileUrl);
             //서버와 접속하는 클라이언트 객체 생성
@@ -70,7 +82,9 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
             }
             is.close();
             fos.close();
-            Log.d("widae", "이미지 다운로드 끝났따 딱기분조타! from : "+fileUrl);
+            Log.d("widae", "이미지 다운로드 끝났따 딱기분조타! from : "+localPath);
+            //Log.d("widae", "파일 다운 경로 : "+localPath);
+            processContext.setLastDownloadFile(localPath);
             conn.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,9 +96,11 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
     protected void onPostExecute(Void result) { //다운 종료 함수
         //doInBackground 공부 : http://itmining.tistory.com/7
         /* show toast through main-activity hanlder */
-        Message msg = handler.obtainMessage();
-        msg.what = 1;
-        handler.sendMessage(msg);
+        if(share){
+            sendMsg(3); //공유하기 알림
+        }else {
+            sendMsg(1); //다운 완료 알림
+        }
         /* show toast through main-activity hanlder */
 
         super.onPostExecute(result);

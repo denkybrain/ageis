@@ -3,18 +3,16 @@ package com.example.denky.ageis;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.provider.SyncStateContract;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
-import static com.example.denky.ageis.ReferenceString.startURL;
+import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 
 
 /**
@@ -63,7 +61,7 @@ public class CustomizedWebView extends WebView {
     public void goToURL(){ //go to with the uri.getText
         weburi = getUriTextString();
         if(weburi.equals("")){
-            loadUrl(startURL);
+            loadUrl(MAIN_URL);
             return ;
         }
         if (weburi.startsWith("http://")) {

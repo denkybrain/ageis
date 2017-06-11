@@ -18,7 +18,7 @@
         >
         <!-- 하드웨어 가속 true -->
 
-        <activity android:name=".MainActivity" android:windowSoftInputMode="stateAlwaysHidden">
+        <activity android:name=".ActivityMain" android:windowSoftInputMode="stateAlwaysHidden">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SettingActivity"></activity>
+        <activity android:name=".ActivitySetting"></activity>
     </application>
 
 </manifest>

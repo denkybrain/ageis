@@ -17,7 +17,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 
-public class SettingActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+public class ActivitySetting extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener{
 
     CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
@@ -115,19 +115,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             case R.id.adBlockOn :
                useAdBlock = cb8.isChecked();
                 break;
-           /* case R.id.googleBtn :
-                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(Plus.API)
-                        .addScope(Plus.SCOPE_PLUS_PROFILE)
-                        .build();
-                mGoogleApiClient.connect();
-                Log.d("result " , "구글 계정 연동 버튼~");
-                break;
-            case R.id.googleDeleteBtn :
-                break;
-*/
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
@@ -147,62 +134,5 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
-    /*
-    protected void settingSave()  {
-
-        File folder ;
-        folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/Ageis/");
-
-        try {
-            folder.mkdirs();
-            Log.d("result", "됨1");
-
-        } catch(Exception e ){
-            Log.d("result", "안 됨1");
-
-        }
-        File file = new File(folder,"/Ageis/setting.txt");
-
-            try {
-                file.createNewFile();
-
-        Log.d("result","됨ㅅㄱ");
-        } catch (IOException e) {
-            Log.d("result", "안됪ㄱ");
-        }
-        FileWriter fw = null ;
-        String text = "";
-        text+="[JS][NewWindow][FileDown][Cache][Tool][Proxy][HistoryDel][AdBlock]";
-        text += "|"+setting_javascript
-                +"|"+setting_newWindow
-                +"|"+setting_fileAccess
-                +"|"+setting_cache
-                +"|"+setting_vulnerable
-                +"|"+setting_proxy
-                +"|"+setting_history
-                +"|"+setting_adblock;
-
-        try {
-            // open file.
-            fw = new FileWriter(file);
-            // write file.
-            fw.write(text) ;
-
-        } catch (Exception e) {
-            e.printStackTrace() ;
-        }
-
-        // close file.
-        if (fw != null) {
-            // catch Exception here or throw.
-            try {
-                fw.close() ;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 }

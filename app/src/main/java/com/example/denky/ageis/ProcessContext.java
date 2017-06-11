@@ -1,11 +1,12 @@
 package com.example.denky.ageis;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 /**
  * Created by denky on 2017-06-11.
@@ -23,13 +24,25 @@ public class ProcessContext {
 
     private String url="";
     private ContextMenu contextMenu;
-    private final String hyperlink ="하이퍼링크";
-    private final String saveImage = "이미지 다운로드(secure)";
-    private final String share = "공유하기";
-    private final String titleImage = "이미지";
-    private final String hyperlinkImage = "하이퍼링크 이미지";
-    private final String goURL = "주소로 이동하기";
-    private final String viewImage = "이미지 확대";
+    private final String TITLE_HYPERLINK ="하이퍼링크";
+    private final String ITEM_IMG_DOWNLOAD = "이미지 다운로드(secure)";
+    private final String ITEM_IMG_SHARE = "공유하기";
+    private final String TITLE_IMG = "이미지";
+    private final String ITEM_GO_TO_URL = "주소로 이동하기";
+    private final String ITEM_PASTE_URL = "주소 복사하기";
+    private final String ITEM_SHARE_URL ="주소 공유하기";
+    private final boolean IMG_SHARE_ON = true;
+    private final boolean IMG_SHARE_OFF = false;
+    private String lastDownloadFile = "";
+
+    public String getLastDownloadFile() {
+        return lastDownloadFile;
+    }
+
+    public void setLastDownloadFile(String lastDownloadFile) {
+        this.lastDownloadFile = lastDownloadFile;
+    }
+
     private int menuBtnVolume = 3;
     private int typeOfLongClickedItem = 0;//롱클릭된 아이템의 타입. 0 기본값 1은 anchor type, 2는 image, 3은 anchor-image
 
@@ -99,25 +112,26 @@ public class ProcessContext {
             case  WebView.HitTestResult.SRC_ANCHOR_TYPE: //앙코르 타입이면
                 menuBtnVolume = 3;
                 typeOfLongClickedItem = 1;
-                setContextTitle(hyperlink);
-                setContextfirstMenu(goURL);
-                setContextthirdMenu(share);
+                setContextTitle(TITLE_HYPERLINK);
+                setContextfirstMenu(ITEM_GO_TO_URL);
+                setContextsecondMenu(ITEM_PASTE_URL);
+                setContextthirdMenu(ITEM_SHARE_URL);
                // Log.d("widae", "Anchor Link:"+url);
                 break;
             case WebView.HitTestResult.IMAGE_TYPE: //이미지 타입이면
                 menuBtnVolume = 2;
                 typeOfLongClickedItem = 2;
-                setContextTitle(titleImage);
-                setContextfirstMenu(saveImage);
-                setContextsecondMenu(share);
+                setContextTitle(TITLE_IMG);
+                setContextfirstMenu(ITEM_IMG_DOWNLOAD);
+                setContextsecondMenu(ITEM_IMG_SHARE);
                // Log.d("widae", "Image Link:"+url);
                 break;
             case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
                 menuBtnVolume = 2;
-                typeOfLongClickedItem = 3;
-                setContextTitle(hyperlinkImage);
-                setContextfirstMenu(viewImage);
-                setContextthirdMenu(share);
+                typeOfLongClickedItem = 2;
+                setContextTitle(TITLE_IMG);
+                setContextfirstMenu(ITEM_IMG_DOWNLOAD);
+                setContextsecondMenu(ITEM_IMG_SHARE);
                // Log.d("widae", "Image Anchor Link:"+url);
                 break;
             default:
@@ -126,36 +140,51 @@ public class ProcessContext {
                 break;
         }
     }
+    private void imgDownload(boolean share){
+        ImageDownload downloader = new ImageDownload();
+        downloader.handler = this.handler;
+        downloader.processContext = this;
+        downloader.share = share;
+        downloader.execute(this.url);
+        }
+    private void sendMsg(int msgType){
+        Message msg = handler.obtainMessage();
+        msg.what = msgType; //다운을 시작한다고 토스트를 띄움
+        handler.sendMessage(msg);
+    }
     public void onContextItemSelected(int itemId) {
-
         switch(typeOfLongClickedItem) {
-            case 1 :
-                return ;
+            case 1 : // anchor tag
+                switch (itemId){
+                    case 1 : //주소로 이동
+                        wv.goToURL(url);
+                       break;
+                    case 2 :
+                        sendMsg(5);
+                        break;
+                    case 3 :
+                        sendMsg(2);
+                        break;
+                }
+                break;
             case 2 :// img tag
                 switch (itemId){
                     case 1 : //save img
-                        ImageDownload downloader = new ImageDownload();
-                        downloader.handler = this.handler;
-                        downloader.execute(this.url);
+                       imgDownload(IMG_SHARE_OFF);
                         break;
-                    case 2 : //share
+                    case 2 : //share img
+                        imgDownload(IMG_SHARE_ON);
                         break;
                 }
                 break;
             case 3 :// anchor img tag
-                url = url.substring(0, this.url.indexOf('?'));
-                Log.d("widae", "item id : "+ itemId);
-                switch(itemId){
-                    case 1 : //goto
-                        wv.goToURL(url);
+                url = url.substring(0, this.url.indexOf('?')); //url 파싱해야함
+                switch (itemId){
+                    case 1 : //save img
+                      imgDownload(IMG_SHARE_ON);
                         break;
-                    case 2 : //save img
-                       // Log.d("widae", "long click from : "+url);
-                        ImageDownload downloader = new ImageDownload();
-                        downloader.handler = this.handler;
-                        downloader.execute(this.url);
-                        break;
-                    case 3 : //share
+                    case 2 : //share img
+                        imgDownload(IMG_SHARE_OFF);
                         break;
                 }
                 break;

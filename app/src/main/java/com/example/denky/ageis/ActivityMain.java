@@ -5,9 +5,13 @@ package com.example.denky.ageis;
  */
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,15 +36,17 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.File;
+
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static com.example.denky.ageis.ReferenceString.securityHint;
-import static com.example.denky.ageis.ReferenceString.securityMode;
-import static com.example.denky.ageis.ReferenceString.startURL;
-import static com.example.denky.ageis.ReferenceString.uriHint;
+import static com.example.denky.ageis.ReferenceString.URL_SECURITY_MODE_HINT;
+import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
+import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
 
 // overloading
-public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
+public class ActivityMain extends AppCompatActivity implements View.OnLongClickListener {
 
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private CustomizedWebView  wv;
@@ -52,11 +58,10 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private ImageView homeBtn , lockBtn, settingBtn, renewBtn;
     private LinearLayout  universe;
     private RelativeLayout gotoBar;
-    private ImageDownload imgDownloader = new ImageDownload();
     private ProcessContext processContext;
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
-    final Activity thisActivity =  this;
+    final Activity THIS_ACTIVITY =  this;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -67,13 +72,40 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     Img_toast.show();
                     break;
                 case 1 :
-                    Img_toast = Toast.makeText(getApplicationContext(), "이미지 다운로드 종료", Toast.LENGTH_LONG);
+                    Img_toast = Toast.makeText(getApplicationContext(), "이미지 다운로드 완료", Toast.LENGTH_LONG);
                     Img_toast.show();
                     break;
-            }
-          }
-    };
+                case 2 : //주소 공유
+                    Intent intent_text = new Intent(Intent.ACTION_SEND);
+                    //intent_text.putExtra(Intent.EXTRA_SUBJECT, "url");
+                    intent_text.setType("text/plain");
+                    intent_text.putExtra(Intent.EXTRA_TEXT, processContext.getUrl());
+                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다."));
+                    break;
+                case 3 : //이미지 공유
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "제목");
+                   // Log.d("widae", "공유할 파일 from "+processContext.getLastDownloadFile());
+                    Uri uri = Uri.fromFile(new File(processContext.getLastDownloadFile()));
+                    intent.putExtra(Intent.EXTRA_STREAM, uri);
+                    intent.setType("image/*");
+                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다."));
+                    break;
+                case 4 :
+                    Img_toast = Toast.makeText(getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
+                    Img_toast.show();
+                    break;
+                case  5:
+                    //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
+                    ClipboardManager clipBoard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
+                    Img_toast = Toast.makeText(getApplicationContext(), "주소가 복사되었습니다.", Toast.LENGTH_LONG);
+                    Img_toast.show();
+                    break;
 
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         //get needed permission
         getPermission();
         //load Settings
-        if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             Settings.loadSettings();
         }
 
@@ -116,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
         progressBar.setVisibility(View.INVISIBLE);
-        wv.goToURL(startURL); //처음 화면 로딩
+        wv.goToURL(MAIN_URL); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
@@ -131,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         cl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(ContextCompat.checkSelfPermission(thisActivity, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(thisActivity, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
+                if(ContextCompat.checkSelfPermission(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
                     DialogMaker maker=new DialogMaker();
                     Callback shutdown=new Callback() {
                         @Override
@@ -144,12 +176,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 }else{
                     switch (v.getId()){
                         case R.id.homeBtn : //홈버튼 이벤트 처리
-                            wv.goToURL(startURL);
+                            wv.goToURL(MAIN_URL);
                             wv.setUri("");
                             break;
                         case R.id.lockBtn :
-                            if(securityMode == false) {
-                                uri.setHint(securityHint); //시큐리티 모드
+                            if(SECURITY_MODE_STATE == false) {
+                                uri.setHint(URL_SECURITY_MODE_HINT); //시큐리티 모드
                                 uri.setBackgroundResource(R.color.supergrey);
                                 uri.setTextColor(Color.WHITE);
                                 wv.setUri("");
@@ -159,12 +191,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                                 homeBtn.setImageResource(R.drawable.home2);
                                 settingBtn.setImageResource(R.drawable.setting2);
                                 universe.setBackgroundResource(R.color.supergrey);
-                                securityMode = true;
+                                SECURITY_MODE_STATE = true;
                             }
                             else{
                                 //기본 모드
-                                wv.goToURL(startURL);
-                                uri.setHint(uriHint);
+                                wv.goToURL(MAIN_URL);
+                                uri.setHint(URL_NORMAL_MODE_HINT);
                                 uri.setBackgroundResource(R.color.white);
                                 uri.setTextColor(Color.BLACK);
                                 lockBtn.setImageResource(R.drawable.lock);
@@ -173,11 +205,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                                 gotoBar.setBackgroundResource(R.color.white);
                                 universe.setBackgroundResource(R.color.white);
                                 renewBtn.setImageResource(R.drawable.returnbtnblack);
-                                securityMode = false;
+                                SECURITY_MODE_STATE = false;
                             }
                             break;
                         case R.id.settingBtn :
-                            Intent appSetting = new Intent(MainActivity.this, SettingActivity.class);
+                            Intent appSetting = new Intent(ActivityMain.this, ActivitySetting.class);
                             startActivity(appSetting);
                             break;
                         case R.id.renewBtn :
@@ -204,13 +236,13 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             case 2 : //image
                 menu.setHeaderTitle(processContext.getContextTitle());
                 menu.add(0,1,100,processContext.getContextfirstMenu());
-                menu.add(0,1,100,processContext.getContextsecondMenu());
+                menu.add(0,2,100,processContext.getContextsecondMenu());
                 break;
             case 3 : //anchor image or anchor tag
                 menu.setHeaderTitle(processContext.getContextTitle());
                 menu.add(0,1,100,processContext.getContextfirstMenu());
-                menu.add(0,1,100,processContext.getContextsecondMenu());
-                menu.add(0,1,100,processContext.getContextthirdMenu());
+                menu.add(0,2,100,processContext.getContextsecondMenu());
+                menu.add(0,3,100,processContext.getContextthirdMenu());
                 break;
         }
     }
@@ -237,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면 뒤로감
-        if (wv.getUrl().equals(startURL)) {//현재가 초기 페이지면 앱을 종료
-            if(securityMode == true) { //시큐리티 모드면 웹뷰의 기록을 파괴하고 어플 종료
+        if (wv.getUrl().equals(MAIN_URL)) {//현재가 초기 페이지면 앱을 종료
+            if(SECURITY_MODE_STATE == true) { //시큐리티 모드면 웹뷰의 기록을 파괴하고 어플 종료
                 wv.clearHistory();
                 wv.clearCache(true);
             }
@@ -255,10 +287,17 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             finish();
             super.onBackPressed();
         } else { //현재가 초기 페이지가 아니라 로딩 페이지면 앱을 종료하지않고 뒤로감
+            /*뒤로갈 url 구하기
             WebBackForwardList webBackForwardList = wv.copyBackForwardList();
-            String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - 1).getUrl();
-            wv.goToURL(backUrl);
+            String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - 1).getUrl();//뒤로갈
+            */
+            wv.goBack();
         }
+    }
+    private void LogPrintWebBackList(int index){
+        WebBackForwardList webBackForwardList = wv.copyBackForwardList();
+        String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
+        Log.d("widae", "-1"+index+":"+backUrl);
     }
 
     public void getPermission(){
@@ -281,11 +320,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                         Toast.makeText(getApplicationContext(), "저장소 읽기 권한 있음", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(getApplicationContext(), "저장소 읽기 권한 없음", Toast.LENGTH_SHORT).show();
-                        if(ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, READ_EXTERNAL_STORAGE)){
+                        if(ActivityCompat.shouldShowRequestPermissionRationale(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)){
                             Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 읽기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
-                            ActivityCompat.requestPermissions(thisActivity, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
+                            ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
                         }else{
-                            ActivityCompat.requestPermissions(thisActivity, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
+                            ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
                         }
                     }
 
@@ -294,11 +333,11 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                         Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 있음", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 없음", Toast.LENGTH_SHORT).show();
-                        if(ActivityCompat.shouldShowRequestPermissionRationale(thisActivity, WRITE_EXTERNAL_STORAGE)){
+                        if(ActivityCompat.shouldShowRequestPermissionRationale(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)){
                             Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 쓰기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
-                            ActivityCompat.requestPermissions(thisActivity, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
+                            ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
                         }else{
-                            ActivityCompat.requestPermissions(thisActivity, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
+                            ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);
                         }
                     }
 
