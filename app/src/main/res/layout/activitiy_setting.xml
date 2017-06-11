@@ -241,7 +241,7 @@
                 android:id="@+id/googleDeleteBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="계정 기록 초기화"
+                android:text="기록 초기화"
                 android:textSize="20dp"
                 android:layout_margin="5dp"
                 android:layout_alignParentLeft="true"

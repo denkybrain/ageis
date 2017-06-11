@@ -40,8 +40,15 @@ class CustomizedWebViewClient extends WebViewClient {
     public void setWebView(){
         wvSettings.setJavaScriptEnabled(Settings.useJavaScript);
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
+        wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
+        if(Settings.permissionAppCache == false)
+            wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        else
+            wvSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
         wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
+        wvSettings.setPluginState(WebSettings.PluginState.ON_DEMAND);
     }
 
     @Override

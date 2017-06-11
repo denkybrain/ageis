@@ -12,7 +12,13 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -53,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
 
-    final Activity thisActivity=this;
-    /*************** 변수 초기화 끝 ******************/
+    final Activity thisActivity =   this;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
@@ -68,13 +75,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //settingRead();
-        // getSupportActionBar().setDisplayShowHomeEnabled(true); -> 하면 오류걸림. 아이콘 설정 코드였는데 현재 버전 API에서 제공 안 하는듯.
-        // 아이콘 설정하려면 그냥 Manifest.xml만 건들면 댐
         imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) findViewById(R.id.uri);
         wv = (CustomizedWebView) findViewById(R.id.wv);
-        //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
-        wv.constructor(weburi, uri);
+        wv.constructor(weburi, uri);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)findViewById(R.id.homeBtn);
         lockBtn = (ImageView)findViewById(R.id.lockBtn);
         gotoBar = (RelativeLayout)findViewById(R.id.gotoBar);
@@ -82,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
         settingBtn = (ImageView)findViewById(R.id.settingBtn);
         renewBtn = (ImageView)findViewById(R.id.renewBtn);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        //CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi
-        wvSettings = wv.getSettings();
+         wvSettings = wv.getSettings();
         CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
@@ -93,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         wvWeb.setWebView();
-
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
         progressBar.setVisibility(View.INVISIBLE);
@@ -123,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
                     maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
                     maker.show(getSupportFragmentManager(), "TAG");
                 }else{
-
                     switch (v.getId()){
                         case R.id.homeBtn : //홈버튼 이벤트 처리
                             wv.goToURL(startURL);
@@ -159,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case R.id.settingBtn :
+                            Log.d("result", "눌러줘서 고마워");
                             Intent appSetting = new Intent(MainActivity.this, SettingActivity.class);
                             startActivity(appSetting);
                             break;
@@ -176,6 +178,13 @@ public class MainActivity extends AppCompatActivity {
         renewBtn.setOnClickListener(cl);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        Log.d("widae", "메뉴가 안 생기노 ?");
+        return super.onCreateOptionsMenu(menu);
+    }
 
     private long time=0;
     @Override
@@ -185,7 +194,8 @@ public class MainActivity extends AppCompatActivity {
                 wv.clearHistory();
                 wv.clearCache(true);
             }
-            //뒤로가기 버튼을 두 번 눌러야 종료됨.
+            //뒤로가기 버튼을 두 번 눌러야 종료되는 함수
+            /*
             if(System.currentTimeMillis()-time>=1500){
                 time=System.currentTimeMillis();
                 Toast.makeText(getApplicationContext(),"뒤로 버튼을 한번 더 누르면 종료합니다.",Toast.LENGTH_SHORT).show();
@@ -193,10 +203,13 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 super.onBackPressed();
             }
+            */
+            finish();
+            super.onBackPressed();
         } else { //현재가 초기 페이지가 아니라 로딩 페이지면 앱을 종료하지않고 뒤로감
-            WebBackForwardList list = wv.copyBackForwardList();
-            wv.goBackOrForward(-(list.getCurrentIndex()));
-            wv.setUri(wv.getUrl()); //텍스트를 비운다
+            WebBackForwardList webBackForwardList = wv.copyBackForwardList();
+            String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - 1).getUrl();
+            wv.goToURL(backUrl);
         }
     }
 
