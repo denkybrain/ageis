@@ -39,23 +39,12 @@ public class Settings{
     //This class is never instantiated at other class
     private Settings(){}
 
-    public static void closeAllStream(){
-        try{
-            if(inputSettings!=null){
-                inputSettings.close();
-            }
-            if(outputSettings!=null){
-                outputSettings.close();
-            }
-        }catch(Exception e){
-            Log.i(TAG, "Can't close stream");
-        }
-    }
-
     public static void restoreSetting(){
         try {
             SetInfo newSetInfo=new SetInfo();
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(newSetInfo);
+            outputSettings.close();
         } catch (IOException e) {
             Log.i(TAG, "Can't restore Setting File");
         }
@@ -77,12 +66,12 @@ public class Settings{
                 //make Output Stream (when not existing setting file)
                 outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
                 outputSettings.writeObject(new SetInfo());
-
+                outputSettings.close();
                 Log.i(TAG, "Success writing new object");
             }else{
                 Log.i(TAG, "Setting File is already exist");
                 //make Output Stream (when already existing setting file)
-                outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
+                //outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
             }
 
             //make Input Stream
@@ -104,6 +93,8 @@ public class Settings{
             }else{
                 Log.i(TAG, "Fail to read object in file");
             }
+
+            inputSettings.close();
         }catch(Exception e) {
             Log.i(TAG, "Exception Occur");
             return false;
@@ -124,8 +115,9 @@ public class Settings{
         info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
         info.useAdBlock=useAdBlock;
         try {
-
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(info);
+            outputSettings.close();
         } catch (IOException e) {
             Log.i(TAG, "Can't save settings");
         }

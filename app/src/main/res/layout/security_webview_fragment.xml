@@ -77,7 +77,7 @@
                 android:layout_marginLeft="35dp"
                 android:paddingLeft="10dp"
                 android:textSize="18dp"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@+id/renewBtn_security"
                 android:layout_toStartOf="@+id/renewBtn_security"

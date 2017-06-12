@@ -26,7 +26,7 @@ public class ActivityMain extends AppCompatActivity{
 
     final Activity THIS_ACTIVITY =  this;
 
-    public static Fragment normalMode=new NormalMode() ;
+    public static Fragment normalMode=new NormalMode();
     public static Fragment securityMode=new SecurityMode();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,7 @@ public class ActivityMain extends AppCompatActivity{
         if(ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             boolean isSuccessLoadSetting=Settings.loadSettings();
             if(isSuccessLoadSetting==false){
-                Toast.makeText(getApplicationContext(), "설정값을 불러오는데 실패해였습니다. 설정을 초기화하세요.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "설정값을 불러오는데 실패해였습니다.\n설정에서 초기화를 실행하세요.", Toast.LENGTH_LONG).show();
             }
         }
 
@@ -120,7 +120,6 @@ public class ActivityMain extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        Settings.closeAllStream();
         super.onBackPressed();
     }
     /*
