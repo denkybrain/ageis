@@ -34,6 +34,7 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
+
         //다운로드 경로를 지정
         String savePath = Environment.getExternalStorageDirectory().toString() + SAVE_FOLDER;
         File dir = new File(savePath);

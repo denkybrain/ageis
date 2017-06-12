@@ -17,6 +17,9 @@ public abstract class ReferenceString {
     public static int DEVICE_HEIGHT;
     public static HashMap<String , String> URL_HASHMAP = new HashMap<String , String>();
 
+    // **virus check jsp site
+    public static final String VIRUST_CHECK_ALGORITHM_URL = "http://175.198.248.51:8080/scan/scan.jsp";
+
     public static void initializeHashMap(){
         URL_HASHMAP.put("", MAIN_URL);
         URL_HASHMAP.put("네이버", "http://naver.com");
@@ -26,7 +29,6 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
         URL_HASHMAP.put("컴응", "http://cafe.daum.net/cris.lecture/");
     }
-
      //changable values
 
     public static boolean SECURITY_MODE_STATE = false;

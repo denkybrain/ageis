@@ -1,6 +1,7 @@
 package com.example.denky.ageis;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Picture;
@@ -17,11 +18,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
-
+import static com.example.denky.ageis.ReferenceString.VIRUST_CHECK_ALGORITHM_URL;
 
 /**
  * Created by denky on 2017-06-08.
@@ -29,7 +32,7 @@ import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
 public class CustomizedWebView extends WebView {
     private final String SAVE_FOLDER = "/ageis_screenshot";
     private WebView wv = this;
-    private String weburi;
+    public String weburi;
     private EditText uri;
     private String country[]
             =   {".com",".co.kr", "go.kr"};
@@ -37,12 +40,27 @@ public class CustomizedWebView extends WebView {
             =   {".php",".html", ".jsp"};
     public Handler handler;
 
+    private final int SAFETY_GREAT = 1;
+    private final int SAFETY_NORMAL = 2;
+    private final int SAFETY_EXPOSED = 3;
+    private final int SAFETY_WARNING = 4;
+    private final int SAFETY_UNACCESSABLE = 5;
+    public final String SHOW_SAFETY_GREAT = "Great";
+    public final String SHOW_SAFETY_NORMAL = "Normal";
+    public final String SHOW_SAFETY_EXPOSED = "Exposed";
+    public final String SHOW_SAFETY_WARNING = "Warning!";
+    public final String SHOW_SAFETY_UNACCESSABLE = "Unaccessable";
+
+    private WebView acceptedView;
+    private String accpetedUrl;
+    private Bitmap acceptedFavicon;
+    public String resultOfsafety;
+
     public void constructor(String weburi, EditText editText, Handler handler){
         this.weburi = weburi;
         this.uri = editText;
         this.handler = handler;
     }
-
 
     public CustomizedWebView(Context context) {
         super(context);
@@ -82,14 +100,75 @@ public class CustomizedWebView extends WebView {
         }
         return false;
     }
+    private void checkVirus(String url){
+        String loadUrl = url;
+        weburi = url;
+         Log.d("widae", "Check URL : "+loadUrl);
+        if(url==MAIN_URL){
+            wv.loadUrl(MAIN_URL);
+              return ;
+        }
+        if(SECURITY_MODE_STATE == true){
+            try {
+                Message msg;
+                CustomTask task = new CustomTask();
+                task.getUrl = loadUrl;
+                int safety = Integer.parseInt(task.execute().get());
+              //  Log.d("widae", "url and safety : "+loadUrl +":"+safety);
+                switch (safety){
+                    case 0 : //when Race condition occurs or other exception occurs, goURL
+                        goToURL(loadUrl);
+                        break;
+                    case SAFETY_GREAT  :
+                        goToURL(loadUrl);
+                        resultOfsafety = SHOW_SAFETY_GREAT;
+                        msg = handler.obtainMessage();
+                        msg.what = 97; //안전한 사이트 이동
+                        handler.sendMessage(msg);
+                        break;
+                    case SAFETY_NORMAL  :
+                        goToURL(loadUrl);
+                        resultOfsafety = SHOW_SAFETY_GREAT;
+                        msg = handler.obtainMessage();
+                        msg.what = 97; //안전한 사이트 이동
+                        handler.sendMessage(msg);
+                        break;
+                    case SAFETY_EXPOSED  :
+                     //   Log.d("widae", "개좆같은 exposed다");
+                        resultOfsafety = SHOW_SAFETY_EXPOSED;
+                        msg = handler.obtainMessage();
+                        msg.what = 99; //저장 완료했다고 띄움
+                        handler.sendMessage(msg);
+                        //super.onPageStarted(view, url, favicon);
+                        break;
+                    case SAFETY_WARNING :
+                        resultOfsafety = SHOW_SAFETY_WARNING;
+                        msg = handler.obtainMessage();
+                        msg.what = 99; //저장 완료했다고 띄움
+                        handler.sendMessage(msg);
+                        break;
+                    case SAFETY_UNACCESSABLE :
+                        resultOfsafety =SHOW_SAFETY_UNACCESSABLE;
+                        msg = handler.obtainMessage();
+                        msg.what = 98; //저장 완료했다고 띄움
+                        handler.sendMessage(msg);
+                        break;
+                }
+            } catch (Exception e){
+                Log.d("widae", "jsp connection faile(error 101) from : "+e.getMessage());
+            }
+        }
+        else{
+            loadUrl(loadUrl);
+        }
+    }
     public void goToURL(){ //go to with the uri.getText
         weburi = getUriTextString();
-        if(CHECK_STATIC_URL(weburi)){
-            return ; //static에 등록된 URL이면 이동하고 함수를 종료함.
-        }
+        if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
         if (weburi.startsWith("http://")) {
-            wv.loadUrl(weburi);
-        } else {
+           checkVirus(weburi);
+        } else { //프로토콜이 안 붙음
+            /*
             for(int i = 0 ; i < country.length; i++){
                 if(weburi.endsWith(country[i])){
                     wv.loadUrl("http://"+weburi);
@@ -102,8 +181,13 @@ public class CustomizedWebView extends WebView {
                     return ;
                 }
             }
+            */
+            if(weburi.indexOf('.') > 0 ){
+                checkVirus("http://"+weburi);
+                return;
+            }
             //둘다 아니면, 즉, country와 fileformat과 맞지않으면 검색으로 치부함
-            wv.loadUrl("https://www.google.co.kr/search?q=" + weburi);
+            checkVirus("https://www.google.co.kr/search?q=" + weburi);
         }
     }
     public void onSavePageAllScreenShot() {
@@ -138,6 +222,7 @@ public class CustomizedWebView extends WebView {
         msg.what = 7; //저장 완료했다고 띄움
         handler.sendMessage(msg);
     }
+
 
 
     static public void MakeCache(View v, String filename){ //오픈 소스 가져옴 아직 안 씀

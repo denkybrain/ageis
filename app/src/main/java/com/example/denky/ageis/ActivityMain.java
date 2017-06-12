@@ -61,6 +61,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
     private LinearLayout  universe;
     private RelativeLayout gotoBar;
     private ProcessContext processContext;
+    CustomizedWebViewClient wvWeb;
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
     final Activity THIS_ACTIVITY =  this;
@@ -113,9 +114,75 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                     Img_toast = Toast.makeText(getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
                     Img_toast.show();
                     break;
+                case 99 ://보안수준 확인
+                   // Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    checkAccess();
+                    break;
+                case 98 ://보안수준 Unaccessable
+                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    denyAccess();
+                    break;
+                case 97 ://보안수준 good
+                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    safeAccess();
+                    break;
             }
         }
     };
+    private void safeAccess(){
+        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_GREAT)){
+            wv.loadUrl(wv.getUrl());
+            lockBtn.setImageResource(R.drawable.lockwhite);
+        }
+        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_NORMAL)){
+            wv.loadUrl(wv.getUrl());
+            lockBtn.setImageResource(R.drawable.locknormal);
+        }
+        return ;
+    }
+    private void checkAccess(){
+       // Log.d("widae" ,"dif : "+wv.resultOfsafety);
+        DialogMaker dm = new DialogMaker();
+        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_EXPOSED)){
+               //     Log.d("widae", "handler : exposed");
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockexposed);
+                }
+                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_WARNING)){
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockwarning);
+                }
+                return ;
+            }
+        };
+        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+            }
+        };
+        dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?", "취소", "접근",cancel, okay);
+        dm.show(getSupportFragmentManager(), "tag");
+        return ;
+    }
+    private void denyAccess(){
+        DialogMaker dm = new DialogMaker();
+        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+            }
+        };
+        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+            }
+        };
+        dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
+        dm.show(getSupportFragmentManager(), "tag");
+        return ;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +218,7 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
         DEVICE_HEIGHT = height;
         /* */
 
-        CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi , handler);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
             @Override
@@ -200,7 +267,8 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                             break;
                         case R.id.lockBtn :
                             if(SECURITY_MODE_STATE == false) {
-                                uri.setHint(URL_SECURITY_MODE_HINT); //시큐리티 모드
+                                wv.renew();
+                                uri.setHint(URL_SECURITY_MODE_HINT); //시큐리티 모드로 만들기
                                 uri.setBackgroundResource(R.color.supergrey);
                                 uri.setTextColor(Color.WHITE);
                                 wv.setUri("");
