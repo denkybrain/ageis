@@ -8,14 +8,21 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
+
+import static com.example.denky.ageis.Settings.permissionAppCache;
+import static com.example.denky.ageis.Settings.permissionAutoRemoveHistory;
+import static com.example.denky.ageis.Settings.permissionFileDownload;
+import static com.example.denky.ageis.Settings.permissionStartNewWindow;
+import static com.example.denky.ageis.Settings.useAdBlock;
+import static com.example.denky.ageis.Settings.useJavaScript;
+import static com.example.denky.ageis.Settings.useProxyServer;
+import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
 
 public class ActivitySetting extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener{
@@ -39,14 +46,14 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
         cb8 = (CheckBox)findViewById(R.id.adBlockOn);
 
-        cb1.setChecked(Settings.useJavaScript);
-        cb2.setChecked(Settings.permissionStartNewWindow);
-        cb3.setChecked(Settings.permissionFileDownload);
-        cb4.setChecked(Settings.permissionAppCache);
-        cb5.setChecked(Settings.useVulnerabilityFindAlgorithm);
-        cb6.setChecked(Settings.useProxyServer);
-        cb7.setChecked(Settings.permissionAutoRemoveHistory);
-        cb8.setChecked(Settings.useAdBlock);
+        cb1.setChecked(useJavaScript);
+        cb2.setChecked(permissionStartNewWindow);
+        cb3.setChecked(permissionFileDownload);
+        cb4.setChecked(permissionAppCache);
+        cb5.setChecked(useVulnerabilityFindAlgorithm);
+        cb6.setChecked(useProxyServer);
+        cb7.setChecked(permissionAutoRemoveHistory);
+        cb8.setChecked(useAdBlock);
 
     }
 
@@ -56,14 +63,14 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
         Callback callback_positive=new Callback() {
             @Override
             public void callbackMethod() {
-                Settings.useJavaScript=cb1.isChecked();
-                Settings.permissionStartNewWindow=cb2.isChecked();
-                Settings.permissionFileDownload=cb3.isChecked();
-                Settings.permissionAppCache=cb4.isChecked();
-                Settings.useVulnerabilityFindAlgorithm=cb5.isChecked();
-                Settings.useProxyServer=cb6.isChecked();
-                Settings.permissionAutoRemoveHistory=cb7.isChecked();
-                Settings.useAdBlock=cb8.isChecked();
+                useJavaScript=cb1.isChecked();
+                permissionStartNewWindow=cb2.isChecked();
+                permissionFileDownload=cb3.isChecked();
+                permissionAppCache=cb4.isChecked();
+                useVulnerabilityFindAlgorithm=cb5.isChecked();
+                useProxyServer=cb6.isChecked();
+                permissionAutoRemoveHistory=cb7.isChecked();
+                useAdBlock=cb8.isChecked();
 
                 Settings.saveSettings();
                 finish();
@@ -82,9 +89,8 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
     }
     public void clickedPermission(View v){
         switch (v.getId()){
-<<<<<<< HEAD
-            case R.id.googleBtn :
-=======
+            //case R.id.googleBtn :
+                //break;
             case R.id.javascriptCheck :
                 useJavaScript = cb1.isChecked();
                 break;
@@ -109,9 +115,7 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
             case R.id.adBlockOn :
                useAdBlock = cb8.isChecked();
                 break;
-<<<<<<< HEAD:app/src/main/java/com/example/denky/ageis/SettingActivity.java
            /* case R.id.googleBtn :
->>>>>>> ageis/master
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
@@ -123,12 +127,7 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
                 break;
             case R.id.googleDeleteBtn :
                 break;
-<<<<<<< HEAD
-=======
-*/
->>>>>>> ageis/master
-=======
->>>>>>> ageis/master:app/src/main/java/com/example/denky/ageis/ActivitySetting.java
+            */
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
@@ -149,8 +148,4 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
-<<<<<<< HEAD:app/src/main/java/com/example/denky/ageis/SettingActivity.java
-
-=======
->>>>>>> ageis/master:app/src/main/java/com/example/denky/ageis/ActivitySetting.java
 }

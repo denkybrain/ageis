@@ -27,7 +27,7 @@ import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
  * Created by denky on 2017-06-08.
  */
 public class CustomizedWebView extends WebView {
-    private final String SAVE_FOLDER = "/ageis_screenshot";
+    private final String SAVE_FOLDER = File.separator+"Ageis"+File.separator+"Ageis_screenshot";
     private WebView wv = this;
     private String weburi;
     private EditText uri;

@@ -20,11 +20,11 @@ import java.util.Locale;
 
 public class ImageDownload extends AsyncTask<String, Void, Void> {
     private String fileName;
-    private final String SAVE_FOLDER = "/save_folder";
+    private final String SAVE_FOLDER = File.separator+"Ageis"+File.separator+"Ageis_download";
     public Handler handler;
     public ProcessContext processContext; //processContext 객체에 접근가능함
     public boolean share = false;
-    private String savedPath ="";
+    private String TAG="Image Download";
 
     private void sendMsg(int msgType){
         Message msg = handler.obtainMessage();
@@ -48,9 +48,10 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
         fileName = String.valueOf(sdf.format(day));
         //웹 서버 쪽 파일이 있는 경로
         String fileUrl = params[0];
+        Log.i(TAG, "File Url >> "+fileUrl);
         //다운로드 폴더에 동일한 파일명이 존재하는지 확인
         String localPath = savePath + "/" + fileName + ".jpg";
-        Log.d("widae", "이미지 다운 접근! from : "+fileUrl);
+        Log.d(TAG, "이미지 다운 접근! from : "+fileUrl);
         /*
         if (new File(localPath).exists() == true) { //이미 파일이 존재하면
             Log.d("widae", "이미 파일이 존재한다 게이야! ");
@@ -73,7 +74,7 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
             FileOutputStream fos = new FileOutputStream(file);
             int read;
             //입력 스트림을 파일로 저장
-            for (;;) {
+            while(true) {
                 read = is.read(tmpByte);
                 if (read <= 0) {
                     break;
@@ -82,12 +83,12 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
             }
             is.close();
             fos.close();
-            Log.d("widae", "이미지 다운로드 끝났따 딱기분조타! from : "+localPath);
-            //Log.d("widae", "파일 다운 경로 : "+localPath);
+            //Log.d(TAG, "이미지 다운로드 끝났따 딱기분조타! from : "+localPath);
+            //Log.d(TAG, "파일 다운 경로 : "+localPath);
             processContext.setLastDownloadFile(localPath);
             conn.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.i(TAG, "Exception!");
         }
         return null;
     }

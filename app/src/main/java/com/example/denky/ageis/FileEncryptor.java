@@ -20,7 +20,7 @@ public class FileEncryptor {
     private static byte buffer[]=new byte[bufferSize];
 
     public static void setBufferSize(int bufferSize) throws BufferSizeSettingException{
-        if(bufferSize<1 || bufferSize>Integer.BYTES){
+        if(bufferSize<1 || bufferSize>Integer.MAX_VALUE){
             throw new BufferSizeSettingException();
         }
         buffer=new byte[bufferSize];
@@ -148,7 +148,7 @@ public class FileEncryptor {
         OutputStream out=null;
         try {
             fileReader=new RandomAccessFile(file, "rw");
-            fileReader.seek(file.length()-Long.BYTES);
+            fileReader.seek(file.length()-Long.SIZE);
 
             long readKey=fileReader.readLong();
 
@@ -178,9 +178,9 @@ public class FileEncryptor {
             filePath=file.getAbsolutePath().substring(0, file.getAbsolutePath().indexOf(fileName));
             String resultFileName="decrypt_"+fileName;
 
-            int garbageValueSize=(int) ((Math.pow(2, 10))*100*Long.BYTES);
+            int garbageValueSize=(int) ((Math.pow(2, 10))*100*Long.SIZE);
 
-            long resultFileLength=file.length()-garbageValueSize-Long.BYTES;
+            long resultFileLength=file.length()-garbageValueSize-Long.SIZE;
 
             fileReader.setLength(resultFileLength);
 

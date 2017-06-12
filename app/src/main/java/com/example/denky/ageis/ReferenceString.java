@@ -22,7 +22,6 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("네이버", "http://naver.com");
         URL_HASHMAP.put("다음", "http://daum.net");
         URL_HASHMAP.put("구글", "http://google.co.kr");
-        URL_HASHMAP.put("일베", "http://ilbe.com");
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
         URL_HASHMAP.put("컴응", "http://cafe.daum.net/cris.lecture/");
     }
