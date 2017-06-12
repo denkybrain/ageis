@@ -35,22 +35,16 @@
                 android:layout_marginLeft="5dp"
                 android:layout_alignParentLeft="true"
                 />
-            <EditText
-                android:textColorHint="@color/grey"
-                android:hint="Search or Input URL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/uri"
-                android:imeOptions="actionGo"
-                android:inputType="text"
-                android:paddingLeft="15dp"
-                android:textSize="18dp"
-                android:textColor="@color/black"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="65dp"
-             />
 
-
+            <ImageView
+                android:id="@+id/renewBtn"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/returnbtnblack"
+                android:layout_marginRight="70dp"
+                android:layout_alignParentRight="true"
+                />
             <ImageView
                 android:id="@+id/lockBtn"
                 android:layout_marginTop="8dp"
@@ -69,29 +63,25 @@
                 android:src="@drawable/setting"
                 android:layout_alignParentRight="true"/>
 
+            <EditText
+                android:textColorHint="@color/grey"
+                android:hint="Search or Input URL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/uri"
+                android:imeOptions="actionGo"
+                android:inputType="text"
+                android:layout_marginLeft="35dp"
+                android:paddingLeft="10dp"
+                android:textSize="18dp"
+                android:textColor="@color/black"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/renewBtn"
+                android:layout_toStartOf="@+id/renewBtn"
+                android:selectAllOnFocus="true"
+                />
+
         </RelativeLayout>
-        <!--
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="1">
-
-            <Button
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="뒤로"
-                android:id="@+id/left"
-                android:layout_weight="0.56" />
-
-            <Button
-                android:layout_width="204dp"
-                android:layout_height="wrap_content"
-                android:text="앞으로"
-                android:id="@+id/right" />
-        </LinearLayout>
-        -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:minHeight="2dip"
@@ -99,30 +89,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             style="@android:style/Widget.ProgressBar.Horizontal" />
-
-        <WebView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/wv" />
+        <!-- 웹뷰 확장 -->
+        <com.example.denky.ageis.CustomizedWebView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/wv" />
     </LinearLayout>
-    <!--
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#F3F3F3"
-        android:paddingLeft="20dp"
-        android:hint="              Search or Input URL"
-        android:drawableStart="@drawable/record"
-        android:drawableLeft="@drawable/record"
-        android:layout_gravity="center"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        />
-</LinearLayout>
--->
 
 </RelativeLayout>

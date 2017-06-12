@@ -16,6 +16,7 @@ import java.io.Serializable;
  */
 
 public class Settings{
+<<<<<<< HEAD
 
     //This Inner Class is only using when saving setting value to file.
     static class SetInfo implements Serializable{
@@ -49,6 +50,9 @@ public class Settings{
 
     static final String TAG="SETTING";
 
+=======
+    static final String TAG="SETTING";
+>>>>>>> ageis/master
     //Setting Value
     public static boolean useJavaScript=true;
     public static boolean permissionStartNewWindow=true;

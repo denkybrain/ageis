@@ -29,7 +29,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitiy_setting);
 
-        googleAsyncText = (TextView)findViewById(R.id.googleBtn);
+       // googleAsyncText = (TextView)findViewById(R.id.googleBtn);
         cb1 = (CheckBox)findViewById(R.id.javascriptCheck);
         cb2 = (CheckBox)findViewById(R.id.newWindowOn);
         cb3 = (CheckBox)findViewById(R.id.fileDownloadOn);
@@ -82,7 +82,35 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     }
     public void clickedPermission(View v){
         switch (v.getId()){
+<<<<<<< HEAD
             case R.id.googleBtn :
+=======
+            case R.id.javascriptCheck :
+                useJavaScript = cb1.isChecked();
+                break;
+            case R.id.newWindowOn :
+                permissionStartNewWindow = cb2.isChecked();
+                break;
+            case R.id.fileDownloadOn :
+                permissionFileDownload = cb3.isChecked();
+                break;
+            case R.id.cacheOn :
+                permissionAppCache = cb4.isChecked();
+                break;
+            case R.id.webvulnearableToolOn :
+                useVulnerabilityFindAlgorithm = cb5.isChecked();
+                break;
+            case R.id.proxyOn :
+                useProxyServer = cb6.isChecked();
+                break;
+            case R.id.historyDelOn :
+                permissionAutoRemoveHistory = cb7.isChecked();
+                break;
+            case R.id.adBlockOn :
+               useAdBlock = cb8.isChecked();
+                break;
+           /* case R.id.googleBtn :
+>>>>>>> ageis/master
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
@@ -94,6 +122,10 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 break;
             case R.id.googleDeleteBtn :
                 break;
+<<<<<<< HEAD
+=======
+*/
+>>>>>>> ageis/master
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
