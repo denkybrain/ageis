@@ -17,7 +17,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 
-public class SettingActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+public class ActivitySetting extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener{
 
     CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
@@ -109,6 +109,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             case R.id.adBlockOn :
                useAdBlock = cb8.isChecked();
                 break;
+<<<<<<< HEAD:app/src/main/java/com/example/denky/ageis/SettingActivity.java
            /* case R.id.googleBtn :
 >>>>>>> ageis/master
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -126,6 +127,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 =======
 */
 >>>>>>> ageis/master
+=======
+>>>>>>> ageis/master:app/src/main/java/com/example/denky/ageis/ActivitySetting.java
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
@@ -146,5 +149,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
+<<<<<<< HEAD:app/src/main/java/com/example/denky/ageis/SettingActivity.java
 
+=======
+>>>>>>> ageis/master:app/src/main/java/com/example/denky/ageis/ActivitySetting.java
 }

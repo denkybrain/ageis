@@ -1,7 +1,6 @@
 package com.example.denky.ageis;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -9,8 +8,8 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import static com.example.denky.ageis.ReferenceString.securityMode;
-import static com.example.denky.ageis.ReferenceString.startURL;
+import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
+import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 
 /**
  * Created by denky on 2017-06-08.
@@ -40,13 +39,22 @@ class CustomizedWebViewClient extends WebViewClient {
     public void setWebView(){
         wvSettings.setJavaScriptEnabled(Settings.useJavaScript);
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
+        wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
+        wvSettings.setBuiltInZoomControls(true);
+        wvSettings.setSupportZoom(true);
+        if(Settings.permissionAppCache == false)
+            wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        else
+            wvSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
         wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
+        wvSettings.setPluginState(WebSettings.PluginState.ON_DEMAND);
     }
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
-        setWebView();
+        setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
         super.onPageStarted(view, url, favicon);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -59,8 +67,8 @@ class CustomizedWebViewClient extends WebViewClient {
     }
 
     private void parseUri(String wvUri){
-        if(securityMode == false) {
-            if(wvUri.equals(startURL)){ //초기 화면이면 uri창을 비움
+        if(SECURITY_MODE_STATE == false) {
+            if(wvUri.equals(MAIN_URL)){ //초기 화면이면 uri창을 비움
                 wv.setUri("");
                 return ;//초기화면이면 비우고 함수 종료
             }
@@ -75,10 +83,10 @@ class CustomizedWebViewClient extends WebViewClient {
                 if (wvUri.endsWith("/"))
                     wv.setUri(wvUri.substring(8, wvUri.length()-1));
                 else
-                    wv.setUri(wvUri.substring(7, wvUri.length()));
+                    wv.setUri(wvUri.substring(8, wvUri.length()));
             }
         }
-        else if(securityMode == true)
+        else if(SECURITY_MODE_STATE == true)
         {
             wv.setUri("");
         }
