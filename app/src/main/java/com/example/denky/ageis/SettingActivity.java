@@ -24,15 +24,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     TextView googleAsyncText;
     private GoogleApiClient mGoogleApiClient;
 
-    private boolean useJavaScript=Settings.useJavaScript;
-    private boolean permissionStartNewWindow=Settings.permissionStartNewWindow;
-    private boolean permissionFileDownload=Settings.permissionFileDownload;
-    private boolean permissionAppCache=Settings.permissionAppCache;
-    private boolean useVulnerabilityFindAlgorithm=Settings.useVulnerabilityFindAlgorithm;
-    private boolean useProxyServer=Settings.useProxyServer;
-    private boolean permissionAutoRemoveHistory=Settings.permissionAutoRemoveHistory;
-    private boolean useAdBlock=Settings.useAdBlock;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,30 +82,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     }
     public void clickedPermission(View v){
         switch (v.getId()){
-            case R.id.javascriptCheck :
-                useJavaScript = cb1.isChecked();
-                break;
-            case R.id.newWindowOn :
-                permissionStartNewWindow = cb2.isChecked();
-                break;
-            case R.id.fileDownloadOn :
-                permissionFileDownload = cb3.isChecked();
-                break;
-            case R.id.cacheOn :
-                permissionAppCache = cb4.isChecked();
-                break;
-            case R.id.webvulnearableToolOn :
-                useVulnerabilityFindAlgorithm = cb5.isChecked();
-                break;
-            case R.id.proxyOn :
-                useProxyServer = cb6.isChecked();
-                break;
-            case R.id.historyDelOn :
-                permissionAutoRemoveHistory = cb7.isChecked();
-                break;
-            case R.id.adBlockOn :
-               useAdBlock = cb8.isChecked();
-                break;
             case R.id.googleBtn :
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
@@ -127,7 +94,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 break;
             case R.id.googleDeleteBtn :
                 break;
-
             case R.id.settingInit:
                 Settings.restoreSetting();
                 finish();
@@ -147,62 +113,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
-    /*
-    protected void settingSave()  {
 
-        File folder ;
-        folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/Ageis/");
-
-        try {
-            folder.mkdirs();
-            Log.d("result", "됨1");
-
-        } catch(Exception e ){
-            Log.d("result", "안 됨1");
-
-        }
-        File file = new File(folder,"/Ageis/setting.txt");
-
-            try {
-                file.createNewFile();
-
-        Log.d("result","됨ㅅㄱ");
-        } catch (IOException e) {
-            Log.d("result", "안됪ㄱ");
-        }
-        FileWriter fw = null ;
-        String text = "";
-        text+="[JS][NewWindow][FileDown][Cache][Tool][Proxy][HistoryDel][AdBlock]";
-        text += "|"+setting_javascript
-                +"|"+setting_newWindow
-                +"|"+setting_fileAccess
-                +"|"+setting_cache
-                +"|"+setting_vulnerable
-                +"|"+setting_proxy
-                +"|"+setting_history
-                +"|"+setting_adblock;
-
-        try {
-            // open file.
-            fw = new FileWriter(file);
-            // write file.
-            fw.write(text) ;
-
-        } catch (Exception e) {
-            e.printStackTrace() ;
-        }
-
-        // close file.
-        if (fw != null) {
-            // catch Exception here or throw.
-            try {
-                fw.close() ;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 }

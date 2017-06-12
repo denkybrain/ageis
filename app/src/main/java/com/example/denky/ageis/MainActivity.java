@@ -191,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
                     maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
                     maker.show(getSupportFragmentManager(), "TAG");
                 }else{
-
                     switch (v.getId()){
                         case R.id.homeBtn : //홈버튼 이벤트 처리
                             goToURL(startURL);

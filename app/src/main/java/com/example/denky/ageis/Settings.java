@@ -16,8 +16,38 @@ import java.io.Serializable;
  */
 
 public class Settings{
-    static final String TAG="SETTING";
 
+    //This Inner Class is only using when saving setting value to file.
+    static class SetInfo implements Serializable{
+
+        public boolean useJavaScript=true;
+        public boolean permissionStartNewWindow=true;
+        public boolean permissionFileDownload=false;
+        public boolean permissionAppCache=true;
+
+        public boolean useVulnerabilityFindAlgorithm=true;
+        public boolean useProxyServer=false;
+        public boolean permissionAutoRemoveHistory=true;
+        public boolean useAdBlock=true;
+
+        public SetInfo(){
+            initiate();
+        }
+
+        private void initiate(){
+            useJavaScript=true;
+            permissionStartNewWindow=true;
+            permissionFileDownload=false;
+            permissionAppCache=true;
+
+            useVulnerabilityFindAlgorithm=true;
+            useProxyServer=false;
+            permissionAutoRemoveHistory=true;
+            useAdBlock=true;
+        }
+    }
+
+    static final String TAG="SETTING";
 
     //Setting Value
     public static boolean useJavaScript=true;
@@ -163,34 +193,4 @@ public class Settings{
             Log.i(TAG, "can't save settings");
         }
     }
-}
-
-class SetInfo implements Serializable{
-
-    public boolean useJavaScript=true;
-    public boolean permissionStartNewWindow=true;
-    public boolean permissionFileDownload=false;
-    public boolean permissionAppCache=true;
-
-    public boolean useVulnerabilityFindAlgorithm=true;
-    public boolean useProxyServer=false;
-    public boolean permissionAutoRemoveHistory=true;
-    public boolean useAdBlock=true;
-
-    public SetInfo(){
-        initiate();
-    }
-
-    private void initiate(){
-        useJavaScript=true;
-        permissionStartNewWindow=true;
-        permissionFileDownload=false;
-        permissionAppCache=true;
-
-        useVulnerabilityFindAlgorithm=true;
-        useProxyServer=false;
-        permissionAutoRemoveHistory=true;
-        useAdBlock=true;
-    }
-
 }
