@@ -5,31 +5,19 @@ package com.example.denky.ageis;
  */
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
+public class ActivitySetting extends AppCompatActivity {
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
-
-public class ActivitySetting extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener{
-
-    CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
-    TextView googleAsyncText;
-    private GoogleApiClient mGoogleApiClient;
+    CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7;
 
     private boolean useJavaScript=Settings.useJavaScript;
     private boolean permissionStartNewWindow=Settings.permissionStartNewWindow;
     private boolean permissionFileDownload=Settings.permissionFileDownload;
     private boolean permissionAppCache=Settings.permissionAppCache;
     private boolean useVulnerabilityFindAlgorithm=Settings.useVulnerabilityFindAlgorithm;
-    private boolean useProxyServer=Settings.useProxyServer;
+    private boolean denyDangerousSite =Settings.denyDangerousSite;
     private boolean permissionAutoRemoveHistory=Settings.permissionAutoRemoveHistory;
     private boolean useAdBlock=Settings.useAdBlock;
 
@@ -44,18 +32,16 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
         cb3 = (CheckBox)findViewById(R.id.fileDownloadOn);
         cb4 = (CheckBox)findViewById(R.id.cacheOn);
         cb5 = (CheckBox)findViewById(R.id.webvulnearableToolOn);
-        cb6 = (CheckBox)findViewById(R.id.proxyOn);
+        cb6 = (CheckBox)findViewById(R.id.denyDangerousSiteOn);
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
-        cb8 = (CheckBox)findViewById(R.id.adBlockOn);
 
         cb1.setChecked(Settings.useJavaScript);
         cb2.setChecked(Settings.permissionStartNewWindow);
         cb3.setChecked(Settings.permissionFileDownload);
         cb4.setChecked(Settings.permissionAppCache);
         cb5.setChecked(Settings.useVulnerabilityFindAlgorithm);
-        cb6.setChecked(Settings.useProxyServer);
+        cb6.setChecked(Settings.denyDangerousSite);
         cb7.setChecked(Settings.permissionAutoRemoveHistory);
-        cb8.setChecked(Settings.useAdBlock);
 
     }
 
@@ -70,10 +56,8 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
                 Settings.permissionFileDownload=cb3.isChecked();
                 Settings.permissionAppCache=cb4.isChecked();
                 Settings.useVulnerabilityFindAlgorithm=cb5.isChecked();
-                Settings.useProxyServer=cb6.isChecked();
+                Settings.denyDangerousSite =cb6.isChecked();
                 Settings.permissionAutoRemoveHistory=cb7.isChecked();
-                Settings.useAdBlock=cb8.isChecked();
-
                 Settings.saveSettings();
                 finish();
             }
@@ -106,14 +90,11 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
             case R.id.webvulnearableToolOn :
                 useVulnerabilityFindAlgorithm = cb5.isChecked();
                 break;
-            case R.id.proxyOn :
-                useProxyServer = cb6.isChecked();
+            case R.id.denyDangerousSiteOn:
+                denyDangerousSite = cb6.isChecked();
                 break;
             case R.id.historyDelOn :
                 permissionAutoRemoveHistory = cb7.isChecked();
-                break;
-            case R.id.adBlockOn :
-               useAdBlock = cb8.isChecked();
                 break;
             case R.id.settingInit:
                 Settings.restoreSetting();
@@ -122,17 +103,5 @@ public class ActivitySetting extends AppCompatActivity implements GoogleApiClien
         }
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        googleAsyncText.setText("현재 로그인 상태입니다.");
-    }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-    }
 }

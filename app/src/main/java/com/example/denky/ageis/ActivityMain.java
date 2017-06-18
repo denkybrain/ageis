@@ -46,6 +46,7 @@ import static com.example.denky.ageis.ReferenceString.URL_SECURITY_MODE_HINT;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
+import static com.example.denky.ageis.Settings.denyDangerousSite;
 
 // overloading
 public class ActivityMain extends AppCompatActivity implements View.OnLongClickListener {
@@ -169,18 +170,36 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
     }
     private void denyAccess(){
         DialogMaker dm = new DialogMaker();
-        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
-            @Override
-            public void callbackMethod() {
-            }
-        };
-        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
-            @Override
-            public void callbackMethod() {
-            }
-        };
-        dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
-        dm.show(getSupportFragmentManager(), "tag");
+
+        if(denyDangerousSite == true && SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
+            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
+
+        }else{ //접근할 수 있도록 설정
+            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockwarning);
+                }
+            };
+            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?","취소", "접근",cancel, okay);
+        }
+         dm.show(getSupportFragmentManager(), "tag");
         return ;
     }
 
@@ -263,16 +282,18 @@ public class ActivityMain extends AppCompatActivity implements View.OnLongClickL
                     switch (v.getId()){
                         case R.id.homeBtn : //홈버튼 이벤트 처리
                             wv.goToURL(MAIN_URL);
+                            if(SECURITY_MODE_STATE == true)
+                                lockBtn.setImageResource(R.drawable.lockwhite);
                             wv.setUri("");
                             break;
                         case R.id.lockBtn :
                             if(SECURITY_MODE_STATE == false) {
+                                lockBtn.setImageResource(R.drawable.lockwhite);
                                 wv.renew();
                                 uri.setHint(URL_SECURITY_MODE_HINT); //시큐리티 모드로 만들기
                                 uri.setBackgroundResource(R.color.supergrey);
                                 uri.setTextColor(Color.WHITE);
                                 wv.setUri("");
-                                lockBtn.setImageResource(R.drawable.lockwhite);
                                 renewBtn.setImageResource(R.drawable.returnbtn);
                                 gotoBar.setBackgroundResource(R.color.supergrey);
                                 homeBtn.setImageResource(R.drawable.home2);

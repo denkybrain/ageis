@@ -1,7 +1,6 @@
 package com.example.denky.ageis;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Picture;
@@ -18,13 +17,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
-import static com.example.denky.ageis.ReferenceString.VIRUST_CHECK_ALGORITHM_URL;
+import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
 
 /**
  * Created by denky on 2017-06-08.
@@ -34,12 +32,7 @@ public class CustomizedWebView extends WebView {
     private WebView wv = this;
     public String weburi;
     private EditText uri;
-    private String country[]
-            =   {".com",".co.kr", "go.kr"};
-    private String fileformat[]
-            =   {".php",".html", ".jsp"};
     public Handler handler;
-
     private final int SAFETY_GREAT = 1;
     private final int SAFETY_NORMAL = 2;
     private final int SAFETY_EXPOSED = 3;
@@ -82,8 +75,20 @@ public class CustomizedWebView extends WebView {
         return  uri.getText().toString();
     }
     public void goToURL(String link){ // go to link by calling
-        wv.loadUrl(link);
+        weburi = link;
+        if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
+        if (weburi.startsWith("http://")) {
+            checkVirus(weburi);
+        } else {
+            if(weburi.indexOf('.') > 0 ){
+                checkVirus("http://"+weburi);
+                return;
+            }
+            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 검색으로 치부함
+            checkVirus("https://www.google.co.kr/search?q=" + weburi);
+        }
     }
+
     public void renew(){
         goToURL();
     }
@@ -103,22 +108,29 @@ public class CustomizedWebView extends WebView {
     private void checkVirus(String url){
         String loadUrl = url;
         weburi = url;
-         Log.d("widae", "Check URL : "+loadUrl);
+       //  Log.d("widae", "Check URL : "+loadUrl);
         if(url==MAIN_URL){
             wv.loadUrl(MAIN_URL);
               return ;
         }
-        if(SECURITY_MODE_STATE == true){
+        if(useVulnerabilityFindAlgorithm == true && SECURITY_MODE_STATE == true){
             try {
+                Log.d("widae", "접근 시도");
                 Message msg;
-                CustomTask task = new CustomTask();
+                JspAccessTask task = new JspAccessTask();
                 task.getUrl = loadUrl;
                 int safety = Integer.parseInt(task.execute().get());
               //  Log.d("widae", "url and safety : "+loadUrl +":"+safety);
                 switch (safety){
                     case 0 : //when Race condition occurs or other exception occurs, goURL
+
+                        Log.d("widae", "0번 오류 : race condition or access failed");
                         goToURL(loadUrl);
-                        break;
+                        resultOfsafety = SHOW_SAFETY_GREAT;
+                        msg = handler.obtainMessage();
+                        msg.what = 97; //안전한 사이트 이동
+                        handler.sendMessage(msg);
+                        return ;
                     case SAFETY_GREAT  :
                         goToURL(loadUrl);
                         resultOfsafety = SHOW_SAFETY_GREAT;

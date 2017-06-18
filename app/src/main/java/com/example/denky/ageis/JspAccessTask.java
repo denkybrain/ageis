@@ -18,12 +18,11 @@ import static com.example.denky.ageis.ReferenceString.VIRUST_CHECK_ALGORITHM_URL
  * Created by denky on 2017-06-12.
  */
 
-class CustomTask extends AsyncTask<String, Void, String> {
+class JspAccessTask extends AsyncTask<String, Void, String> {
     String sendMsg, receiveMsg;
     String getUrl ;
 
     @Override
-    // doInBackground의 매개값이 문자열 배열인데요. 보낼 값이 여러개일 경우를 위해 배열로 합니다.
     protected String doInBackground(String... strings) {
         //source from : http://blog.naver.com/PostView.nhn?blogId=rain483&logNo=220814116681&redirect=Dlog&widgetTypeCall=true
         try {
@@ -45,17 +44,14 @@ class CustomTask extends AsyncTask<String, Void, String> {
                     buffer.append(str);
                 }
                 receiveMsg = buffer.toString();
-             //   Log.d("widae", "buffer : "+receiveMsg);
+                return receiveMsg;
             } else {
-           //    Log.d("widae", conn.getResponseCode()+"에러");
                 return "0";
             }
         } catch (Exception e){
-
-          //  Log.d("widae", "jsp connection failed from : "+e.getMessage());
+            Log.d("widae", "서버 접속 불가");
             return "0";
         }
         //jsp로부터 받은 리턴 값입니다.
-        return receiveMsg;
     }
 }

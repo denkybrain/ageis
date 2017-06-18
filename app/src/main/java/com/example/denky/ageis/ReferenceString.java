@@ -17,6 +17,12 @@ public abstract class ReferenceString {
     public static int DEVICE_HEIGHT;
     public static HashMap<String , String> URL_HASHMAP = new HashMap<String , String>();
 
+
+    private String country[]
+            =   {".com",".co.kr", "go.kr"};
+    private String fileformat[]
+            =   {".php",".html", ".jsp"};
+
     // **virus check jsp site
     public static final String VIRUST_CHECK_ALGORITHM_URL = "http://175.198.248.51:8080/scan/scan.jsp";
 

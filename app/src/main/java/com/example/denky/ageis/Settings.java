@@ -20,11 +20,11 @@ public class Settings{
     //Setting Value
     public static boolean useJavaScript=true;
     public static boolean permissionStartNewWindow=true;
-    public static boolean permissionFileDownload=false;
+    public static boolean permissionFileDownload=true;
     public static boolean permissionAppCache=true;
 
     public static boolean useVulnerabilityFindAlgorithm=true;
-    public static boolean useProxyServer=false;
+    public static boolean denyDangerousSite =true;
     public static boolean permissionAutoRemoveHistory=true;
     public static boolean useAdBlock=true;
 
@@ -123,7 +123,7 @@ public class Settings{
             permissionAppCache=info.permissionAppCache;
 
             useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
-            useProxyServer=info.useProxyServer;
+            denyDangerousSite =info.useProxyServer;
             permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
             useAdBlock=info.useAdBlock;
         }else{
@@ -151,7 +151,7 @@ public class Settings{
             info.permissionFileDownload=permissionFileDownload;
             info.permissionAppCache=permissionAppCache;
             info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
-            info.useProxyServer=useProxyServer;
+            info.useProxyServer= denyDangerousSite;
             info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
             info.useAdBlock=useAdBlock;
 
