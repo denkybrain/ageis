@@ -1,8 +1,6 @@
 package com.example.denky.ageis;
 
 import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -11,6 +9,8 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import static com.example.denky.ageis.ReferenceString.NORMAL_MODE_LAST_VIEW;
+import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 
@@ -24,18 +24,14 @@ class CustomizedWebViewClient extends WebViewClient {
     ProgressBar progressBar;
     private EditText uri;
     private String weburi;
-    Handler handler;
 
 
-
-
-    CustomizedWebViewClient(CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi, Handler handler){
+    CustomizedWebViewClient(CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi){
         this.wv = wv;
         this.wvSettings = ws;
         this.progressBar = pb;
         this.uri = editText;
         this.weburi = weburi;
-        this.handler = handler;
     }
 
     @Override
@@ -48,7 +44,7 @@ class CustomizedWebViewClient extends WebViewClient {
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
         wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
-       // wvSettings.setBuiltInZoomControls(true);
+        wvSettings.setBuiltInZoomControls(true);
         wvSettings.setSupportZoom(true);
         if(Settings.permissionAppCache == false)
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -62,13 +58,16 @@ class CustomizedWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
         setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
+        super.onPageStarted(view, url, favicon);
         progressBar.setVisibility(View.VISIBLE);
-        super.onPageStarted(view, url,favicon);
     }
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         //방문한 히스토리가 업데이트 될 때마다 작동하는 함수
-       // Log.d("test", url);
+        if(SECURITY_MODE_STATE)
+            SECURITY_MODE_LAST_VIEW = url;
+        else
+            NORMAL_MODE_LAST_VIEW = url;
         parseUri(wv.getUrl());
         super.doUpdateVisitedHistory(view, url, isReload);
     }
@@ -93,8 +92,9 @@ class CustomizedWebViewClient extends WebViewClient {
                     wv.setUri(wvUri.substring(8, wvUri.length()));
             }
         }
-        else if(SECURITY_MODE_STATE == true) {
-            //wv.setUri("Safety : " +wv.resultOfsafety);
+        else if(SECURITY_MODE_STATE == true)
+        {
+            wv.setUri("");
         }
     }
     //웹페이지 로딩 종료시 호출

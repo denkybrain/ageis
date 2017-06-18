@@ -43,10 +43,6 @@ public class CustomizedWebView extends WebView {
     public final String SHOW_SAFETY_EXPOSED = "Exposed";
     public final String SHOW_SAFETY_WARNING = "Warning!";
     public final String SHOW_SAFETY_UNACCESSABLE = "Unaccessable";
-
-    private WebView acceptedView;
-    private String accpetedUrl;
-    private Bitmap acceptedFavicon;
     public String resultOfsafety;
 
     public void constructor(String weburi, EditText editText, Handler handler){
@@ -108,10 +104,10 @@ public class CustomizedWebView extends WebView {
     private void checkVirus(String url){
         String loadUrl = url;
         weburi = url;
-       //  Log.d("widae", "Check URL : "+loadUrl);
+        //  Log.d("widae", "Check URL : "+loadUrl);
         if(url==MAIN_URL){
             wv.loadUrl(MAIN_URL);
-              return ;
+            return ;
         }
         if(useVulnerabilityFindAlgorithm == true && SECURITY_MODE_STATE == true){
             try {
@@ -120,10 +116,9 @@ public class CustomizedWebView extends WebView {
                 JspAccessTask task = new JspAccessTask();
                 task.getUrl = loadUrl;
                 int safety = Integer.parseInt(task.execute().get());
-              //  Log.d("widae", "url and safety : "+loadUrl +":"+safety);
+                //  Log.d("widae", "url and safety : "+loadUrl +":"+safety);
                 switch (safety){
                     case 0 : //when Race condition occurs or other exception occurs, goURL
-
                         Log.d("widae", "0번 오류 : race condition or access failed");
                         goToURL(loadUrl);
                         resultOfsafety = SHOW_SAFETY_GREAT;
@@ -146,7 +141,7 @@ public class CustomizedWebView extends WebView {
                         handler.sendMessage(msg);
                         break;
                     case SAFETY_EXPOSED  :
-                     //   Log.d("widae", "개좆같은 exposed다");
+                        //   Log.d("widae", "개좆같은 exposed다");
                         resultOfsafety = SHOW_SAFETY_EXPOSED;
                         msg = handler.obtainMessage();
                         msg.what = 99; //저장 완료했다고 띄움
@@ -178,7 +173,7 @@ public class CustomizedWebView extends WebView {
         weburi = getUriTextString();
         if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
         if (weburi.startsWith("http://")) {
-           checkVirus(weburi);
+            checkVirus(weburi);
         } else { //프로토콜이 안 붙음
             /*
             for(int i = 0 ; i < country.length; i++){

@@ -5,43 +5,47 @@ package com.example.denky.ageis;
  */
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.TextView;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import static com.example.denky.ageis.Settings.permissionAppCache;
+import static com.example.denky.ageis.Settings.permissionAutoRemoveHistory;
+import static com.example.denky.ageis.Settings.permissionFileDownload;
+import static com.example.denky.ageis.Settings.permissionStartNewWindow;
+import static com.example.denky.ageis.Settings.useJavaScript;
+import static com.example.denky.ageis.Settings.permissionDangerousSite;
+import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
+
 public class ActivitySetting extends AppCompatActivity {
 
-    CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7;
-
-    private boolean useJavaScript=Settings.useJavaScript;
-    private boolean permissionStartNewWindow=Settings.permissionStartNewWindow;
-    private boolean permissionFileDownload=Settings.permissionFileDownload;
-    private boolean permissionAppCache=Settings.permissionAppCache;
-    private boolean useVulnerabilityFindAlgorithm=Settings.useVulnerabilityFindAlgorithm;
-    private boolean denyDangerousSite =Settings.denyDangerousSite;
-    private boolean permissionAutoRemoveHistory=Settings.permissionAutoRemoveHistory;
-    private boolean useAdBlock=Settings.useAdBlock;
+    CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitiy_setting);
-
-       // googleAsyncText = (TextView)findViewById(R.id.googleBtn);
         cb1 = (CheckBox)findViewById(R.id.javascriptCheck);
         cb2 = (CheckBox)findViewById(R.id.newWindowOn);
         cb3 = (CheckBox)findViewById(R.id.fileDownloadOn);
         cb4 = (CheckBox)findViewById(R.id.cacheOn);
         cb5 = (CheckBox)findViewById(R.id.webvulnearableToolOn);
-        cb6 = (CheckBox)findViewById(R.id.denyDangerousSiteOn);
+        cb6 = (CheckBox)findViewById(R.id.clickedDenyDangerousSite);
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
 
-        cb1.setChecked(Settings.useJavaScript);
-        cb2.setChecked(Settings.permissionStartNewWindow);
-        cb3.setChecked(Settings.permissionFileDownload);
-        cb4.setChecked(Settings.permissionAppCache);
-        cb5.setChecked(Settings.useVulnerabilityFindAlgorithm);
-        cb6.setChecked(Settings.denyDangerousSite);
-        cb7.setChecked(Settings.permissionAutoRemoveHistory);
+        cb1.setChecked(useJavaScript);
+        cb2.setChecked(permissionStartNewWindow);
+        cb3.setChecked(permissionFileDownload);
+        cb4.setChecked(permissionAppCache);
+        cb5.setChecked(useVulnerabilityFindAlgorithm);
+        cb6.setChecked(permissionDangerousSite);
+        cb7.setChecked(permissionAutoRemoveHistory);
 
     }
 
@@ -51,13 +55,14 @@ public class ActivitySetting extends AppCompatActivity {
         Callback callback_positive=new Callback() {
             @Override
             public void callbackMethod() {
-                Settings.useJavaScript=cb1.isChecked();
-                Settings.permissionStartNewWindow=cb2.isChecked();
-                Settings.permissionFileDownload=cb3.isChecked();
-                Settings.permissionAppCache=cb4.isChecked();
-                Settings.useVulnerabilityFindAlgorithm=cb5.isChecked();
-                Settings.denyDangerousSite =cb6.isChecked();
-                Settings.permissionAutoRemoveHistory=cb7.isChecked();
+                useJavaScript=cb1.isChecked();
+                permissionStartNewWindow=cb2.isChecked();
+                permissionFileDownload=cb3.isChecked();
+                permissionAppCache=cb4.isChecked();
+                useVulnerabilityFindAlgorithm=cb5.isChecked();
+                permissionDangerousSite =cb6.isChecked();
+                permissionAutoRemoveHistory=cb7.isChecked();
+
                 Settings.saveSettings();
                 finish();
             }
@@ -75,6 +80,8 @@ public class ActivitySetting extends AppCompatActivity {
     }
     public void clickedPermission(View v){
         switch (v.getId()){
+            //case R.id.googleBtn :
+                //break;
             case R.id.javascriptCheck :
                 useJavaScript = cb1.isChecked();
                 break;
@@ -90,8 +97,8 @@ public class ActivitySetting extends AppCompatActivity {
             case R.id.webvulnearableToolOn :
                 useVulnerabilityFindAlgorithm = cb5.isChecked();
                 break;
-            case R.id.denyDangerousSiteOn:
-                denyDangerousSite = cb6.isChecked();
+            case R.id.clickedDenyDangerousSite:
+                permissionDangerousSite = cb6.isChecked();
                 break;
             case R.id.historyDelOn :
                 permissionAutoRemoveHistory = cb7.isChecked();
@@ -102,6 +109,4 @@ public class ActivitySetting extends AppCompatActivity {
                 break;
         }
     }
-
-
 }

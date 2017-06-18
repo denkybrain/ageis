@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/normalWebView">
+    <LinearLayout
+        android:id="@+id/universe_normal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <RelativeLayout
+            android:id="@+id/gotoBar_normal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_gravity="center"
+            >
+            <ImageView
+                android:id="@+id/homeBtn_normal"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/home"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentLeft="true"
+                />
+            <ImageView
+                android:id="@+id/screenBtn_normal"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/screenbtn"
+                android:layout_marginRight="70dp"
+                android:layout_alignParentRight="true"
+                />
+            <ImageView
+                android:id="@+id/renewBtn_normal"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/returnbtnblack"
+                android:layout_marginRight="105dp"
+                android:layout_alignParentRight="true"
+                />
+            <ImageView
+                android:id="@+id/lockBtn_normal"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/lock"
+                android:layout_marginRight="35dp"
+                android:layout_alignParentRight="true"
+                />
+
+            <ImageView
+                android:id="@+id/settingBtn_normal"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/setting"
+                android:layout_alignParentRight="true"/>
+
+            <EditText
+                android:textColorHint="@color/grey"
+                android:hint="Search or Input URL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/uri_normal"
+                android:imeOptions="actionGo"
+                android:inputType="text"
+                android:layout_marginLeft="35dp"
+                android:paddingLeft="10dp"
+                android:textSize="18dp"
+                android:textColor="@color/black"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/renewBtn_normal"
+                android:layout_toStartOf="@+id/renewBtn_normal"
+                android:selectAllOnFocus="true"
+                />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar_normal"
+            android:minHeight="2dip"
+            android:maxHeight="2dip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ProgressBar.Horizontal" />
+    </LinearLayout>
+
+    <com.example.denky.ageis.CustomizedWebView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_below="@id/universe_normal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/wv_normal" />
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/circle_arrow_black"
+        android:id="@+id/hideVarBtn_normal"
+        android:layout_below="@id/universe_normal"
+        android:layout_alignParentRight="true"
+        android:layout_margin="16dp" />
+</RelativeLayout>

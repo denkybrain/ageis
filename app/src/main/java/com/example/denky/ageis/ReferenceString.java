@@ -35,7 +35,8 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
         URL_HASHMAP.put("컴응", "http://cafe.daum.net/cris.lecture/");
     }
-     //changable values
-
+    //changable values
+    public static String NORMAL_MODE_LAST_VIEW = MAIN_URL;
+    public static String SECURITY_MODE_LAST_VIEW = MAIN_URL;
     public static boolean SECURITY_MODE_STATE = false;
 }

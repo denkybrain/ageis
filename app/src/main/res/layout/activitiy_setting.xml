@@ -171,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:id="@+id/denyDangerousSiteOn"
+                android:id="@+id/clickedDenyDangerousSite"
                 android:onClick="clickedPermission"
                 android:checked="true"
                 />
@@ -195,27 +195,7 @@
                 android:checked="false"
                 />
         </RelativeLayout>
-        <!--
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="광고 차단(JSP filter)"
-                android:textSize="20dp"
-                android:layout_margin="5dp"
-                android:layout_alignParentLeft="true"/>
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:id="@+id/adBlockOn"
-                android:onClick="clickedPermission"
-                android:checked="true"
-                />
-        </RelativeLayout>
-        -->
+
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"

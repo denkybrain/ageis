@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/securityWebView">
+    <LinearLayout
+        android:id="@+id/universe_security"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <RelativeLayout
+            android:id="@+id/gotoBar_security"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:layout_gravity="center"
+            >
+            <ImageView
+                android:id="@+id/homeBtn_security"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/home2"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentLeft="true"
+                />
+            <ImageView
+                android:id="@+id/screenBtn_security"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/screenwhite"
+                android:layout_marginRight="70dp"
+                android:layout_alignParentRight="true"
+                />
+            <ImageView
+                android:id="@+id/renewBtn_security"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/returnbtn"
+                android:layout_marginRight="105dp"
+                android:layout_alignParentRight="true"
+                />
+            <ImageView
+                android:id="@+id/lockBtn_security"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/lockwhite"
+                android:layout_marginRight="35dp"
+                android:layout_alignParentRight="true"
+                />
+
+            <ImageView
+                android:id="@+id/settingBtn_security"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/setting2"
+                android:layout_alignParentRight="true"/>
+
+            <EditText
+                android:textColorHint="@color/grey"
+                android:hint="Search or Input URL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/uri_security"
+                android:imeOptions="actionGo"
+                android:inputType="text"
+                android:layout_marginLeft="35dp"
+                android:paddingLeft="10dp"
+                android:textSize="18dp"
+                android:textColor="@color/white"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/renewBtn_security"
+                android:layout_toStartOf="@+id/renewBtn_security"
+                android:selectAllOnFocus="true"
+                android:elevation="2dp" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar_security"
+            android:minHeight="2dip"
+            android:maxHeight="2dip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ProgressBar.Horizontal" />
+    </LinearLayout>
+
+    <com.example.denky.ageis.CustomizedWebView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_below="@id/universe_security"
+        android:layout_height="match_parent"
+        android:id="@+id/wv_security" >
+
+    </com.example.denky.ageis.CustomizedWebView>
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:srcCompat="@drawable/circle_arrow_black"
+        android:id="@+id/hideVarBtn_security"
+        android:layout_below="@id/universe_security"
+        android:layout_alignParentRight="true"
+        android:layout_margin="16dp" />
+</RelativeLayout>

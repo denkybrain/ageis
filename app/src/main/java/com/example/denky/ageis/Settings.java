@@ -16,153 +16,113 @@ import java.io.Serializable;
  */
 
 public class Settings{
-    static final String TAG="SETTING";
+
+    static final String TAG="Setting File";
+
     //Setting Value
     public static boolean useJavaScript=true;
     public static boolean permissionStartNewWindow=true;
-    public static boolean permissionFileDownload=true;
+    public static boolean permissionFileDownload=false;
     public static boolean permissionAppCache=true;
 
     public static boolean useVulnerabilityFindAlgorithm=true;
-    public static boolean denyDangerousSite =true;
+    public static boolean permissionDangerousSite =false;
     public static boolean permissionAutoRemoveHistory=true;
-    public static boolean useAdBlock=true;
 
     //Stream for File I/O
-    private static ObjectInputStream inputSettings;
-    private static ObjectOutputStream outputSettings;
+    private static ObjectInputStream inputSettings=null;
+    private static ObjectOutputStream outputSettings=null;
 
-    private static String filePath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis"+File.separator+"Settings.set";
+    private static String filePath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis"+File.separator+".Settings.set";
 
     //This class is never instantiated at other class
     private Settings(){}
 
     public static void restoreSetting(){
-
-        File f=new File(filePath);
-        f.delete();
-        try {
-            outputSettings=new ObjectOutputStream(new FileOutputStream(f));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         try {
             SetInfo newSetInfo=new SetInfo();
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(newSetInfo);
+            outputSettings.close();
         } catch (IOException e) {
-            Log.i(TAG, "failed saving file");
+            Log.i(TAG, "Can't restore Setting File");
         }
     }
 
-    public static void loadSettings(){
-
+    public static boolean loadSettings(){
         String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         sdPath+= File.separator+"Ageis";
 
         File folder= new File(sdPath);
-        folder.mkdirs();
-
-        Log.i(TAG, filePath);
+        if(folder.exists()==false){
+            folder.mkdirs();
+        }
 
         File settingFile=new File(filePath);
-
-        if(settingFile.exists()==false){
-            try {
-
-                //make Output Stream
-                try{
-                    outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
-                }catch(Exception e){
-                    Log.i(TAG, "can't make outputStream");
-                }
-
-                SetInfo newSetInfo=new SetInfo();
-                outputSettings.writeObject(newSetInfo);
-                Log.i(TAG, "success writing object");
-            } catch (IOException e) {
-                Log.i(TAG, "fail writing object");
-            }
-        }else{
-
-            //make Output Stream
-            try{
-                outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
-            }catch(Exception e){
-                Log.i(TAG, "can't make outputStream");
-            }
-
-            Log.i(TAG, "File is already exist");
-        }
-
-        //make Input Stream
         try{
-            inputSettings=new ObjectInputStream(new FileInputStream(settingFile));
-        }catch(Exception e){
-            Log.i(TAG, "Can't make InputStream");
-        }
-
-        //Read Setting file
-        SetInfo info=null;
-        if(inputSettings!=null){
-            try{
-                info=(SetInfo)inputSettings.readObject();
-            }catch(Exception e){
-                Log.i(TAG, "Exception: "+e.toString());
-                Log.i(TAG, "can't read setting file");
+            if(settingFile.exists()==false){
+                Log.i(TAG, "Setting File is not existing");
+                //make Output Stream (when not existing setting file)
+                outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
+                outputSettings.writeObject(new SetInfo());
+                outputSettings.close();
+                Log.i(TAG, "Success writing new object");
+            }else{
+                Log.i(TAG, "Setting File is already exist");
+                //make Output Stream (when already existing setting file)
+                //outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
             }
-        }else{
-            Log.i(TAG, "InputStream is null");
+
+            //make Input Stream
+            inputSettings=new ObjectInputStream(new FileInputStream(settingFile));
+
+            //Read Setting file
+            SetInfo info=(SetInfo)inputSettings.readObject();
+            Log.i(TAG, "Success Reading");
+
+            if(info!=null){
+                useJavaScript=info.useJavaScript;
+                permissionStartNewWindow=info.permissionStartNewWindow;
+                permissionFileDownload=info.permissionFileDownload;
+                permissionAppCache=info.permissionAppCache;
+                useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
+                permissionDangerousSite =info.permissionDangerousSite;
+                permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
+            }else{
+                Log.i(TAG, "Fail to read object in file");
+            }
+
+            inputSettings.close();
+        }catch(Exception e) {
+            Log.i(TAG, "Exception Occur");
+            return false;
         }
-
-
-        if(info!=null){
-            useJavaScript=info.useJavaScript;
-            permissionStartNewWindow=info.permissionStartNewWindow;
-            permissionFileDownload=info.permissionFileDownload;
-            permissionAppCache=info.permissionAppCache;
-
-            useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
-            denyDangerousSite =info.useProxyServer;
-            permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
-            useAdBlock=info.useAdBlock;
-        }else{
-            Log.i(TAG, "Fail to read object in file");
-        }
-
+    return true;
     }
 
     public static void saveSettings(){
+        ////////////////////////////Saving////////////////////////////////
+        SetInfo info=new SetInfo();
+
+        info.useJavaScript=useJavaScript;
+        info.permissionStartNewWindow=permissionStartNewWindow;
+        info.permissionFileDownload=permissionFileDownload;
+        info.permissionAppCache=permissionAppCache;
+        info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
+        info.permissionDangerousSite = permissionDangerousSite;
+        info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
         try {
-            //after deleting setting file, Save New Setting file.
-            File f=new File(filePath);
-            if(f.delete()){
-                Log.i(TAG, "Success delete");
-            }else {
-                Log.i(TAG, "Fail delete");
-            }
-            outputSettings=new ObjectOutputStream(new FileOutputStream(f));
-
-            ////////////////////////////Saving////////////////////////////////
-            SetInfo info=new SetInfo();
-
-            info.useJavaScript=useJavaScript;
-            info.permissionStartNewWindow=permissionStartNewWindow;
-            info.permissionFileDownload=permissionFileDownload;
-            info.permissionAppCache=permissionAppCache;
-            info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
-            info.useProxyServer= denyDangerousSite;
-            info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
-            info.useAdBlock=useAdBlock;
-
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(info);
-            //////////////////////////////////////////////////////////////////
+            outputSettings.close();
         } catch (IOException e) {
-            Log.i(TAG, "can't save settings");
+            Log.i(TAG, "Can't save settings");
         }
+        //////////////////////////////////////////////////////////////////
     }
 }
 
+//This Class is only using when saving setting value to file.
 class SetInfo implements Serializable{
 
     public boolean useJavaScript=true;
@@ -171,9 +131,8 @@ class SetInfo implements Serializable{
     public boolean permissionAppCache=true;
 
     public boolean useVulnerabilityFindAlgorithm=true;
-    public boolean useProxyServer=false;
+    public boolean permissionDangerousSite =false;
     public boolean permissionAutoRemoveHistory=true;
-    public boolean useAdBlock=true;
 
     public SetInfo(){
         initiate();
@@ -186,9 +145,7 @@ class SetInfo implements Serializable{
         permissionAppCache=true;
 
         useVulnerabilityFindAlgorithm=true;
-        useProxyServer=false;
+        permissionDangerousSite =false;
         permissionAutoRemoveHistory=true;
-        useAdBlock=true;
     }
-
 }
