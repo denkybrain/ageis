@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 
+import static com.example.denky.ageis.Settings.autoClearUrl;
 import static com.example.denky.ageis.Settings.permissionAppCache;
 import static com.example.denky.ageis.Settings.permissionAutoRemoveHistory;
 import static com.example.denky.ageis.Settings.permissionFileDownload;
@@ -34,6 +35,7 @@ public class ActivitySetting extends AppCompatActivity {
         cb5 = (CheckBox)findViewById(R.id.webvulnearableToolOn);
         cb6 = (CheckBox)findViewById(R.id.clickedDenyDangerousSite);
         cb7 = (CheckBox)findViewById(R.id.historyDelOn);
+        cb8 = (CheckBox)findViewById(R.id.clearUrlOn);
 
         cb1.setChecked(useJavaScript);
         cb2.setChecked(permissionStartNewWindow);
@@ -42,6 +44,7 @@ public class ActivitySetting extends AppCompatActivity {
         cb5.setChecked(useVulnerabilityFindAlgorithm);
         cb6.setChecked(permissionDangerousSite);
         cb7.setChecked(permissionAutoRemoveHistory);
+        cb8.setChecked(autoClearUrl);
 
     }
 
@@ -58,6 +61,7 @@ public class ActivitySetting extends AppCompatActivity {
                 useVulnerabilityFindAlgorithm=cb5.isChecked();
                 permissionDangerousSite =cb6.isChecked();
                 permissionAutoRemoveHistory=cb7.isChecked();
+                autoClearUrl = cb8.isChecked();
                 Settings.saveSettings();
                 finish();
             }
@@ -87,7 +91,11 @@ public class ActivitySetting extends AppCompatActivity {
                 break;
             case R.id.webvulnearableToolOn :
                 useVulnerabilityFindAlgorithm = cb5.isChecked();
-                break;
+                if(useVulnerabilityFindAlgorithm == false) {
+                    permissionDangerousSite = false;
+                    cb6.setChecked(false);
+                }
+                    break;
             case R.id.clickedDenyDangerousSite:
                 permissionDangerousSite = cb6.isChecked();
                 break;
@@ -98,6 +106,10 @@ public class ActivitySetting extends AppCompatActivity {
                 Settings.restoreSetting();
                 finish();
                 break;
+            case R.id.clearUrlOn :
+                autoClearUrl = cb8.isChecked();
+                break;
+
         }
     }
 }

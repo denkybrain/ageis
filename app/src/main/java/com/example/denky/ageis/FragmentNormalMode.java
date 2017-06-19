@@ -56,8 +56,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
     private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
-    private LinearLayout universe;
-    private RelativeLayout gotoBar;
     private ProcessContext processContext;
     DisplayMetrics displayMetrics = new DisplayMetrics();
     private CustomizedHandler handler;
@@ -75,8 +73,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
         wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_normal);
-        gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_normal);
-        universe = (LinearLayout)rootView.findViewById(R.id.universe_normal);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_normal);
         renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_normal);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
@@ -91,7 +87,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
 
     private void initializedWv(){
-        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
             @Override
@@ -223,8 +219,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     @Override
     public boolean onLongClick(View v) {
         if (v == wv) { //웹 뷰에서의 롱 터치일 때만 실행
-
-            // Log.d("widae", "long click listener activated");
             WebView.HitTestResult hitTestResult = wv.getHitTestResult();
             processContext.longClickEvent(hitTestResult, hitTestResult.getExtra());
         }

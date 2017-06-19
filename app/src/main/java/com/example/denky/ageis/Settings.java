@@ -28,6 +28,7 @@ public class Settings{
     public static boolean useVulnerabilityFindAlgorithm=true;
     public static boolean permissionDangerousSite =false;
     public static boolean permissionAutoRemoveHistory=true;
+    public static boolean autoClearUrl=true;
 
     //Stream for File I/O
     private static ObjectInputStream inputSettings=null;

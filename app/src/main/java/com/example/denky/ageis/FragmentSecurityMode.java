@@ -61,8 +61,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
     private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
-    private LinearLayout universe;
-    private RelativeLayout gotoBar;
     private ProcessContext processContext;
     private CustomizedWebViewClient wvWeb;
     DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -80,8 +78,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
         wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
-        gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
-        universe = (LinearLayout)rootView.findViewById(R.id.universe_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
         renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_security);
@@ -95,7 +91,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         /* */
     }
     private void initializedWv(){
-        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
             @Override
@@ -148,6 +144,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                     switch (v.getId()){
                         case R.id.homeBtn_security : //홈버튼 이벤트 처리
                             wv.goToURL(MAIN_URL);
+                            lockBtn.setImageResource(R.drawable.lockwhite);
                             wv.setUri("");
                             break;
                         case R.id.lockBtn_security :

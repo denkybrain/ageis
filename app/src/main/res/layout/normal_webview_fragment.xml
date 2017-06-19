@@ -86,11 +86,13 @@
 
         <ProgressBar
             android:id="@+id/progressBar_normal"
-            android:minHeight="2dip"
-            android:maxHeight="2dip"
+            android:minHeight="2.5dip"
+            android:maxHeight="2.5dip"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            style="@android:style/Widget.ProgressBar.Horizontal" />
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/progressbar_style_normal"
+            />
     </LinearLayout>
 
     <com.example.denky.ageis.CustomizedWebView

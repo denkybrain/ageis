@@ -13,6 +13,7 @@ import static com.example.denky.ageis.ReferenceString.NORMAL_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.Settings.autoClearUrl;
 
 /**
  * Created by denky on 2017-06-08.
@@ -22,15 +23,11 @@ class CustomizedWebViewClient extends WebViewClient {
     CustomizedWebView wv;
     WebSettings wvSettings;
     ProgressBar progressBar;
-    private EditText uri;
-    private String weburi;
 
-    CustomizedWebViewClient(CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi){
+    CustomizedWebViewClient(CustomizedWebView wv, WebSettings ws, ProgressBar pb){
         this.wv = wv;
         this.wvSettings = ws;
         this.progressBar = pb;
-        this.uri = editText;
-        this.weburi = weburi;
     }
 
     @Override
@@ -56,7 +53,8 @@ class CustomizedWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
         setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
-        progressBar.setVisibility(View.VISIBLE);
+        if(!url.equals(MAIN_URL))
+            progressBar.setVisibility(View.VISIBLE);
         super.onPageStarted(view, url, favicon);
     }
     @Override
@@ -86,9 +84,10 @@ class CustomizedWebViewClient extends WebViewClient {
                     wv.setUri(wvUri.substring(8, wvUri.length()));
             }
         }
-        else if(SECURITY_MODE_STATE == true)
+        else if(SECURITY_MODE_STATE == true && autoClearUrl == true)
         {
             wv.setUri("");
+
         }
     }
     //웹페이지 로딩 종료시 호출

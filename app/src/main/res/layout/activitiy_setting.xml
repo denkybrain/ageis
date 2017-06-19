@@ -195,6 +195,25 @@
                 android:checked="false"
                 />
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="URL 자동 비우기"
+                android:textSize="20dp"
+                android:layout_margin="5dp"
+                android:layout_alignParentLeft="true"/>
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id="@+id/clearUrlOn"
+                android:onClick="clickedPermission"
+                android:checked="false"
+                />
+        </RelativeLayout>
 
     </LinearLayout>
     <TextView
