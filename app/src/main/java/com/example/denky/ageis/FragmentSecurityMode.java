@@ -64,15 +64,13 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private LinearLayout universe;
     private RelativeLayout gotoBar;
     private ProcessContext processContext;
+    private CustomizedWebViewClient wvWeb;
     DisplayMetrics displayMetrics = new DisplayMetrics();
 
     private CustomizedHandler handler;
+    private ViewGroup rootView;
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
-
+    private void initializeValues(){
         THIS_ACTIVITY=getActivity();
         lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
@@ -82,22 +80,22 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
         wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
-         gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
+        gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
         universe = (LinearLayout)rootView.findViewById(R.id.universe_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
         renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_security);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_security);
         wvSettings = wv.getSettings();
-
-        /* display의 가로 세로 구하기 */
+         /* display의 가로 세로 구하기 */
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;// 가로
         int height = displayMetrics.heightPixels;// 세로
         DEVICE_HEIGHT = height;
         /* */
-
-        CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
+    }
+    private void initializedWv(){
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
             @Override
@@ -112,9 +110,15 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         customizedWebViewManager.setSecurityWebView(wv);
         registerForContextMenu(wv);
         wvWeb.setWebView();
-        //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
-        //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
         progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
+        initializeValues(); //변수 초기화
+        initializedWv(); //웹뷰 초기화
         wv.goToURL(SECURITY_MODE_LAST_VIEW); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -169,7 +173,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             break;
                     }
                 }
-
             }
         };
         lockBtn.setOnClickListener(cl);

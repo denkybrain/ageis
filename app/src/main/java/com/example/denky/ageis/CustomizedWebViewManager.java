@@ -11,14 +11,6 @@ public class CustomizedWebViewManager {
     private CustomizedWebView normalWebView;
     private CustomizedWebView securityWebView;
 
-    public CustomizedWebView getNormalWebView() {
-        return normalWebView;
-    }
-
-    public CustomizedWebView getSecurityWebView() {
-        return securityWebView;
-    }
-
     public void setSecurityWebView(CustomizedWebView securityWebView) {
         this.securityWebView = securityWebView;
     }

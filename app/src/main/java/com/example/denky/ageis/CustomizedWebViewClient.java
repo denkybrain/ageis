@@ -43,8 +43,8 @@ class CustomizedWebViewClient extends WebViewClient {
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
         wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
-     //   wvSettings.setBuiltInZoomControls(true);
-       wvSettings.setSupportZoom(true);
+        //   wvSettings.setBuiltInZoomControls(true);
+        wvSettings.setSupportZoom(true);
         if(Settings.permissionAppCache == false)
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         else
@@ -75,7 +75,7 @@ class CustomizedWebViewClient extends WebViewClient {
             if (wvUri.startsWith("http://")) {//http://로 시작하면
 
                 if (wvUri.endsWith("/"))
-                   wv.setUri(wvUri.substring(7, wvUri.length()-1));
+                    wv.setUri(wvUri.substring(7, wvUri.length()-1));
                 else
                     wv.setUri(wvUri.substring(7, wvUri.length()));
             }

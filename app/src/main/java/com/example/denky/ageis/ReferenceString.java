@@ -12,12 +12,15 @@ public abstract class ReferenceString {
     public static final String URL_SECURITY_MODE_HINT = "Security Mode";
 
     //unchangable values : unviewable
+    public static final String GOOGLE_SEARCH_URL = "https://www.google.co.kr/search?q=";
     public static final String MAIN_URL = "http://denkybrain.cafe24.com/ageis/main.php";
     public static int DEVICE_WIDTH;
     public static int DEVICE_HEIGHT; //device height
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
     public static HashMap<String , String> URL_HASHMAP = new HashMap<String , String>();
+
+    // protocols
     private String country[]
             =   {".com",".co.kr", "go.kr"};
     private String fileformat[]

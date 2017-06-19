@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
+import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
+import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
@@ -32,7 +34,7 @@ public class CustomizedWebView extends WebView {
     private WebView wv = this;
     public String weburi;
     private EditText uri;
-    public Handler handler;
+    public CustomizedHandler handler;
     private final int SAFETY_GREAT = 1;
     private final int SAFETY_NORMAL = 2;
     private final int SAFETY_EXPOSED = 3;
@@ -45,7 +47,7 @@ public class CustomizedWebView extends WebView {
     public final String SHOW_SAFETY_UNACCESSABLE = "Unaccessable";
     public String resultOfsafety;
 
-    public void constructor(String weburi, EditText editText, Handler handler){
+    public void constructor(String weburi, EditText editText, CustomizedHandler handler){
         this.weburi = weburi;
         this.uri = editText;
         this.handler = handler;
@@ -59,10 +61,10 @@ public class CustomizedWebView extends WebView {
     }
 
     @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        Log.d("scrolled : ", l + ":" + t + ":" + oldl+":"+oldt);
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) { //스크롤 이벤트
         super.onScrollChanged(l, t, oldl, oldt);
     }
+
 
     public void setUri(String str){
         uri.setText(str);
@@ -72,16 +74,15 @@ public class CustomizedWebView extends WebView {
     }
     public void goToURL(String link){ // go to link by calling
         weburi = link;
-        Log.d("widae", weburi);
         if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
-        if (weburi.startsWith("http://")) {
+        if (weburi.startsWith("http://") || weburi.startsWith("https://")) {
             checkVirus(weburi);
         } else {
             if(weburi.indexOf('.') > 0 ){
                 checkVirus("http://"+weburi);
                 return;
             }
-            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 검색으로 치부함
+            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 구글 검색으로 처리
             checkVirus("https://www.google.co.kr/search?q=" + weburi);
         }
     }
@@ -91,7 +92,6 @@ public class CustomizedWebView extends WebView {
     }
 
     private boolean CHECK_STATIC_URL(String staticURL){
-      //  Log.d("widae","찾느중이다 게이야 ㄱㄷ리라");
         if(staticURL.equals(MAIN_URL)){
             loadUrl(MAIN_URL);
             return true;
@@ -105,7 +105,6 @@ public class CustomizedWebView extends WebView {
     private void checkVirus(String url){
         String loadUrl = url;
         weburi = url;
-        //  Log.d("widae", "Check URL : "+loadUrl);
         if(url==MAIN_URL){
             wv.loadUrl(MAIN_URL);
             return ;
@@ -113,49 +112,35 @@ public class CustomizedWebView extends WebView {
         if(useVulnerabilityFindAlgorithm == true && SECURITY_MODE_STATE == true){
             try {
                 Log.d("widae", "접근 시도");
-                Message msg;
                 JspAccessTask task = new JspAccessTask();
                 task.getUrl = loadUrl;
                 int safety = Integer.parseInt(task.execute().get());
-                //  Log.d("widae", "url and safety : "+loadUrl +":"+safety);
                 switch (safety){
-                    case 0 : //when Race condition occurs or other exception occurs, goURL
+                    case 0 : //when Race condition occurs or other exception occurs, just goURL
                         Log.d("widae", "0번 오류 : race condition or access failed");
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        msg = handler.obtainMessage();
-                        msg.what = 97; //안전한 사이트 이동
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(97);
                         return ;
                     case SAFETY_GREAT  :
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        msg = handler.obtainMessage();
-                        msg.what = 97; //안전한 사이트 이동
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(97);
                         break;
                     case SAFETY_NORMAL  :
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        msg = handler.obtainMessage();
-                        msg.what = 97; //안전한 사이트 이동
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(97);
                         break;
                     case SAFETY_EXPOSED  :
                         resultOfsafety = SHOW_SAFETY_EXPOSED;
-                        msg = handler.obtainMessage();
-                        msg.what = 99; //저장 완료했다고 띄움
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(99);
                         //super.onPageStarted(view, url, favicon);
                         break;
                     case SAFETY_WARNING :
                         resultOfsafety = SHOW_SAFETY_WARNING;
-                        msg = handler.obtainMessage();
-                        msg.what = 99; //저장 완료했다고 띄움
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(99);
                         break;
                     case SAFETY_UNACCESSABLE :
                         resultOfsafety =SHOW_SAFETY_UNACCESSABLE;
-                        msg = handler.obtainMessage();
-                        msg.what = 98; //저장 완료했다고 띄움
-                        handler.sendMessage(msg);
+                        handler.sendMsgQuick(98);
                         break;
                 }
             } catch (Exception e){
@@ -169,7 +154,7 @@ public class CustomizedWebView extends WebView {
     public void goToURL(){ //go to with the uri.getText
         weburi = getUriTextString();
         if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
-        if (weburi.startsWith("http://")) {
+        if (weburi.startsWith("http://") || weburi.startsWith("https://")) {
             checkVirus(weburi);
         } else { //프로토콜이 안 붙음
             if(weburi.indexOf('.') > 0 ){
@@ -177,13 +162,11 @@ public class CustomizedWebView extends WebView {
                 return;
             }
             //둘다 아니면, 즉, country와 fileformat과 맞지않으면 검색으로 치부함
-            checkVirus("https://www.google.co.kr/search?q=" + weburi);
+            checkVirus( GOOGLE_SEARCH_URL + weburi);
         }
     }
     public void onSavePageAllScreenShot() {
-        Message msg = handler.obtainMessage();
-        msg.what = 6; //캡쳐한다고 띄움
-        handler.sendMessage(msg);
+        handler.sendMsgQuick(6);
         wv.setDrawingCacheEnabled(true);
         Picture picture = wv.capturePicture();
         int captureHeight = DEVICE_HEIGHT -255;
@@ -208,9 +191,7 @@ public class CustomizedWebView extends WebView {
         }
 
         wv.setDrawingCacheEnabled(false);
-        msg = handler.obtainMessage();
-        msg.what = 7; //저장 완료했다고 띄움
-        handler.sendMessage(msg);
+        handler.sendMsgQuick(7);
     }
 
     static public void MakeCache(View v, String filename){ //오픈 소스 가져옴 아직 안 씀

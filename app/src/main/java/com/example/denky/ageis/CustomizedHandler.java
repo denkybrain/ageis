@@ -35,6 +35,12 @@ public class CustomizedHandler extends Handler {
         this.processContext = processContext;
         this.lockBtn = lockBtn;
     }
+    public void sendMsgQuick(int data){
+        Message msg = obtainMessage();
+        msg = obtainMessage();
+        msg.what = data; //저장 완료했다고 띄움
+        sendMessage(msg);
+    }
 
     public ProcessContext getProcessContext() {
         return processContext;
@@ -76,18 +82,18 @@ public class CustomizedHandler extends Handler {
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
                 Img_toast.show();
                 break;
-            case  5:
+            case  5: //주소 복사
                 //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
                 ClipboardManager clipBoard = (ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);
                 clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
                 Img_toast.show();
                 break;
-            case  6:
+            case  6: //스크린샷
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
                 Img_toast.show();
                 break;
-            case  7:
+            case  7: //화면 저장
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
                 Img_toast.show();
                 break;
@@ -115,7 +121,6 @@ public class CustomizedHandler extends Handler {
     }
 
     private void checkAccess(){
-        // Log.d("widae" ,"dif : "+wv.resultOfsafety);
         DialogMaker dm = new DialogMaker();
         com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
             @Override
