@@ -43,6 +43,7 @@ import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
+import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
  * Created by Windows10 on 2017-06-12.
@@ -72,11 +73,11 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
             Toast Img_toast;
             switch (msg.what) {
                 case 0  :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 시작", Toast.LENGTH_SHORT);
+                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미지 다운로드 시작", Toast.LENGTH_SHORT);
                     Img_toast.show();
                     break;
                 case 1 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 완료", Toast.LENGTH_LONG);
+                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미지 다운로드 완료", Toast.LENGTH_LONG);
                     Img_toast.show();
                     break;
                 case 2 : //주소 공유
@@ -103,20 +104,103 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                     //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
                     ClipboardManager clipBoard = (ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_SHORT);
+                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
                     Img_toast.show();
                     break;
                 case  6:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면 캡쳐중...", Toast.LENGTH_SHORT);
+                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
                     Img_toast.show();
                     break;
                 case  7:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT);
+                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
                     Img_toast.show();
+                    break;
+                case 99 ://보안수준 확인
+                    // Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    checkAccess();
+                    break;
+                case 98 ://보안수준 Unaccessable
+                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    denyAccess();
+                    break;
+                case 97 ://보안수준 good
+                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
+                    safeAccess();
                     break;
             }
         }
     };
+
+    private void safeAccess(){
+        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_GREAT))
+            wv.loadUrl(wv.getUrl());
+        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_NORMAL)){
+            wv.loadUrl(wv.getUrl());
+        }
+        return ;
+    }
+
+    private void checkAccess(){
+        // Log.d("widae" ,"dif : "+wv.resultOfsafety);
+        DialogMaker dm = new DialogMaker();
+        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_EXPOSED)){
+                    //     Log.d("widae", "handler : exposed");
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockexposed);
+                }
+                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_WARNING)){
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockwarning);
+                }
+                return ;
+            }
+        };
+        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+            @Override
+            public void callbackMethod() {
+            }
+        };
+        dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?", "취소", "접근",cancel, okay);
+        dm.show(getActivity().getSupportFragmentManager(), "tag");
+        return ;
+    }
+    private void denyAccess(){
+        DialogMaker dm = new DialogMaker();
+
+        if(permissionDangerousSite == true && SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
+            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
+
+        }else{ //접근할 수 있도록 설정
+            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                    wv.loadUrl(wv.weburi);
+                    lockBtn.setImageResource(R.drawable.lockwarning);
+                }
+            };
+            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+                @Override
+                public void callbackMethod() {
+                }
+            };
+            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?","취소", "접근",cancel, okay);
+        }
+        dm.show(getActivity().getSupportFragmentManager(), "tag");
+        return ;
+    }
 
     @Nullable
     @Override

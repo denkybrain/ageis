@@ -24,7 +24,7 @@ public abstract class ReferenceString {
             =   {".php",".html", ".jsp"};
 
     // **virus check jsp site
-    public static final String VIRUST_CHECK_ALGORITHM_URL = "http://175.198.248.51:8080/scan/scan.jsp";
+    public static final String VIRUST_CHECK_ALGORITHM_URL = "http://150.95.155.101:8080/scan.jsp";
 
     public static void initializeHashMap(){
         URL_HASHMAP.put("", MAIN_URL);
@@ -34,6 +34,7 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("일베", "http://ilbe.com");
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
         URL_HASHMAP.put("컴응", "http://cafe.daum.net/cris.lecture/");
+
     }
     //changable values
     public static String NORMAL_MODE_LAST_VIEW = MAIN_URL;

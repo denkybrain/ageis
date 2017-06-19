@@ -72,6 +72,7 @@ public class CustomizedWebView extends WebView {
     }
     public void goToURL(String link){ // go to link by calling
         weburi = link;
+        Log.d("widae", weburi);
         if(CHECK_STATIC_URL(weburi)){ return ;  } //static에 등록된 URL이면 이동하고 함수를 종료함.
         if (weburi.startsWith("http://")) {
             checkVirus(weburi);
@@ -89,14 +90,14 @@ public class CustomizedWebView extends WebView {
         goToURL();
     }
 
-    private boolean checkURL(String myURL, String staticURL){
-        if(myURL.equals(staticURL))
-            return true;
-        return false;
-    }
     private boolean CHECK_STATIC_URL(String staticURL){
+      //  Log.d("widae","찾느중이다 게이야 ㄱㄷ리라");
+        if(staticURL.equals(MAIN_URL)){
+            loadUrl(MAIN_URL);
+            return true;
+        }
         if(URL_HASHMAP.containsKey(staticURL)){
-            goToURL(URL_HASHMAP.get(staticURL).toString());
+            loadUrl(URL_HASHMAP.get(staticURL).toString());
             return true;
         }
         return false;

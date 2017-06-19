@@ -44,8 +44,8 @@ class CustomizedWebViewClient extends WebViewClient {
         wvSettings.setSupportMultipleWindows(Settings.permissionStartNewWindow);
         wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
-        wvSettings.setBuiltInZoomControls(true);
-        wvSettings.setSupportZoom(true);
+     //   wvSettings.setBuiltInZoomControls(true);
+       wvSettings.setSupportZoom(true);
         if(Settings.permissionAppCache == false)
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         else
@@ -59,15 +59,11 @@ class CustomizedWebViewClient extends WebViewClient {
     public void onPageStarted(WebView view, String url, Bitmap favicon){
         setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
         super.onPageStarted(view, url, favicon);
-        progressBar.setVisibility(View.VISIBLE);
     }
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         //방문한 히스토리가 업데이트 될 때마다 작동하는 함수
-        if(SECURITY_MODE_STATE)
-            SECURITY_MODE_LAST_VIEW = url;
-        else
-            NORMAL_MODE_LAST_VIEW = url;
+        progressBar.setVisibility(View.VISIBLE);
         parseUri(wv.getUrl());
         super.doUpdateVisitedHistory(view, url, isReload);
     }
@@ -101,6 +97,10 @@ class CustomizedWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url){
         super.onPageFinished(view, url);
+        if(SECURITY_MODE_STATE)
+            SECURITY_MODE_LAST_VIEW = url;
+        else
+            NORMAL_MODE_LAST_VIEW = url;
         progressBar.setVisibility(View.INVISIBLE);
     }
 

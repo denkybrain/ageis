@@ -43,6 +43,7 @@ import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.NORMAL_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
+import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
     private boolean isVisibleBar=true;
@@ -61,7 +62,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     static final int STORAGE_READ_PERMISSON=100;
     static final int STORAGE_WRITE_PERMISSON=101;
     DisplayMetrics displayMetrics = new DisplayMetrics();
-
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -307,5 +307,4 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
         Log.d("widae", "-1"+index+":"+backUrl);
     }
-
 }
