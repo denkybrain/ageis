@@ -10,10 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import static com.example.denky.ageis.Settings.permissionAppCache;
 import static com.example.denky.ageis.Settings.permissionAutoRemoveHistory;
@@ -62,7 +58,6 @@ public class ActivitySetting extends AppCompatActivity {
                 useVulnerabilityFindAlgorithm=cb5.isChecked();
                 permissionDangerousSite =cb6.isChecked();
                 permissionAutoRemoveHistory=cb7.isChecked();
-
                 Settings.saveSettings();
                 finish();
             }
@@ -73,15 +68,11 @@ public class ActivitySetting extends AppCompatActivity {
                 finish();
             }
         };
-
         maker.setValue("설정을 저장하시겠습니까?", "예", "아니오", callback_positive, callback_negative);
         maker.show(getSupportFragmentManager(), "Dialog");
-
     }
     public void clickedPermission(View v){
         switch (v.getId()){
-            //case R.id.googleBtn :
-                //break;
             case R.id.javascriptCheck :
                 useJavaScript = cb1.isChecked();
                 break;

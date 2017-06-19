@@ -29,7 +29,7 @@ class JspAccessTask extends AsyncTask<String, Void, String> {
             String str;
             String ASSEMBLED_URL = VIRUST_CHECK_ALGORITHM_URL +"?site="+ getUrl;
             URL url = new URL(ASSEMBLED_URL);
-            // Log.d("widae", "do in Background url : "+ASSEMBLED_URL);
+             Log.d("widae", "do in Background url : "+ASSEMBLED_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");//데이터를 POST 방식으로 전송합니다.
@@ -44,6 +44,7 @@ class JspAccessTask extends AsyncTask<String, Void, String> {
                     buffer.append(str);
                 }
                 receiveMsg = buffer.toString();
+            //    Log.d("widae", "receiveMsg : "+receiveMsg);
                 return receiveMsg;
             } else {
                 return "0";

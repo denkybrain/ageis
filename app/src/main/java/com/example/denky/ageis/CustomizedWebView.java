@@ -121,28 +121,24 @@ public class CustomizedWebView extends WebView {
                 switch (safety){
                     case 0 : //when Race condition occurs or other exception occurs, goURL
                         Log.d("widae", "0번 오류 : race condition or access failed");
-                        goToURL(loadUrl);
                         resultOfsafety = SHOW_SAFETY_GREAT;
                         msg = handler.obtainMessage();
                         msg.what = 97; //안전한 사이트 이동
                         handler.sendMessage(msg);
                         return ;
                     case SAFETY_GREAT  :
-                        goToURL(loadUrl);
                         resultOfsafety = SHOW_SAFETY_GREAT;
                         msg = handler.obtainMessage();
                         msg.what = 97; //안전한 사이트 이동
                         handler.sendMessage(msg);
                         break;
                     case SAFETY_NORMAL  :
-                        goToURL(loadUrl);
                         resultOfsafety = SHOW_SAFETY_GREAT;
                         msg = handler.obtainMessage();
                         msg.what = 97; //안전한 사이트 이동
                         handler.sendMessage(msg);
                         break;
                     case SAFETY_EXPOSED  :
-                        //   Log.d("widae", "개좆같은 exposed다");
                         resultOfsafety = SHOW_SAFETY_EXPOSED;
                         msg = handler.obtainMessage();
                         msg.what = 99; //저장 완료했다고 띄움
@@ -176,20 +172,6 @@ public class CustomizedWebView extends WebView {
         if (weburi.startsWith("http://")) {
             checkVirus(weburi);
         } else { //프로토콜이 안 붙음
-            /*
-            for(int i = 0 ; i < country.length; i++){
-                if(weburi.endsWith(country[i])){
-                    wv.loadUrl("http://"+weburi);
-                    return ;
-                }
-            }
-            for(int i = 0; i < fileformat.length; i++){
-                if(weburi.endsWith(fileformat[i])){
-                    wv.loadUrl("http://"+weburi);
-                    return ;
-                }
-            }
-            */
             if(weburi.indexOf('.') > 0 ){
                 checkVirus("http://"+weburi);
                 return;
@@ -230,8 +212,6 @@ public class CustomizedWebView extends WebView {
         msg.what = 7; //저장 완료했다고 띄움
         handler.sendMessage(msg);
     }
-
-
 
     static public void MakeCache(View v, String filename){ //오픈 소스 가져옴 아직 안 씀
         //src : http://blog.jusun.org/archives/6

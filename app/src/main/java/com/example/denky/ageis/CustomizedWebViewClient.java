@@ -25,7 +25,6 @@ class CustomizedWebViewClient extends WebViewClient {
     private EditText uri;
     private String weburi;
 
-
     CustomizedWebViewClient(CustomizedWebView wv, WebSettings ws, ProgressBar pb, EditText editText, String weburi){
         this.wv = wv;
         this.wvSettings = ws;
@@ -36,7 +35,7 @@ class CustomizedWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        // TODO Auto-generated method stub
+        progressBar.setVisibility(View.VISIBLE);
         return super.shouldOverrideUrlLoading(view, url);
     }
     public void setWebView(){
@@ -50,7 +49,6 @@ class CustomizedWebViewClient extends WebViewClient {
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         else
             wvSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
         wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
         wvSettings.setPluginState(WebSettings.PluginState.ON_DEMAND);
     }
@@ -58,12 +56,12 @@ class CustomizedWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
         setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
+        progressBar.setVisibility(View.VISIBLE);
         super.onPageStarted(view, url, favicon);
     }
     @Override
     public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
         //방문한 히스토리가 업데이트 될 때마다 작동하는 함수
-        progressBar.setVisibility(View.VISIBLE);
         parseUri(wv.getUrl());
         super.doUpdateVisitedHistory(view, url, isReload);
     }

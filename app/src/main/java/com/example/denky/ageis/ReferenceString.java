@@ -8,24 +8,24 @@ import java.util.HashMap;
 
 public abstract class ReferenceString {
     //unchangable values : viewable in main Activity
-
     public static final String URL_NORMAL_MODE_HINT ="Search or Input URI";
     public static final String URL_SECURITY_MODE_HINT = "Security Mode";
-    // : unviewable
+
+    //unchangable values : unviewable
     public static final String MAIN_URL = "http://denkybrain.cafe24.com/ageis/main.php";
     public static int DEVICE_WIDTH;
-    public static int DEVICE_HEIGHT;
+    public static int DEVICE_HEIGHT; //device height
+    static final int STORAGE_READ_PERMISSON=100;
+    static final int STORAGE_WRITE_PERMISSON=101;
     public static HashMap<String , String> URL_HASHMAP = new HashMap<String , String>();
-
-
     private String country[]
             =   {".com",".co.kr", "go.kr"};
     private String fileformat[]
             =   {".php",".html", ".jsp"};
-
     // **virus check jsp site
     public static final String VIRUST_CHECK_ALGORITHM_URL = "http://150.95.155.101:8080/scan.jsp";
 
+    //functions that words only once
     public static void initializeHashMap(){
         URL_HASHMAP.put("", MAIN_URL);
         URL_HASHMAP.put("네이버", "http://naver.com");

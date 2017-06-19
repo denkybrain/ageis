@@ -39,6 +39,7 @@ import java.io.File;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.example.denky.ageis.ActivityMain.customizedWebViewManager;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_LAST_VIEW;
@@ -63,144 +64,9 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private LinearLayout universe;
     private RelativeLayout gotoBar;
     private ProcessContext processContext;
-    static final int STORAGE_READ_PERMISSON=100;
-    static final int STORAGE_WRITE_PERMISSON=101;
     DisplayMetrics displayMetrics = new DisplayMetrics();
 
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast Img_toast;
-            switch (msg.what) {
-                case 0  :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미지 다운로드 시작", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case 1 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미지 다운로드 완료", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case 2 : //주소 공유
-                    Intent intent_text = new Intent(Intent.ACTION_SEND);
-                    //intent_text.putExtra(Intent.EXTRA_SUBJECT, "url");
-                    intent_text.setType("text/plain");
-                    intent_text.putExtra(Intent.EXTRA_TEXT, processContext.getUrl());
-                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다"));
-                    break;
-                case 3 : //이미지 공유
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "제목");
-                    // Log.d("widae", "공유할 파일 from "+processContext.getLastDownloadFile());
-                    Uri uri = Uri.fromFile(new File(processContext.getLastDownloadFile()));
-                    intent.putExtra(Intent.EXTRA_STREAM, uri);
-                    intent.setType("image/*");
-                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다"));
-                    break;
-                case 4 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case  5:
-                    //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
-                    ClipboardManager clipBoard = (ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case  6:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case  7:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case 99 ://보안수준 확인
-                    // Log.d("widae", "access warning : " +wv.resultOfsafety);
-                    checkAccess();
-                    break;
-                case 98 ://보안수준 Unaccessable
-                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
-                    denyAccess();
-                    break;
-                case 97 ://보안수준 good
-                    //  Log.d("widae", "access warning : " +wv.resultOfsafety);
-                    safeAccess();
-                    break;
-            }
-        }
-    };
-
-    private void safeAccess(){
-        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_GREAT))
-            wv.loadUrl(wv.getUrl());
-        if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_NORMAL)){
-            wv.loadUrl(wv.getUrl());
-        }
-        return ;
-    }
-
-    private void checkAccess(){
-        // Log.d("widae" ,"dif : "+wv.resultOfsafety);
-        DialogMaker dm = new DialogMaker();
-        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
-            @Override
-            public void callbackMethod() {
-                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_EXPOSED)){
-                    //     Log.d("widae", "handler : exposed");
-                    wv.loadUrl(wv.weburi);
-                    lockBtn.setImageResource(R.drawable.lockexposed);
-                }
-                if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_WARNING)){
-                    wv.loadUrl(wv.weburi);
-                    lockBtn.setImageResource(R.drawable.lockwarning);
-                }
-                return ;
-            }
-        };
-        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
-            @Override
-            public void callbackMethod() {
-            }
-        };
-        dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?", "취소", "접근",cancel, okay);
-        dm.show(getActivity().getSupportFragmentManager(), "tag");
-        return ;
-    }
-    private void denyAccess(){
-        DialogMaker dm = new DialogMaker();
-
-        if(permissionDangerousSite == true && SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
-            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
-                @Override
-                public void callbackMethod() {
-                }
-            };
-            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
-                @Override
-                public void callbackMethod() {
-                }
-            };
-            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
-
-        }else{ //접근할 수 있도록 설정
-            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
-                @Override
-                public void callbackMethod() {
-                    wv.loadUrl(wv.weburi);
-                    lockBtn.setImageResource(R.drawable.lockwarning);
-                }
-            };
-            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
-                @Override
-                public void callbackMethod() {
-                }
-            };
-            dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근하시겠습니까?","취소", "접근",cancel, okay);
-        }
-        dm.show(getActivity().getSupportFragmentManager(), "tag");
-        return ;
-    }
+    private CustomizedHandler handler;
 
     @Nullable
     @Override
@@ -208,15 +74,15 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         ViewGroup rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
 
         THIS_ACTIVITY=getActivity();
-
+        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_security);
         wv = (CustomizedWebView) rootView.findViewById(R.id.wv_security);
+        handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
         wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
-        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
-        gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
+         gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
         universe = (LinearLayout)rootView.findViewById(R.id.universe_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
         renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
@@ -242,6 +108,8 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         wv.setLongClickable(true);
         wv.setOnLongClickListener(this);
         processContext = new ProcessContext(wv, handler);
+        handler.setProcessContext(processContext);
+        customizedWebViewManager.setSecurityWebView(wv);
         registerForContextMenu(wv);
         wvWeb.setWebView();
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //

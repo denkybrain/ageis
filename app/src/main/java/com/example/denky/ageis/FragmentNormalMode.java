@@ -39,11 +39,11 @@ import java.io.File;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.example.denky.ageis.ActivityMain.customizedWebViewManager;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.NORMAL_MODE_LAST_VIEW;
 import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
-import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
     private boolean isVisibleBar=true;
@@ -59,60 +59,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private LinearLayout universe;
     private RelativeLayout gotoBar;
     private ProcessContext processContext;
-    static final int STORAGE_READ_PERMISSON=100;
-    static final int STORAGE_WRITE_PERMISSON=101;
     DisplayMetrics displayMetrics = new DisplayMetrics();
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast Img_toast;
-            switch (msg.what) {
-                case 0  :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 시작", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case 1 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 완료", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case 2 : //주소 공유
-                    Intent intent_text = new Intent(Intent.ACTION_SEND);
-                    //intent_text.putExtra(Intent.EXTRA_SUBJECT, "url");
-                    intent_text.setType("text/plain");
-                    intent_text.putExtra(Intent.EXTRA_TEXT, processContext.getUrl());
-                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다"));
-                    break;
-                case 3 : //이미지 공유
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "제목");
-                    // Log.d("widae", "공유할 파일 from "+processContext.getLastDownloadFile());
-                    Uri uri = Uri.fromFile(new File(processContext.getLastDownloadFile()));
-                    intent.putExtra(Intent.EXTRA_STREAM, uri);
-                    intent.setType("image/*");
-                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다"));
-                    break;
-                case 4 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case  5:
-                    //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
-                    ClipboardManager clipBoard = (ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case  6:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면 캡쳐중...", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case  7:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-            }
-        }
-    };
+    private CustomizedHandler handler;
 
     @Nullable
     @Override
@@ -120,14 +68,14 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         ViewGroup rootView=(ViewGroup)inflater.inflate(R.layout.normal_webview_fragment, container, false);
         THIS_ACTIVITY=getActivity();
 
-
+        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_normal);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_normal);
         wv = (CustomizedWebView) rootView.findViewById(R.id.wv_normal);
+        handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
         wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_normal);
-        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_normal);
         gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_normal);
         universe = (LinearLayout)rootView.findViewById(R.id.universe_normal);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_normal);
@@ -154,6 +102,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         wv.setLongClickable(true);
         wv.setOnLongClickListener(this);
         processContext = new ProcessContext(wv, handler);
+        handler.setProcessContext(processContext);
+        customizedWebViewManager.setNormalWebView(wv);
         registerForContextMenu(wv);
         wvWeb.setWebView();
         //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
