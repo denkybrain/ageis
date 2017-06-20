@@ -31,16 +31,14 @@ public abstract class ReferenceString {
     //functions that words only once
     public static void initializeHashMap(){
         URL_HASHMAP.put("", MAIN_URL);
-        URL_HASHMAP.put("네이버", "http://naver.com");
-        URL_HASHMAP.put("다음", "http://daum.net");
-        URL_HASHMAP.put("구글", "http://google.co.kr");
-        URL_HASHMAP.put("일베", "http://ilbe.com");
+        URL_HASHMAP.put("네이버", "http://www.naver.com");
+        URL_HASHMAP.put("다음", "http://www.daum.net");
+        URL_HASHMAP.put("구글", "http://www.google.co.kr");
+        URL_HASHMAP.put("일베", "http://www.ilbe.com");
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
-        URL_HASHMAP.put("컴응", "http://cafe.daum.net/cris.lecture/");
+        URL_HASHMAP.put("컴응", "http://www.cafe.daum.net/cris.lecture/");
 
     }
     //changable values
-    public static String NORMAL_MODE_LAST_VIEW = MAIN_URL;
-    public static String SECURITY_MODE_LAST_VIEW = MAIN_URL;
-    public static boolean SECURITY_MODE_STATE = false;
+
 }

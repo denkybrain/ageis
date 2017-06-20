@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
@@ -27,13 +26,18 @@ public class CustomizedHandler extends Handler {
     private FragmentActivity activity;
     private ProcessContext processContext;
     private ImageView lockBtn;
+    private CustomizedWebViewManager customizedWebViewManager;
+
     //사용할 객체만 받아옴
 
-    CustomizedHandler(CustomizedWebView wv, FragmentActivity activity, ProcessContext processContext, ImageView lockBtn){
+    CustomizedHandler(CustomizedWebView wv, FragmentActivity activity, ProcessContext processContext, ImageView lockBtn
+    ,CustomizedWebViewManager customizedWebViewManager
+                      ){
         this.wv = wv;
         this.activity =activity;
         this.processContext = processContext;
         this.lockBtn = lockBtn;
+        this.customizedWebViewManager =customizedWebViewManager;
     }
     public void sendMsgQuick(int data){
         Message msg = obtainMessage();
@@ -149,7 +153,7 @@ public class CustomizedHandler extends Handler {
     private void denyAccess(){
         DialogMaker dm = new DialogMaker();
 
-        if(permissionDangerousSite == true && SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
+        if(permissionDangerousSite == true && customizedWebViewManager.SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
             com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
                 @Override
                 public void callbackMethod() {

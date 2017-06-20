@@ -5,6 +5,7 @@ package com.example.denky.ageis;
  */
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -26,9 +28,14 @@ public class ActivityMain extends AppCompatActivity{
 
     final Activity THIS_ACTIVITY =  this;
 
-    public static Fragment normalMode=new FragmentNormalMode();
-    public static Fragment securityMode=new FragmentSecurityMode();
-    public static CustomizedWebViewManager customizedWebViewManager = new CustomizedWebViewManager();
+    public Fragment normalMode   =  new FragmentNormalMode();
+    public Fragment securityMode =   new FragmentSecurityMode();
+    public CustomizedWebViewManager customizedWebViewManager = new CustomizedWebViewManager(normalMode,securityMode, THIS_ACTIVITY);
+
+    public CustomizedWebViewManager getData(){
+        return customizedWebViewManager;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
@@ -47,6 +54,12 @@ public class ActivityMain extends AppCompatActivity{
         final FragmentManager manager=getSupportFragmentManager();
         final FragmentTransaction transaction=manager.beginTransaction();
         transaction.add(R.id.container, normalMode).commit();
+        Intent intent = getIntent();
+        String url = intent.getStringExtra("URL");
+        if(url != null){
+            Log.d("widae","게이야 새 창열었다!");
+            customizedWebViewManager.goToUrlNormalMode(url);
+        }
     }
     public void getPermission(){
         final int permissonCheck_readStorage= ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);

@@ -22,7 +22,6 @@ import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
 import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
-import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
 import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
 
@@ -46,11 +45,15 @@ public class CustomizedWebView extends WebView {
     public final String SHOW_SAFETY_WARNING = "Warning!";
     public final String SHOW_SAFETY_UNACCESSABLE = "Unaccessable";
     public String resultOfsafety;
+    private CustomizedWebViewManager customizedWebViewManager;
 
-    public void constructor(String weburi, EditText editText, CustomizedHandler handler){
+    public void constructor(String weburi, EditText editText, CustomizedHandler handler
+    ,CustomizedWebViewManager cwvm
+    ){
         this.weburi = weburi;
         this.uri = editText;
         this.handler = handler;
+        this.customizedWebViewManager = cwvm;
     }
 
     public CustomizedWebView(Context context) {
@@ -109,7 +112,7 @@ public class CustomizedWebView extends WebView {
             wv.loadUrl(MAIN_URL);
             return ;
         }
-        if(useVulnerabilityFindAlgorithm == true && SECURITY_MODE_STATE == true){
+        if(useVulnerabilityFindAlgorithm == true && customizedWebViewManager.SECURITY_MODE_STATE == true){
             try {
                 Log.d("widae", "접근 시도");
                 JspAccessTask task = new JspAccessTask();

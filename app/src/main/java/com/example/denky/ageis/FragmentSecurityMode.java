@@ -39,11 +39,8 @@ import java.io.File;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static com.example.denky.ageis.ActivityMain.customizedWebViewManager;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
-import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_LAST_VIEW;
-import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
 import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
@@ -67,7 +64,15 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
 
     private CustomizedHandler handler;
     private ViewGroup rootView;
+    private CustomizedWebViewManager customizedWebViewManager;
 
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        if(getActivity() != null && getActivity() instanceof ActivityMain){
+           this.customizedWebViewManager = ((ActivityMain)getActivity()).getData();
+        }
+    }
     private void initializeValues(){
         THIS_ACTIVITY=getActivity();
         lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
@@ -75,8 +80,8 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_security);
         wv = (CustomizedWebView) rootView.findViewById(R.id.wv_security);
-        handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn);
-        wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
+        handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn,customizedWebViewManager);
+        wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
         renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
@@ -91,14 +96,10 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         /* */
     }
     private void initializedWv(){
-        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar);
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
-        wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                progressBar.setProgress(newProgress);
-            }
-        });
+        wv.setWebChromeClient(customizedWebChromeClient);
         wv.setLongClickable(true);
         wv.setOnLongClickListener(this);
         processContext = new ProcessContext(wv, handler);
@@ -107,6 +108,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         registerForContextMenu(wv);
         wvWeb.setWebView();
         progressBar.setVisibility(View.INVISIBLE);
+        wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
     }
 
     @Nullable
@@ -115,7 +117,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
         initializeValues(); //변수 초기화
         initializedWv(); //웹뷰 초기화
-        wv.goToURL(SECURITY_MODE_LAST_VIEW); //처음 화면 로딩
+        wv.goToURL(customizedWebViewManager.SECURITY_MODE_LAST_VIEW); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
@@ -148,13 +150,13 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             wv.setUri("");
                             break;
                         case R.id.lockBtn_security :
-                            if(SECURITY_MODE_STATE == false) {
+                            if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
                                 //Security Mode
-                                SECURITY_MODE_STATE = true;
+                                customizedWebViewManager.SECURITY_MODE_STATE = true;
                             }
                             else{
                                 //Normal Mode
-                                SECURITY_MODE_STATE = false;
+                                customizedWebViewManager.SECURITY_MODE_STATE = false;
                             }
                             break;
 
@@ -211,8 +213,8 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         changeToSecurityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SECURITY_MODE_STATE = false;
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ActivityMain.normalMode).commit();
+                customizedWebViewManager.SECURITY_MODE_STATE = false;
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getNormalMode()).commit();
             }
         });
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
