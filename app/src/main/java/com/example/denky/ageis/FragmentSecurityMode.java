@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
@@ -57,14 +60,25 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
+    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
     private ProcessContext processContext;
     private CustomizedWebViewClient wvWeb;
     DisplayMetrics displayMetrics = new DisplayMetrics();
-
     private CustomizedHandler handler;
     private ViewGroup rootView;
     private CustomizedWebViewManager customizedWebViewManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public LinearLayout bar;
+    private boolean ANIMATION_DONE = true;
+    private final int TIME_OF_ANIMATION = 500;
+
+    public boolean isVisibleBar() {
+        return isVisibleBar;
+    }
+
+    public void setVisibleBar(boolean visibleBar) {
+        isVisibleBar = visibleBar;
+    }
 
     @Override
     public void onAttach(Context context){
@@ -76,6 +90,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private void initializeValues(){
         THIS_ACTIVITY=getActivity();
         lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
+        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_security);
@@ -84,10 +99,21 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
-        renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_security);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_security);
         wvSettings = wv.getSettings();
+        swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutSecurity);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //새로고침 작업 실행...
+                wv.renew();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+
+
          /* display의 가로 세로 구하기 */
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;// 가로
@@ -148,6 +174,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             wv.goToURL(MAIN_URL);
                             lockBtn.setImageResource(R.drawable.lockwhite);
                             wv.setUri("");
+                            visibleUniverseBar();
                             break;
                         case R.id.lockBtn_security :
                             if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
@@ -164,11 +191,11 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                             startActivity(appSetting);
                             break;
-                        case R.id.renewBtn_security :
-                            wv.renew();
-                            break;
                         case R.id.screenBtn_security :
                             wv.onSavePageAllScreenShot();
+                            break;
+                        case R.id.extendWindowBtn :
+                            invisibleUniverseBar();
                             break;
                     }
                 }
@@ -177,36 +204,14 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        renewBtn.setOnClickListener(cl);
         screenshotBtn.setOnClickListener(cl);
+        extendBtn.setOnClickListener(cl);
 
         /////////////////////////////////////////Hide Navigation Function////////////////////////////////////////////
-        final LinearLayout bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
+        bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
         final FrameLayout fragmentContainer=(FrameLayout)rootView.findViewById(R.id.container);
         final CustomizedWebView wv=(CustomizedWebView)rootView.findViewById(R.id.wv_security);
         final RelativeLayout relativeLayout=(RelativeLayout)rootView.findViewById(R.id.normalWebView);
-        ImageView hideBarBt=(ImageView)rootView.findViewById(R.id.hideVarBtn_security);
-        hideBarBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isVisibleBar == true) {
-                    isVisibleBar = false;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=0;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Hide Bar", Toast.LENGTH_LONG).show();
-                } else {
-                    isVisibleBar = true;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Appear Bar", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /////////////////////////////////////////Change to security Mode////////////////////////////////////////////
         ImageView changeToSecurityBtn=(ImageView)rootView.findViewById(R.id.lockBtn_security);
@@ -220,6 +225,47 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return rootView;
+    }
+    public void visibleUniverseBar(){
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        bar.setLayoutParams(params);
+        wv.scrollTo(0,0);
+    }
+
+    public void invisibleUniverseBar(){
+        if(ANIMATION_DONE == true && !wv.getUrl().equals(MAIN_URL) ) {
+            TranslateAnimation ani = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, //fromY
+                    Animation.RELATIVE_TO_SELF, -1.0f);//toY
+
+            ani.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                    ANIMATION_DONE = false;
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                    ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+                    params.height = 0;
+                    bar.setLayoutParams(params);
+                    ANIMATION_DONE = true;
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+
+            ani.setDuration(TIME_OF_ANIMATION);
+            bar.startAnimation(ani);
+        }
+
     }
 
     @Override

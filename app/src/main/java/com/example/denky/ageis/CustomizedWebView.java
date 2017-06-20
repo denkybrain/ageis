@@ -10,8 +10,10 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +50,7 @@ public class CustomizedWebView extends WebView {
     private CustomizedWebViewManager customizedWebViewManager;
 
     public void constructor(String weburi, EditText editText, CustomizedHandler handler
-    ,CustomizedWebViewManager cwvm
+            ,CustomizedWebViewManager cwvm
     ){
         this.weburi = weburi;
         this.uri = editText;
@@ -65,6 +67,8 @@ public class CustomizedWebView extends WebView {
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) { //스크롤 이벤트
+        //Log.d("widae","scrolled:"+t+":"+oldt);
+        customizedWebViewManager.controlHidebar(t, oldt);
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
@@ -91,7 +95,7 @@ public class CustomizedWebView extends WebView {
     }
 
     public void renew(){
-        goToURL();
+        goToURL(getUrl());
     }
 
     private boolean CHECK_STATIC_URL(String staticURL){
@@ -218,4 +222,5 @@ public class CustomizedWebView extends WebView {
             e.printStackTrace();
         }
     }
+
 }

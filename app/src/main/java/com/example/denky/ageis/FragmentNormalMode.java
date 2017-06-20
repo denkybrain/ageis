@@ -1,18 +1,16 @@
 package com.example.denky.ageis;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,9 +19,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebBackForwardList;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -32,9 +31,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -52,13 +51,19 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
+    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
     private ProcessContext processContext;
     DisplayMetrics displayMetrics = new DisplayMetrics();
     private CustomizedHandler handler;
     private ViewGroup rootView;
     private CustomizedWebViewClient wvWeb;
     private CustomizedWebViewManager customizedWebViewManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public LinearLayout bar;
+    final private int TIME_OF_ANIMATION = 500;
+    private boolean ANIMATION_DONE = true;
+    //private CustomizedHandlerAnimation customizedHandlerAnimation;
+
 
     @Override
     public void onAttach(Context context){
@@ -69,6 +74,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     }
 
     private void initializeValues(){
+
         THIS_ACTIVITY=getActivity();
         lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_normal);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
@@ -79,9 +85,22 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_normal);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_normal);
-        renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_normal);
+        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_normal);
+        swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
+
+     //   customizedHandlerAnimation = new CustomizedHandlerAnimation(this);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //새로고침 작업 실행...
+                wv.renew();
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
         wvSettings = wv.getSettings();
         //device 가로 세로 구하기
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -148,6 +167,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                         case R.id.homeBtn_normal : //홈버튼 이벤트 처리
                             wv.goToURL(MAIN_URL);
                             wv.setUri("");
+                            visibleUniverseBar();
                             break;
                         case R.id.lockBtn_normal :
                             if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
@@ -164,11 +184,12 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                             startActivity(appSetting);
                             break;
-                        case R.id.renewBtn_normal :
-                            wv.renew();
-                            break;
+
                         case R.id.screenBtn_normal :
                             wv.onSavePageAllScreenShot();
+                            break;
+                        case R.id.extendWindowBtn :
+                            invisibleUniverseBar();
                             break;
                     }
                 }
@@ -178,36 +199,15 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        renewBtn.setOnClickListener(cl);
         screenshotBtn.setOnClickListener(cl);
+        extendBtn.setOnClickListener(cl);
 
         /////////////////////////////////////////Hide Navigation Function////////////////////////////////////////////
-        final LinearLayout bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
+        bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
+        //invisibleUniverseBar();
         final FrameLayout fragmentContainer=(FrameLayout)rootView.findViewById(R.id.container);
         final CustomizedWebView wv=(CustomizedWebView)rootView.findViewById(R.id.wv_normal);
         final RelativeLayout relativeLayout=(RelativeLayout)rootView.findViewById(R.id.normalWebView);
-        ImageView hideBarBt=(ImageView)rootView.findViewById(R.id.hideVarBtn_normal);
-        hideBarBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isVisibleBar == true) {
-                    isVisibleBar = false;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=0;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Hide Bar", Toast.LENGTH_LONG).show();
-                } else {
-                    isVisibleBar = true;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Appear Bar", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /////////////////////////////////////////Change to security Mode////////////////////////////////////////////
         ImageView changeToSecurityBtn=(ImageView)rootView.findViewById(R.id.lockBtn_normal);
@@ -222,6 +222,51 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
         return rootView;
     }
+
+    //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
+    public void visibleUniverseBar(){
+
+            ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+            params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            bar.setLayoutParams(params);
+            wv.scrollTo(0,0);
+    }
+
+    public void invisibleUniverseBar(){
+        if(ANIMATION_DONE == true && !wv.getUrl().equals(MAIN_URL) ) {
+            TranslateAnimation ani = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, //fromY
+                    Animation.RELATIVE_TO_SELF, -1.0f);//toY
+
+            ani.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                    ANIMATION_DONE = false;
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                    ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+                    params.height = 0;
+                    bar.setLayoutParams(params);
+                    ANIMATION_DONE = true;
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+
+            ani.setDuration(TIME_OF_ANIMATION);
+            bar.startAnimation(ani);
+        }
+
+    }
+    //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public boolean onLongClick(View v) {
@@ -264,4 +309,5 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
         Log.d("widae", "-1"+index+":"+backUrl);
     }
+
 }

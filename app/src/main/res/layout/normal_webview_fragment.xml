@@ -38,14 +38,15 @@
                 android:layout_alignParentRight="true"
                 />
             <ImageView
-                android:id="@+id/renewBtn_normal"
+                android:id="@+id/extendWindowBtn"
                 android:layout_marginTop="8dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/returnbtnblack"
+                android:src="@drawable/extendwindow"
                 android:layout_marginRight="105dp"
                 android:layout_alignParentRight="true"
                 />
+
             <ImageView
                 android:id="@+id/lockBtn_normal"
                 android:layout_marginTop="8dp"
@@ -77,8 +78,8 @@
                 android:textSize="18dp"
                 android:textColor="@color/black"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/renewBtn_normal"
-                android:layout_toStartOf="@+id/renewBtn_normal"
+                android:layout_toLeftOf="@+id/extendWindowBtn"
+                android:layout_toStartOf="@+id/extendWindowBtn"
                 android:selectAllOnFocus="true"
                 />
 
@@ -94,20 +95,28 @@
             android:progressDrawable="@drawable/progressbar_style_normal"
             />
     </LinearLayout>
-
-    <com.example.denky.ageis.CustomizedWebView
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/universe_normal"
+    >
+    <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_below="@id/universe_normal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/wv_normal" />
+        android:id="@+id/swipeRefreshLayoutNormal">
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/circle_arrow_black"
-        android:id="@+id/hideVarBtn_normal"
-        android:layout_below="@id/universe_normal"
-        android:layout_alignParentRight="true"
-        android:layout_margin="16dp" />
+    <com.example.denky.ageis.CustomizedWebView
+
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/wv_normal" >
+    </com.example.denky.ageis.CustomizedWebView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</RelativeLayout>
+
 </RelativeLayout>
