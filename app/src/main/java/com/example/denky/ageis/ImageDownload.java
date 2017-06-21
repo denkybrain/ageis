@@ -52,14 +52,7 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
         //다운로드 폴더에 동일한 파일명이 존재하는지 확인
         String localPath = savePath + "/" + fileName + ".jpg";
         Log.d(TAG, "이미지 다운 접근! from : "+fileUrl);
-        /*
-        if (new File(localPath).exists() == true) { //이미 파일이 존재하면
-            Log.d("widae", "이미 파일이 존재한다 게이야! ");
-            sendMsg(4);
-            processContext.setLastDownloadFile(localPath);
-            return null; //백그라운드 작업 종료
-        }
-        */
+
         sendMsg(0); //이미지 다운 시작
         try {
             URL imgUrl = new URL(fileUrl);

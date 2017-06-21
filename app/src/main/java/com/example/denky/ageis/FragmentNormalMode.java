@@ -62,8 +62,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     public LinearLayout bar;
     final private int TIME_OF_ANIMATION = 500;
     private boolean ANIMATION_DONE = true;
-    //private CustomizedHandlerAnimation customizedHandlerAnimation;
-
 
     @Override
     public void onAttach(Context context){
@@ -89,8 +87,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_normal);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
-
-     //   customizedHandlerAnimation = new CustomizedHandlerAnimation(this);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -225,7 +221,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
     //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
     public void visibleUniverseBar(){
-
             ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
             params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
             bar.setLayoutParams(params);
@@ -303,11 +298,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                 menu.add(0,3,100,processContext.getContextthirdMenu());
                 break;
         }
-    }
-    private void LogPrintWebBackList(int index){
-        WebBackForwardList webBackForwardList = wv.copyBackForwardList();
-        String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
-        Log.d("widae", "-1"+index+":"+backUrl);
     }
 
 }

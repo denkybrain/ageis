@@ -52,7 +52,6 @@ class JspAccessTask extends AsyncTask<String, Void, String> {
         } catch (Exception e){
             Log.d("widae", "서버 접속 불가");
             return "0";
-        }
-        //jsp로부터 받은 리턴 값입니다.
+        }        //jsp로부터 받은 리턴 값입니다.
     }
 }

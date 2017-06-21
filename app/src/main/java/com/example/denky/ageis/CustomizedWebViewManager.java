@@ -58,8 +58,6 @@ public class CustomizedWebViewManager {
         this.normalWebView = normalWebView;
     }
 
-
-
     public void goToUrlNormalMode(String url){
 
         NORMAL_MODE_LAST_VIEW = url;

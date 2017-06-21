@@ -72,7 +72,6 @@ public class CustomizedWebView extends WebView {
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
-
     public void setUri(String str){
         uri.setText(str);
     }
@@ -88,8 +87,7 @@ public class CustomizedWebView extends WebView {
             if(weburi.indexOf('.') > 0 ){
                 checkVirus("http://"+weburi);
                 return;
-            }
-            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 구글 검색으로 처리
+            }            //둘다 아니면, 즉, country와 fileformat과 맞지않으면 구글 검색으로 처리
             checkVirus("https://www.google.co.kr/search?q=" + weburi);
         }
     }
@@ -199,28 +197,6 @@ public class CustomizedWebView extends WebView {
 
         wv.setDrawingCacheEnabled(false);
         handler.sendMsgQuick(7);
-    }
-
-    static public void MakeCache(View v, String filename){ //오픈 소스 가져옴 아직 안 씀
-        //src : http://blog.jusun.org/archives/6
-
-        String StoragePath =
-                Environment.getExternalStorageDirectory().getAbsolutePath();
-        String savePath = StoragePath;
-        File f = new File(savePath);
-        if (!f.isDirectory())f.mkdirs();
-
-        v.buildDrawingCache();
-        Bitmap bitmap = v.getDrawingCache();
-        FileOutputStream fos;
-        try{
-            /*
-            fos = new FileOutputStream(savePath+&quot;/&quot;+filename);
-            bitmap.compress(Bitmap.CompressFormat <a href="http://biturlz.com/DFMr7yC">cherche viagra a vendre</a>.JPEG,80,fos);
-            */
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
 }

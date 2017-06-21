@@ -306,10 +306,4 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                 break;
         }
     }
-    private void LogPrintWebBackList(int index){
-        WebBackForwardList webBackForwardList = wv.copyBackForwardList();
-        String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
-        Log.d("widae", "-1"+index+":"+backUrl);
-    }
-
 }
