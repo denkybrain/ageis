@@ -49,25 +49,8 @@ public class ActivityMain extends AppCompatActivity{
         final FragmentManager manager=getSupportFragmentManager();
         final FragmentTransaction transaction=manager.beginTransaction();
         transaction.add(R.id.container, normalMode).commit();
-
-        /*
-        ImageView changeToSecurityBtn=(ImageView)findViewById(R.id.lockBtn_normal);
-        changeToSecurityBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                transaction.replace(R.id.container, securityMode).commit();
-            }
-        });
-
-        ImageView changeToNormalBtn=(ImageView)findViewById(R.id.lockBtn_security);
-        changeToNormalBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                transaction.replace(R.id.container, normalMode).commit();
-            }
-        });
-        */
     }
+
     public void getPermission(){
         final int permissonCheck_readStorage= ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
         final int permissonCheck_writeStorage= ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
