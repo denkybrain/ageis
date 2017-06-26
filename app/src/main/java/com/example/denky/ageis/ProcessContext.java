@@ -18,7 +18,7 @@ public class ProcessContext {
     private String contextsecondMenu = "";
     private String contextthirdMenu = "";
     private CustomizedWebView wv;
-    public Handler handler;
+    public CustomizedHandler handler;
     public String getUrl() {       return url;    }
     public void setUrl(String url) {        this.url = url;    }
 
@@ -33,20 +33,12 @@ public class ProcessContext {
     private final String ITEM_SHARE_URL ="주소 공유하기";
     private final boolean IMG_SHARE_ON = true;
     private final boolean IMG_SHARE_OFF = false;
-    private String lastDownloadFile = "";
 
-    public String getLastDownloadFile() {
-        return lastDownloadFile;
-    }
-
-    public void setLastDownloadFile(String lastDownloadFile) {
-        this.lastDownloadFile = lastDownloadFile;
-    }
 
     private int menuBtnVolume = 3;
     private int typeOfLongClickedItem = 0;//롱클릭된 아이템의 타입. 0 기본값 1은 anchor type, 2는 image, 3은 anchor-image
 
-    ProcessContext(CustomizedWebView wv, Handler handler){
+    ProcessContext(CustomizedWebView wv, CustomizedHandler handler){
         this.wv = wv;
         this.handler = handler;
     } //이 함수에서 웹뷰와 메인액티비티 핸들러에 접근해야함
@@ -147,11 +139,6 @@ public class ProcessContext {
         downloader.share = share;
         downloader.execute(this.url);
         }
-    private void sendMsg(int msgType){
-        Message msg = handler.obtainMessage();
-        msg.what = msgType; //다운을 시작한다고 토스트를 띄움
-        handler.sendMessage(msg);
-    }
     public void onContextItemSelected(int itemId) {
         switch(typeOfLongClickedItem) {
             case 1 : // anchor tag
@@ -160,10 +147,10 @@ public class ProcessContext {
                         wv.goToURL(url);
                        break;
                     case 2 :
-                        sendMsg(5);
+                        handler.sendMsgQuick(handler.ANCHOR_COPY);
                         break;
                     case 3 :
-                        sendMsg(2);
+                        handler.sendMsgQuick(handler.ANCHOR_SHARE);
                         break;
                 }
                 break;

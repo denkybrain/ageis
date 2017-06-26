@@ -1,5 +1,6 @@
 package com.example.denky.ageis;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
@@ -21,7 +22,7 @@ import java.util.Locale;
 public class ImageDownload extends AsyncTask<String, Void, Void> {
     private String fileName;
     private final String SAVE_FOLDER = File.separator+"Ageis"+File.separator+"Ageis_download";
-    public Handler handler;
+    public CustomizedHandler handler;
     public ProcessContext processContext; //processContext 객체에 접근가능함
     public boolean share = false;
     private String TAG="Image Download";
@@ -78,7 +79,7 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
             fos.close();
             //Log.d(TAG, "이미지 다운로드 끝났따 딱기분조타! from : "+localPath);
             //Log.d(TAG, "파일 다운 경로 : "+localPath);
-            processContext.setLastDownloadFile(localPath);
+            handler.setLastDownloadFile(localPath);
             conn.disconnect();
         } catch (Exception e) {
             Log.i(TAG, "Exception!");
@@ -86,16 +87,26 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
         return null;
     }
 
+    private void downloadFailed(){
+        handler.sendMsgQuick(handler.IMG_DOWNLOAD_FAILED);
+    }
+
     @Override
     protected void onPostExecute(Void result) { //다운 종료 함수
         //doInBackground 공부 : http://itmining.tistory.com/7
         /* show toast through main-activity hanlder */
-        if(share){
-            sendMsg(3); //공유하기 알림
-        }else {
-            sendMsg(1); //다운 완료 알림
+        if(handler.getLastDownloadFile().equals("")) { // 다운로드 실패시
+            downloadFailed();
+        }else { // 다운로드 성공시
+            handler.sendMsgQuick(handler.MEDIA_SCAN); // 미디어 스캐닝
+            if (share) {
+                handler.sendMsgQuick(handler.IMG_SHARE); //공유하기 알림
+            } else {
+                handler.sendMsgQuick(handler.IMG_DOWNLOAD_FINISHED); //다운 완료 알림
+            }
         }
-        /* show toast through main-activity hanlder */
+        /* show toast through main-activity handler */
+      //  sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
 
         super.onPostExecute(result);
         /*

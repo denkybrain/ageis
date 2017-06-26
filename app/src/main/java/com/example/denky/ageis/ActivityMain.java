@@ -41,7 +41,6 @@ public class ActivityMain extends AppCompatActivity{
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         getPermission();  //get needed permission
         //load Settings
         if(ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){

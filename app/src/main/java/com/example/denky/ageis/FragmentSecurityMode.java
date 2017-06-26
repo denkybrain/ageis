@@ -72,13 +72,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private boolean ANIMATION_DONE = true;
     private final int TIME_OF_ANIMATION = 500;
 
-    public boolean isVisibleBar() {
-        return isVisibleBar;
-    }
-
-    public void setVisibleBar(boolean visibleBar) {
-        isVisibleBar = visibleBar;
-    }
 
     @Override
     public void onAttach(Context context){

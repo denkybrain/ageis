@@ -21,6 +21,8 @@ public class CustomizedWebChromeClient extends WebChromeClient {
         this.customizedWebViewManager = customizedWebViewManager;
         this.activity = customizedWebViewManager.getActivity();
     }
+    //Progress bar 설정, 새 창 띄우기 위함
+
     @Override
     public boolean onCreateWindow(WebView wv, boolean isDialog, boolean isUserGesture, Message resultMsg){
         wv.requestFocusNodeHref(resultMsg);

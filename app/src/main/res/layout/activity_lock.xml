@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/white"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icon"
+            />
+            </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/lockno"
+            android:id="@+id/pin1"
+            android:layout_margin="20dp"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/lockno"
+            android:id="@+id/pin2"
+            android:layout_margin="20dp"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/lockno"
+            android:id="@+id/pin3"
+            android:layout_margin="20dp"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/lockno"
+            android:id="@+id/pin4"
+            android:layout_margin="20dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+    >
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="1"
+            android:textSize="35dp"
+            android:textColor="@color/black"
+            android:padding="30dp"
+            android:textAlignment="center"
+            />
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="1"
+            android:textSize="35dp"
+            android:textColor="@color/black"
+            android:padding="30dp"
+            android:textAlignment="center"
+            />
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="1"
+            android:textSize="35dp"
+            android:textColor="@color/black"
+            android:padding="30dp"
+            android:textAlignment="center"
+            />
+
+
+    </LinearLayout>
+
+</LinearLayout>

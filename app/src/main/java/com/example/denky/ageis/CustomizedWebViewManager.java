@@ -2,13 +2,7 @@ package com.example.denky.ageis;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.ViewGroup;
 import android.webkit.WebBackForwardList;
-import android.widget.LinearLayout;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 
@@ -29,6 +23,25 @@ public class CustomizedWebViewManager {
     public boolean focusOnUrlBar = true;
     private Activity activity;
 
+    public boolean isSTATE_LOADING_NORMAL() {
+        return STATE_LOADING_NORMAL;
+    }
+
+    public void setSTATE_LOADING_NORMAL(boolean STATE_LOADING_NORMAL) {
+        this.STATE_LOADING_NORMAL = STATE_LOADING_NORMAL;
+    }
+
+    public boolean isSTATE_LOADING_SECURITY() {
+        return STATE_LOADING_SECURITY;
+    }
+
+    public void setSTATE_LOADING_SECURITY(boolean STATE_LOADING_SECURITY) {
+        this.STATE_LOADING_SECURITY = STATE_LOADING_SECURITY;
+    }
+
+    private boolean STATE_LOADING_NORMAL = false;
+    private boolean STATE_LOADING_SECURITY = false;
+
     public Activity getActivity() {
         return activity;
     }
@@ -41,12 +54,12 @@ public class CustomizedWebViewManager {
         this.activity = activity;
     }
 
-    public void controlHidebar(int t, int oldt){
+    public void controlHidebar(int t, int oldt){        //Log.d("widae", "controlHideBar function on");
       if(t == 0 && oldt > 0){ // 보이게 함
            if(!SECURITY_MODE_STATE)
-               fragmentNormalMode.visibleUniverseBar();
+                   fragmentNormalMode.visibleUniverseBar();
           else
-               fragmentSecurityMode.visibleUniverseBar();
+                   fragmentSecurityMode.visibleUniverseBar();
        }
     }
 

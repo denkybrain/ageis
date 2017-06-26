@@ -63,6 +63,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     final private int TIME_OF_ANIMATION = 500;
     private boolean ANIMATION_DONE = true;
 
+
+
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
@@ -121,6 +123,10 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar.setVisibility(View.INVISIBLE);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
 
+    }
+
+    public boolean isVisibleBar() {
+        return isVisibleBar;
     }
 
     @Nullable
@@ -249,6 +255,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                     params.height = 0;
                     bar.setLayoutParams(params);
                     ANIMATION_DONE = true;
+
                 }
 
                 @Override
@@ -259,7 +266,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
             ani.setDuration(TIME_OF_ANIMATION);
             bar.startAnimation(ani);
         }
-
     }
     //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
 

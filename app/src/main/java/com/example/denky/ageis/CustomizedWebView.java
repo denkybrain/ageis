@@ -22,7 +22,6 @@ import java.util.Date;
 
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
-import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
 import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
@@ -49,13 +48,14 @@ public class CustomizedWebView extends WebView {
     public String resultOfsafety;
     private CustomizedWebViewManager customizedWebViewManager;
 
+
     public void constructor(String weburi, EditText editText, CustomizedHandler handler
-            ,CustomizedWebViewManager cwvm
-    ){
+            ,CustomizedWebViewManager cwvm){
         this.weburi = weburi;
         this.uri = editText;
         this.handler = handler;
         this.customizedWebViewManager = cwvm;
+
     }
 
     public CustomizedWebView(Context context) {
@@ -67,7 +67,13 @@ public class CustomizedWebView extends WebView {
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) { //스크롤 이벤트
-        //Log.d("widae","scrolled:"+t+":"+oldt);
+        if(customizedWebViewManager.SECURITY_MODE_STATE) {// 시큐리티 모드면
+            if (customizedWebViewManager.isSTATE_LOADING_SECURITY())
+                return; //로딩중이면 함수 종료시킴.
+        } else {//노말 모드일 때
+            if (customizedWebViewManager.isSTATE_LOADING_NORMAL())
+                return ;
+        }
         customizedWebViewManager.controlHidebar(t, oldt);
         super.onScrollChanged(l, t, oldl, oldt);
     }
@@ -124,28 +130,28 @@ public class CustomizedWebView extends WebView {
                     case 0 : //when Race condition occurs or other exception occurs, just goURL
                         Log.d("widae", "0번 오류 : race condition or access failed");
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        handler.sendMsgQuick(97);
+                        handler.sendMsgQuick(handler.ACCESS_SAFE);
                         return ;
                     case SAFETY_GREAT  :
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        handler.sendMsgQuick(97);
+                        handler.sendMsgQuick(handler.ACCESS_SAFE);
                         break;
                     case SAFETY_NORMAL  :
                         resultOfsafety = SHOW_SAFETY_GREAT;
-                        handler.sendMsgQuick(97);
+                        handler.sendMsgQuick(handler.ACCESS_SAFE);
                         break;
                     case SAFETY_EXPOSED  :
                         resultOfsafety = SHOW_SAFETY_EXPOSED;
-                        handler.sendMsgQuick(99);
+                        handler.sendMsgQuick(handler.ACCESS_CHECK);
                         //super.onPageStarted(view, url, favicon);
                         break;
                     case SAFETY_WARNING :
                         resultOfsafety = SHOW_SAFETY_WARNING;
-                        handler.sendMsgQuick(99);
+                        handler.sendMsgQuick(handler.ACCESS_CHECK);
                         break;
                     case SAFETY_UNACCESSABLE :
                         resultOfsafety =SHOW_SAFETY_UNACCESSABLE;
-                        handler.sendMsgQuick(98);
+                        handler.sendMsgQuick(handler.ACCESS_DENY);
                         break;
                 }
             } catch (Exception e){
@@ -171,7 +177,7 @@ public class CustomizedWebView extends WebView {
         }
     }
     public void onSavePageAllScreenShot() {
-        handler.sendMsgQuick(6);
+        handler.sendMsgQuick(handler.SCREENSHOT_CAPTURE);
         wv.setDrawingCacheEnabled(true);
         Picture picture = wv.capturePicture();
         int captureHeight = DEVICE_HEIGHT -255;
@@ -185,18 +191,22 @@ public class CustomizedWebView extends WebView {
         File file = new File(dirPath);
         if( !file.exists() )  // 원하는 경로에 폴더가 있는지 확인
             file.mkdirs();
-        File hFile = new File( "" + dirPath + "/SC_" + strDate +".jpg" );
+        String localFile =  "" + dirPath + "/SC_" + strDate +".jpg";
+        File hFile = new File( localFile );
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(hFile);
             saveAllScreenShot.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
+            handler.setLastDownloadFile(localFile);
         } catch ( Exception e){
             Log.i("error", e.getMessage());
         }
 
+
         wv.setDrawingCacheEnabled(false);
-        handler.sendMsgQuick(7);
+        handler.sendMsgQuick(handler.SCREENSHOT_SAVED);
+        handler.sendMsgQuick(handler.IMG_SHARE);
     }
 
 }

@@ -95,6 +95,7 @@
             android:progressDrawable="@drawable/progressbar_style_normal"
             />
     </LinearLayout>
+
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
