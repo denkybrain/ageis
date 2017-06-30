@@ -1,5 +1,8 @@
 package com.example.denky.ageis;
 
+import android.os.Environment;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,36 +11,134 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import android.content.pm.PackageManager;
-import android.os.Environment;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-
 /**
  * Created by WINDOWS7 on 2017-05-31.
  */
 
-public class Settings implements Serializable{
-    public static boolean useJavaScript;
-    public static boolean permissionStartNewWindow;
-    public static boolean permissionFileDownload;
-    public static boolean permissionAppCache;
+public class Settings{
 
-    public static boolean useVulnerabilityFindAlgorithm;
-    public static boolean useProxyServer;
-    public static boolean permissionAutoRemoveHistory;
-    public static boolean useAdBlock;
+    static final String TAG="Setting File";
 
-    private static ObjectInputStream inputSettings;
-    private static ObjectOutputStream outputSettings;
+    //Setting Value
+    public static boolean useJavaScript=true;
+    public static boolean permissionStartNewWindow=true;
+    public static boolean permissionFileDownload=false;
+    public static boolean permissionAppCache=true;
 
+    public static boolean useVulnerabilityFindAlgorithm=true;
+    public static boolean useProxyServer=false;
+    public static boolean permissionAutoRemoveHistory=true;
+    public static boolean useAdBlock=true;
 
-    private static Settings imported=null;
+    //Stream for File I/O
+    private static ObjectInputStream inputSettings=null;
+    private static ObjectOutputStream outputSettings=null;
+
+    private static String filePath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis"+File.separator+".Settings.set";
 
     //This class is never instantiated at other class
-    private Settings(){
+    private Settings(){}
+
+    public static void restoreSetting(){
+        try {
+            SetInfo newSetInfo=new SetInfo();
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
+            outputSettings.writeObject(newSetInfo);
+            outputSettings.close();
+        } catch (IOException e) {
+            Log.i(TAG, "Can't restore Setting File");
+        }
+    }
+
+    public static boolean loadSettings(){
+        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        sdPath+= File.separator+"Ageis";
+
+        File folder= new File(sdPath);
+        if(folder.exists()==false){
+            folder.mkdirs();
+        }
+
+        File settingFile=new File(filePath);
+        try{
+            if(settingFile.exists()==false){
+                Log.i(TAG, "Setting File is not existing");
+                //make Output Stream (when not existing setting file)
+                outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
+                outputSettings.writeObject(new SetInfo());
+                outputSettings.close();
+                Log.i(TAG, "Success writing new object");
+            }else{
+                Log.i(TAG, "Setting File is already exist");
+                //make Output Stream (when already existing setting file)
+                //outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
+            }
+
+            //make Input Stream
+            inputSettings=new ObjectInputStream(new FileInputStream(settingFile));
+
+            //Read Setting file
+            SetInfo info=(SetInfo)inputSettings.readObject();
+            Log.i(TAG, "Success Reading");
+
+            if(info!=null){
+                useJavaScript=info.useJavaScript;
+                permissionStartNewWindow=info.permissionStartNewWindow;
+                permissionFileDownload=info.permissionFileDownload;
+                permissionAppCache=info.permissionAppCache;
+                useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
+                useProxyServer=info.useProxyServer;
+                permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
+                useAdBlock=info.useAdBlock;
+            }else{
+                Log.i(TAG, "Fail to read object in file");
+            }
+
+            inputSettings.close();
+        }catch(Exception e) {
+            Log.i(TAG, "Exception Occur");
+            return false;
+        }
+    return true;
+    }
+
+    public static void saveSettings(){
+        ////////////////////////////Saving////////////////////////////////
+        SetInfo info=new SetInfo();
+
+        info.useJavaScript=useJavaScript;
+        info.permissionStartNewWindow=permissionStartNewWindow;
+        info.permissionFileDownload=permissionFileDownload;
+        info.permissionAppCache=permissionAppCache;
+        info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
+        info.useProxyServer=useProxyServer;
+        info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
+        info.useAdBlock=useAdBlock;
+        try {
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
+            outputSettings.writeObject(info);
+            outputSettings.close();
+        } catch (IOException e) {
+            Log.i(TAG, "Can't save settings");
+        }
+        //////////////////////////////////////////////////////////////////
+    }
+}
+
+//This Class is only using when saving setting value to file.
+class SetInfo implements Serializable{
+
+    public boolean useJavaScript=true;
+    public boolean permissionStartNewWindow=true;
+    public boolean permissionFileDownload=false;
+    public boolean permissionAppCache=true;
+
+    public boolean useVulnerabilityFindAlgorithm=true;
+    public boolean useProxyServer=false;
+    public boolean permissionAutoRemoveHistory=true;
+    public boolean useAdBlock=true;
+
+    public SetInfo(){
         initiate();
     }
 
@@ -51,84 +152,5 @@ public class Settings implements Serializable{
         useProxyServer=false;
         permissionAutoRemoveHistory=true;
         useAdBlock=true;
-    }
-
-    public static void restoreSetting(){
-        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        sdPath+="/Ageis"+"/Settings.set";
-
-        File f=new File(sdPath);
-        f.delete();
-
-        try {
-            outputSettings.writeObject(new Settings());
-        } catch (IOException e) {
-            Log.i("SettingSaveError: ", "failed saving file");
-        }
-    }
-
-    //must be getting by this method
-    public static Settings getInstance(){
-
-        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        sdPath+="/Ageis";
-
-        File folder= new File(sdPath);
-        folder.mkdirs();
-
-        sdPath+="/Settings.set";
-
-        File settingFile=new File(sdPath);
-
-        //make Stream
-        try{
-            outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
-        }catch(Exception e){
-            Log.i("SettingSaveError: ", "can't make outputStream");
-        }
-        if(!settingFile.exists()){
-            try {
-                outputSettings.writeObject(new Settings());
-                Log.i("SettingSaveError: ", "success writing object");
-            } catch (IOException e) {
-                Log.i("SettingSaveError: ", "fail writing object");
-            }
-        }
-        try{
-            inputSettings=new ObjectInputStream(new FileInputStream(settingFile));
-        }catch(Exception e){
-            Log.i("SettingSaveError: ", "Not exist setting file");
-        }
-
-        if(inputSettings==null){
-            Log.i("SS", "NULL");
-        }
-
-        try{
-            imported=(Settings)inputSettings.readObject();
-        }catch(Exception e){
-            Log.i("SettingSaveError: ", "can't read setting file");
-        }
-
-        return imported;
-    }
-
-    public static void saveSettings(){
-        try {
-            if(imported!=null){
-
-                String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-                sdPath+="/Ageis"+"/Settings.set";
-
-                File f=new File(sdPath);
-                f.delete();
-
-                outputSettings.writeObject(imported);
-            }else{
-                Log.i("SettingSaveError: ", "can't read setting file");
-            }
-        } catch (IOException e) {
-            Log.i("SettingSaveError: ", "can't save settings");
-        }
     }
 }

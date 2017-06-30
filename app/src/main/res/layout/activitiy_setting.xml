@@ -219,7 +219,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/title_t"
-        android:text="계정 설정"
+        android:text="기타 설정"
         android:gravity="center_vertical"
         android:shadowColor="#A8A8A8"
         android:shadowDx="0"
@@ -233,30 +233,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="2dp">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/google"
-                />
-            <TextView
-                android:id="@+id/googleBtn"
-                android:paddingLeft="30dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="구글 계정 연동"
-                android:textSize="20dp"
-                android:layout_margin="5dp"
-                android:layout_alignParentLeft="true"
-                android:onClick="clickedPermission"
-                />
 
-
-        </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -264,7 +241,7 @@
                 android:id="@+id/googleDeleteBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="계정 기록 초기화"
+                android:text="기록 초기화"
                 android:textSize="20dp"
                 android:layout_margin="5dp"
                 android:layout_alignParentLeft="true"
@@ -287,20 +264,6 @@
                 />
 
         </RelativeLayout>
-        </LinearLayout>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/title_t"
-            android:text="기타"
-            android:gravity="center_vertical"
-            android:shadowColor="#A8A8A8"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="5"
-            android:textColor="#ffffff"
-            android:textSize="20dip"
-            android:paddingLeft="4dp"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -316,5 +279,8 @@
                 android:layout_alignParentLeft="true"
                 android:onClick="clickedPermission"
                 />
-         </LinearLayout>
+        </LinearLayout>
+        </LinearLayout>
+
+
 </LinearLayout>
