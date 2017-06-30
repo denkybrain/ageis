@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebChromeClient;
@@ -41,13 +44,13 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
-import static com.example.denky.ageis.ReferenceString.SECURITY_MODE_STATE;
+import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
  * Created by Windows10 on 2017-06-12.
  */
 
-public class SecurityMode extends Fragment implements View.OnLongClickListener{
+public class FragmentSecurityMode extends Fragment implements View.OnLongClickListener{
     private boolean isVisibleBar=true;
     private Activity THIS_ACTIVITY ;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
@@ -57,112 +60,83 @@ public class SecurityMode extends Fragment implements View.OnLongClickListener{
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn, renewBtn, screenshotBtn;
-    private LinearLayout universe;
-    private RelativeLayout gotoBar;
+    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
     private ProcessContext processContext;
-    static final int STORAGE_READ_PERMISSON=100;
-    static final int STORAGE_WRITE_PERMISSON=101;
+    private CustomizedWebViewClient wvWeb;
     DisplayMetrics displayMetrics = new DisplayMetrics();
+    private CustomizedHandler handler;
+    private ViewGroup rootView;
+    private CustomizedWebViewManager customizedWebViewManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public LinearLayout bar;
+    private boolean ANIMATION_DONE = true;
+    private final int TIME_OF_ANIMATION = 500;
 
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            Toast Img_toast;
-            switch (msg.what) {
-                case 0  :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 시작", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case 1 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "다운로드 완료", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case 2 : //주소 공유
-                    Intent intent_text = new Intent(Intent.ACTION_SEND);
-                    //intent_text.putExtra(Intent.EXTRA_SUBJECT, "url");
-                    intent_text.setType("text/plain");
-                    intent_text.putExtra(Intent.EXTRA_TEXT, processContext.getUrl());
-                    startActivity(Intent.createChooser(intent_text, "이 사진을 공유합니다"));
-                    break;
-                case 3 : //이미지 공유
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "제목");
-                    // Log.d("widae", "공유할 파일 from "+processContext.getLastDownloadFile());
-                    Uri uri = Uri.fromFile(new File(processContext.getLastDownloadFile()));
-                    intent.putExtra(Intent.EXTRA_STREAM, uri);
-                    intent.setType("image/*");
-                    startActivity(Intent.createChooser(intent, "이 사진을 공유합니다"));
-                    break;
-                case 4 :
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
-                    Img_toast.show();
-                    break;
-                case  5:
-                    //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
-                    ClipboardManager clipBoard = (ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                    clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case  6:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "화면 캡쳐중...", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-                case  7:
-                    Img_toast = Toast.makeText(getActivity().getApplicationContext(), "저장 완료", Toast.LENGTH_SHORT);
-                    Img_toast.show();
-                    break;
-            }
-        }
-    };
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
-
+    public void onAttach(Context context){
+        super.onAttach(context);
+        if(getActivity() != null && getActivity() instanceof ActivityMain){
+           this.customizedWebViewManager = ((ActivityMain)getActivity()).getData();
+        }
+    }
+    private void initializeValues(){
         THIS_ACTIVITY=getActivity();
-
+        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
+        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_security);
         wv = (CustomizedWebView) rootView.findViewById(R.id.wv_security);
-        wv.constructor(weburi, uri, handler);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
+        handler = new CustomizedHandler(wv,getActivity(),processContext,lockBtn,customizedWebViewManager);
+        wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
-        lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
-        gotoBar = (RelativeLayout)rootView.findViewById(R.id.gotoBar_security);
-        universe = (LinearLayout)rootView.findViewById(R.id.universe_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
-        renewBtn = (ImageView)rootView.findViewById(R.id.renewBtn_security);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_security);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_security);
         wvSettings = wv.getSettings();
+        swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutSecurity);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //새로고침 작업 실행...
+                wv.renew();
+                swipeRefreshLayout.setRefreshing(false);
 
-        /* display의 가로 세로 구하기 */
+            }
+        });
+
+
+         /* display의 가로 세로 구하기 */
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int width = displayMetrics.widthPixels;// 가로
         int height = displayMetrics.heightPixels;// 세로
         DEVICE_HEIGHT = height;
         /* */
-
-        CustomizedWebViewClient wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, uri, weburi);
+    }
+    private void initializedWv(){
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
-        wv.setWebChromeClient(new WebChromeClient() { //Progress bar 체인지를 위한 ChromeClient
-            @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                progressBar.setProgress(newProgress);
-            }
-        });
+        wv.setWebChromeClient(customizedWebChromeClient);
         wv.setLongClickable(true);
         wv.setOnLongClickListener(this);
         processContext = new ProcessContext(wv, handler);
+        handler.setProcessContext(processContext);
+        customizedWebViewManager.setSecurityWebView(wv);
         registerForContextMenu(wv);
         wvWeb.setWebView();
-        //progressBar.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN); //
-        //progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);//Prgress bar color change
         progressBar.setVisibility(View.INVISIBLE);
-        wv.goToURL(MAIN_URL); //처음 화면 로딩
+        wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
+        initializeValues(); //변수 초기화
+        initializedWv(); //웹뷰 초기화
+        wv.goToURL(customizedWebViewManager.SECURITY_MODE_LAST_VIEW); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {  //Enter key Action
@@ -191,16 +165,18 @@ public class SecurityMode extends Fragment implements View.OnLongClickListener{
                     switch (v.getId()){
                         case R.id.homeBtn_security : //홈버튼 이벤트 처리
                             wv.goToURL(MAIN_URL);
+                            lockBtn.setImageResource(R.drawable.lockwhite);
                             wv.setUri("");
+                            visibleUniverseBar();
                             break;
                         case R.id.lockBtn_security :
-                            if(SECURITY_MODE_STATE == false) {
+                            if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
                                 //Security Mode
-                                SECURITY_MODE_STATE = true;
+                                customizedWebViewManager.SECURITY_MODE_STATE = true;
                             }
                             else{
                                 //Normal Mode
-                                SECURITY_MODE_STATE = false;
+                                customizedWebViewManager.SECURITY_MODE_STATE = false;
                             }
                             break;
 
@@ -208,62 +184,81 @@ public class SecurityMode extends Fragment implements View.OnLongClickListener{
                             Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                             startActivity(appSetting);
                             break;
-                        case R.id.renewBtn_security :
-                            wv.renew();
-                            break;
                         case R.id.screenBtn_security :
                             wv.onSavePageAllScreenShot();
                             break;
+                        case R.id.extendWindowBtn :
+                            invisibleUniverseBar();
+                            break;
                     }
                 }
-
             }
         };
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        renewBtn.setOnClickListener(cl);
         screenshotBtn.setOnClickListener(cl);
+        extendBtn.setOnClickListener(cl);
 
         /////////////////////////////////////////Hide Navigation Function////////////////////////////////////////////
-        final LinearLayout bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
+        bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
         final FrameLayout fragmentContainer=(FrameLayout)rootView.findViewById(R.id.container);
         final CustomizedWebView wv=(CustomizedWebView)rootView.findViewById(R.id.wv_security);
         final RelativeLayout relativeLayout=(RelativeLayout)rootView.findViewById(R.id.normalWebView);
-        ImageView hideBarBt=(ImageView)rootView.findViewById(R.id.hideVarBtn_security);
-        hideBarBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isVisibleBar == true) {
-                    isVisibleBar = false;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=0;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Hide Bar", Toast.LENGTH_LONG).show();
-                } else {
-                    isVisibleBar = true;
-                    ViewGroup.LayoutParams params=(ViewGroup.LayoutParams)bar.getLayoutParams();
-                    params.height=LinearLayout.LayoutParams.WRAP_CONTENT;
-                    bar.setLayoutParams(params);
-                    //fragmentContainer.getLayoutParams().height= FrameLayout.LayoutParams.MATCH_PARENT;
-                    //Toast.makeText(getActivity().getApplicationContext(), "Appear Bar", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /////////////////////////////////////////Change to security Mode////////////////////////////////////////////
         ImageView changeToSecurityBtn=(ImageView)rootView.findViewById(R.id.lockBtn_security);
         changeToSecurityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ActivityMain.normalMode).commit();
+                customizedWebViewManager.SECURITY_MODE_STATE = false;
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getNormalMode()).commit();
             }
         });
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return rootView;
+    }
+    public void visibleUniverseBar(){
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        bar.setLayoutParams(params);
+        wv.scrollTo(0,0);
+    }
+
+    public void invisibleUniverseBar(){
+        if(ANIMATION_DONE == true && !wv.getUrl().equals(MAIN_URL) ) {
+            TranslateAnimation ani = new TranslateAnimation(
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f,
+                    Animation.RELATIVE_TO_SELF, 0.0f, //fromY
+                    Animation.RELATIVE_TO_SELF, -1.0f);//toY
+
+            ani.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                    ANIMATION_DONE = false;
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+
+                    ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();
+                    params.height = 0;
+                    bar.setLayoutParams(params);
+                    ANIMATION_DONE = true;
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+
+            ani.setDuration(TIME_OF_ANIMATION);
+            bar.startAnimation(ani);
+        }
+
     }
 
     @Override
@@ -304,10 +299,4 @@ public class SecurityMode extends Fragment implements View.OnLongClickListener{
                 break;
         }
     }
-    private void LogPrintWebBackList(int index){
-        WebBackForwardList webBackForwardList = wv.copyBackForwardList();
-        String backUrl = webBackForwardList.getItemAtIndex(webBackForwardList.getCurrentIndex() - index).getUrl();
-        Log.d("widae", "-1"+index+":"+backUrl);
-    }
-
 }

@@ -26,9 +26,9 @@ public class Settings{
     public static boolean permissionAppCache=true;
 
     public static boolean useVulnerabilityFindAlgorithm=true;
-    public static boolean useProxyServer=false;
+    public static boolean permissionDangerousSite =false;
     public static boolean permissionAutoRemoveHistory=true;
-    public static boolean useAdBlock=true;
+    public static boolean autoClearUrl=true;
 
     //Stream for File I/O
     private static ObjectInputStream inputSettings=null;
@@ -87,9 +87,8 @@ public class Settings{
                 permissionFileDownload=info.permissionFileDownload;
                 permissionAppCache=info.permissionAppCache;
                 useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
-                useProxyServer=info.useProxyServer;
+                permissionDangerousSite =info.permissionDangerousSite;
                 permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
-                useAdBlock=info.useAdBlock;
             }else{
                 Log.i(TAG, "Fail to read object in file");
             }
@@ -111,9 +110,8 @@ public class Settings{
         info.permissionFileDownload=permissionFileDownload;
         info.permissionAppCache=permissionAppCache;
         info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
-        info.useProxyServer=useProxyServer;
+        info.permissionDangerousSite = permissionDangerousSite;
         info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
-        info.useAdBlock=useAdBlock;
         try {
             outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(info);
@@ -134,9 +132,8 @@ class SetInfo implements Serializable{
     public boolean permissionAppCache=true;
 
     public boolean useVulnerabilityFindAlgorithm=true;
-    public boolean useProxyServer=false;
+    public boolean permissionDangerousSite =false;
     public boolean permissionAutoRemoveHistory=true;
-    public boolean useAdBlock=true;
 
     public SetInfo(){
         initiate();
@@ -149,8 +146,7 @@ class SetInfo implements Serializable{
         permissionAppCache=true;
 
         useVulnerabilityFindAlgorithm=true;
-        useProxyServer=false;
+        permissionDangerousSite =false;
         permissionAutoRemoveHistory=true;
-        useAdBlock=true;
     }
 }

@@ -163,7 +163,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="프록시 서버 사용"
+                android:text="위험 사이트 차단"
                 android:textSize="20dp"
                 android:layout_margin="5dp"
                 android:layout_alignParentLeft="true"/>
@@ -171,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:id="@+id/proxyOn"
+                android:id="@+id/clickedDenyDangerousSite"
                 android:onClick="clickedPermission"
                 android:checked="true"
                 />
@@ -201,7 +201,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="광고 차단(JSP filter)"
+                android:text="URL 자동 비우기"
                 android:textSize="20dp"
                 android:layout_margin="5dp"
                 android:layout_alignParentLeft="true"/>
@@ -209,11 +209,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:id="@+id/adBlockOn"
+                android:id="@+id/clearUrlOn"
                 android:onClick="clickedPermission"
-                android:checked="true"
+                android:checked="false"
                 />
         </RelativeLayout>
+
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
