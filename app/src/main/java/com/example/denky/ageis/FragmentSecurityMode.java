@@ -164,7 +164,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                 }else{
                     switch (v.getId()){
                         case R.id.homeBtn_security : //홈버튼 이벤트 처리
-                            wv.goToURL(MAIN_URL);
+                            wv.goToURL(Settings.homeUri);
                             lockBtn.setImageResource(R.drawable.lockwhite);
                             wv.setUri("");
                             visibleUniverseBar();

@@ -16,6 +16,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -28,7 +30,7 @@ public class ActivityMain extends AppCompatActivity{
 
     final Activity THIS_ACTIVITY =  this;
 
-    public Fragment normalMode   =  new FragmentNormalMode();
+    public Fragment normalMode=new FragmentNormalMode();
     public Fragment securityMode =   new FragmentSecurityMode();
     public CustomizedWebViewManager customizedWebViewManager = new CustomizedWebViewManager(normalMode,securityMode, THIS_ACTIVITY);
 

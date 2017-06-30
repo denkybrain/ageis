@@ -10,12 +10,46 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by WINDOWS7 on 2017-05-31.
  */
 
 public class Settings{
+
+    //This Inner Class is only using when saving setting value to file.
+    private static class SetInfo implements Serializable{
+
+        public boolean useJavaScript=true;
+        public boolean permissionStartNewWindow=true;
+        public boolean permissionFileDownload=false;
+        public boolean permissionAppCache=true;
+        public String homeUri="http://denkybrain.cafe24.com/ageis/main.php";
+        public HashMap<String,String> favoriteSiteList=new HashMap<>();
+
+        public boolean useVulnerabilityFindAlgorithm=true;
+        public boolean permissionDangerousSite =false;
+        public boolean permissionAutoRemoveHistory=true;
+
+        public SetInfo(){
+            initiate();
+        }
+
+        private void initiate(){
+            useJavaScript=true;
+            permissionStartNewWindow=true;
+            permissionFileDownload=false;
+            permissionAppCache=true;
+            homeUri="http://denkybrain.cafe24.com/ageis/main.php";
+            favoriteSiteList=new HashMap<>();
+
+            useVulnerabilityFindAlgorithm=true;
+            permissionDangerousSite =false;
+            permissionAutoRemoveHistory=true;
+        }
+    }
 
     static final String TAG="Setting File";
 
@@ -24,6 +58,8 @@ public class Settings{
     public static boolean permissionStartNewWindow=true;
     public static boolean permissionFileDownload=false;
     public static boolean permissionAppCache=true;
+    public static String homeUri="http://denkybrain.cafe24.com/ageis/main.php";
+    public static HashMap<String,String> favoriteSiteList=new HashMap<>();
 
     public static boolean useVulnerabilityFindAlgorithm=true;
     public static boolean permissionDangerousSite =false;
@@ -48,6 +84,7 @@ public class Settings{
         } catch (IOException e) {
             Log.i(TAG, "Can't restore Setting File");
         }
+        loadSettings();
     }
 
     public static boolean loadSettings(){
@@ -89,6 +126,8 @@ public class Settings{
                 useVulnerabilityFindAlgorithm=info.useVulnerabilityFindAlgorithm;
                 permissionDangerousSite =info.permissionDangerousSite;
                 permissionAutoRemoveHistory=info.permissionAutoRemoveHistory;
+                homeUri=info.homeUri;
+                favoriteSiteList=info.favoriteSiteList;
             }else{
                 Log.i(TAG, "Fail to read object in file");
             }
@@ -109,6 +148,7 @@ public class Settings{
         info.permissionStartNewWindow=permissionStartNewWindow;
         info.permissionFileDownload=permissionFileDownload;
         info.permissionAppCache=permissionAppCache;
+        info.homeUri=homeUri;
         info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
         info.permissionDangerousSite = permissionDangerousSite;
         info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
@@ -120,33 +160,5 @@ public class Settings{
             Log.i(TAG, "Can't save settings");
         }
         //////////////////////////////////////////////////////////////////
-    }
-}
-
-//This Class is only using when saving setting value to file.
-class SetInfo implements Serializable{
-
-    public boolean useJavaScript=true;
-    public boolean permissionStartNewWindow=true;
-    public boolean permissionFileDownload=false;
-    public boolean permissionAppCache=true;
-
-    public boolean useVulnerabilityFindAlgorithm=true;
-    public boolean permissionDangerousSite =false;
-    public boolean permissionAutoRemoveHistory=true;
-
-    public SetInfo(){
-        initiate();
-    }
-
-    private void initiate(){
-        useJavaScript=true;
-        permissionStartNewWindow=true;
-        permissionFileDownload=false;
-        permissionAppCache=true;
-
-        useVulnerabilityFindAlgorithm=true;
-        permissionDangerousSite =false;
-        permissionAutoRemoveHistory=true;
     }
 }

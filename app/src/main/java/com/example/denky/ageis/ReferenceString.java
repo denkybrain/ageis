@@ -13,7 +13,7 @@ public abstract class ReferenceString {
 
     //unchangable values : unviewable
     public static final String GOOGLE_SEARCH_URL = "https://www.google.co.kr/search?q=";
-    public static final String MAIN_URL = "http://denkybrain.cafe24.com/ageis/main.php";
+    public static String MAIN_URL = Settings.homeUri;
     public static int DEVICE_WIDTH;
     public static int DEVICE_HEIGHT; //device height
     static final int STORAGE_READ_PERMISSON=100;
@@ -34,7 +34,6 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("네이버", "http://www.naver.com");
         URL_HASHMAP.put("다음", "http://www.daum.net");
         URL_HASHMAP.put("구글", "http://www.google.co.kr");
-        URL_HASHMAP.put("일베", "http://www.ilbe.com");
         URL_HASHMAP.put("건국대학교", "http://www.konkuk.ac.kr/");
         URL_HASHMAP.put("컴응", "http://www.cafe.daum.net/cris.lecture/");
 

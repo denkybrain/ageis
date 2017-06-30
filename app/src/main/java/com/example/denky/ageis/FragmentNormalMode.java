@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,20 +18,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebBackForwardList;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Iterator;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -63,7 +61,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     final private int TIME_OF_ANIMATION = 500;
     private boolean ANIMATION_DONE = true;
 
-
+    private ImageView favoriteSiteIcon;
 
     @Override
     public void onAttach(Context context){
@@ -89,6 +87,25 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
         screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_normal);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
+
+        favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
+
+        favoriteSiteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                favoriteSiteIcon.requestFocus();
+                Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
+
+                String linkList[]=new String[Settings.favoriteSiteList.size()];
+                Iterator<String> key=Settings.favoriteSiteList.keySet().iterator();
+
+                for(int i=0; i<Settings.favoriteSiteList.size(); i++){
+                    linkList[i]=new String(Settings.favoriteSiteList.get(key.next()));
+                }
+                */
+            }
+        });
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -133,6 +150,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = (ViewGroup)inflater.inflate(R.layout.normal_webview_fragment, container, false);
+
         initializeValues(); //변수들 초기화
         initializedWv(); //웹뷰 초기화
         if(customizedWebViewManager.focusOnUrlBar == false) {
@@ -167,7 +185,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                 }else{
                     switch (v.getId()){
                         case R.id.homeBtn_normal : //홈버튼 이벤트 처리
-                            wv.goToURL(MAIN_URL);
+                            wv.goToURL(Settings.homeUri);
                             wv.setUri("");
                             visibleUniverseBar();
                             break;
@@ -179,7 +197,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                             startActivity(appSetting);
                             break;
-
                         case R.id.screenBtn_normal :
                             wv.onSavePageAllScreenShot();
                             break;

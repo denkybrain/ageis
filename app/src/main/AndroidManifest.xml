@@ -17,7 +17,6 @@
         android:hardwareAccelerated="true"
         >
         <!-- 하드웨어 가속 true -->
-
         <activity android:name=".ActivityMain" android:windowSoftInputMode="stateAlwaysHidden">
 
             <intent-filter>
@@ -27,6 +26,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ActivitySetting"></activity>
+        <activity android:name=".HomepageChangeDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:label=""></activity>
     </application>
 
 </manifest>

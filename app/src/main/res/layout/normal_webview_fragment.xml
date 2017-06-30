@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:id="@+id/normalWebView">
     <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"></LinearLayout>
+
+    <LinearLayout
         android:id="@+id/universe_normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +40,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/screenbtn"
-                android:layout_marginRight="70dp"
+                android:layout_marginRight="105dp"
                 android:layout_alignParentRight="true"
                 />
             <ImageView
@@ -43,7 +49,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/extendwindow"
-                android:layout_marginRight="105dp"
+                android:layout_marginRight="140dp"
                 android:layout_alignParentRight="true"
                 />
 
@@ -53,6 +59,17 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/lock"
+                android:layout_marginRight="70dp"
+                android:layout_alignParentRight="true"
+                />
+
+            <ImageView
+                android:id="@+id/favoriteSite_normal"
+                android:paddingBottom="2dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/favorite_site_icon"
                 android:layout_marginRight="35dp"
                 android:layout_alignParentRight="true"
                 />

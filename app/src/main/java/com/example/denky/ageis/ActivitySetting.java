@@ -4,12 +4,14 @@ package com.example.denky.ageis;
  * Created by denky on 2017-05-19.
  */
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 import static com.example.denky.ageis.Settings.autoClearUrl;
 import static com.example.denky.ageis.Settings.permissionAppCache;
@@ -89,13 +91,20 @@ public class ActivitySetting extends AppCompatActivity {
             case R.id.cacheOn :
                 permissionAppCache = cb4.isChecked();
                 break;
+            case R.id.changeHomeUri:
+                Intent intent=new Intent(getApplicationContext(), HomepageChangeDialog.class);
+                startActivity(intent);
+                break;
+            case R.id.manageFavoriteSite:
+                //즐겨찾기 사이트 띄움
+                break;
             case R.id.webvulnearableToolOn :
                 useVulnerabilityFindAlgorithm = cb5.isChecked();
                 if(useVulnerabilityFindAlgorithm == false) {
                     permissionDangerousSite = false;
                     cb6.setChecked(false);
                 }
-                    break;
+                break;
             case R.id.clickedDenyDangerousSite:
                 permissionDangerousSite = cb6.isChecked();
                 break;
