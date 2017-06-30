@@ -172,16 +172,9 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             visibleUniverseBar();
                             break;
                         case R.id.lockBtn_normal :
-                            if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
-                                //Security Mode
-                                customizedWebViewManager.SECURITY_MODE_STATE = true;
-                            }
-                            else{
-                                //Normal Mode
-                                customizedWebViewManager.SECURITY_MODE_STATE = false;
-                            }
+                            customizedWebViewManager.SECURITY_MODE_STATE = true;
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getSecurityMode()).commit();
                             break;
-
                         case R.id.settingBtn_normal :
                             Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                             startActivity(appSetting);
@@ -193,6 +186,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                         case R.id.extendWindowBtn :
                             invisibleUniverseBar();
                             break;
+
                     }
                 }
 
@@ -204,24 +198,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         screenshotBtn.setOnClickListener(cl);
         extendBtn.setOnClickListener(cl);
 
-        /////////////////////////////////////////Hide Navigation Function////////////////////////////////////////////
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
-        //invisibleUniverseBar();
-        final FrameLayout fragmentContainer=(FrameLayout)rootView.findViewById(R.id.container);
-        final CustomizedWebView wv=(CustomizedWebView)rootView.findViewById(R.id.wv_normal);
-        final RelativeLayout relativeLayout=(RelativeLayout)rootView.findViewById(R.id.normalWebView);
-
-        /////////////////////////////////////////Change to security Mode////////////////////////////////////////////
-        ImageView changeToSecurityBtn=(ImageView)rootView.findViewById(R.id.lockBtn_normal);
-        changeToSecurityBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customizedWebViewManager.SECURITY_MODE_STATE = true;
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getSecurityMode()).commit();
-            }
-        });
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         return rootView;
     }
 

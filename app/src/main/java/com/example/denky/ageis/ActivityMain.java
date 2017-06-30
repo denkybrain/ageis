@@ -41,7 +41,10 @@ public class ActivityMain extends AppCompatActivity{
         getWindow().requestFeature(Window.FEATURE_PROGRESS); //프로그래스 바 기능 요청
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getPermission();  //get needed permission
+
+        //get needed permission
+        getPermission();
+
         //load Settings
         if(ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
             boolean isSuccessLoadSetting=Settings.loadSettings();
@@ -49,6 +52,7 @@ public class ActivityMain extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(), "설정값을 불러오는데 실패해였습니다.\n설정에서 초기화를 실행하세요.", Toast.LENGTH_LONG).show();
             }
         }
+
         //Set Fragment
         final FragmentManager manager=getSupportFragmentManager();
         final FragmentTransaction transaction=manager.beginTransaction();
@@ -56,7 +60,7 @@ public class ActivityMain extends AppCompatActivity{
         Intent intent = getIntent();
         String url = intent.getStringExtra("URL");
         if(url != null){
-            Log.d("widae","게이야 새 창열었다!");
+            Log.d("widae","새 창 열림");
             customizedWebViewManager.goToUrlNormalMode(url);
         }
     }
@@ -68,7 +72,7 @@ public class ActivityMain extends AppCompatActivity{
             Callback shutdown=new Callback() {
                 @Override
                 public void callbackMethod() {
-                    System.exit(0);
+                    finish();
                 }
             };
 
@@ -77,9 +81,9 @@ public class ActivityMain extends AppCompatActivity{
                 public void callbackMethod() {
                     //storage read permission
                     if(permissonCheck_readStorage == PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(getApplicationContext(), "저장소 읽기 권한 있음", Toast.LENGTH_SHORT).show();
+                        Log.i("Permission","Read Permission is exist");
                     }else{
-                        Toast.makeText(getApplicationContext(), "저장소 읽기 권한 없음", Toast.LENGTH_SHORT).show();
+                        Log.i("Permission","Read Permission is not exist");
                         if(ActivityCompat.shouldShowRequestPermissionRationale(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)){
                             Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 읽기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
                             ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{READ_EXTERNAL_STORAGE}, STORAGE_READ_PERMISSON);
@@ -90,9 +94,9 @@ public class ActivityMain extends AppCompatActivity{
 
                     //storage write permission
                     if(permissonCheck_writeStorage == PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 있음", Toast.LENGTH_SHORT).show();
+                        Log.i("Permission","Write Permission is exist");
                     }else{
-                        Toast.makeText(getApplicationContext(), "저장소 쓰기 권한 없음", Toast.LENGTH_SHORT).show();
+                        Log.i("Permission","Write Permission is not exist");
                         if(ActivityCompat.shouldShowRequestPermissionRationale(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)){
                             Toast.makeText(getApplicationContext(), "앱 사용을 위해 저장소 쓰기 권한이 필요합니다", Toast.LENGTH_SHORT).show();
                             ActivityCompat.requestPermissions(THIS_ACTIVITY, new String[]{WRITE_EXTERNAL_STORAGE}, STORAGE_WRITE_PERMISSON);

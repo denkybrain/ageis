@@ -170,14 +170,8 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             visibleUniverseBar();
                             break;
                         case R.id.lockBtn_security :
-                            if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
-                                //Security Mode
-                                customizedWebViewManager.SECURITY_MODE_STATE = true;
-                            }
-                            else{
-                                //Normal Mode
-                                customizedWebViewManager.SECURITY_MODE_STATE = false;
-                            }
+                            customizedWebViewManager.SECURITY_MODE_STATE = false;
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getNormalMode()).commit();
                             break;
 
                         case R.id.settingBtn_security :
@@ -200,22 +194,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         screenshotBtn.setOnClickListener(cl);
         extendBtn.setOnClickListener(cl);
 
-        /////////////////////////////////////////Hide Navigation Function////////////////////////////////////////////
         bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
-        final FrameLayout fragmentContainer=(FrameLayout)rootView.findViewById(R.id.container);
-        final CustomizedWebView wv=(CustomizedWebView)rootView.findViewById(R.id.wv_security);
-        final RelativeLayout relativeLayout=(RelativeLayout)rootView.findViewById(R.id.normalWebView);
-
-        /////////////////////////////////////////Change to security Mode////////////////////////////////////////////
-        ImageView changeToSecurityBtn=(ImageView)rootView.findViewById(R.id.lockBtn_security);
-        changeToSecurityBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customizedWebViewManager.SECURITY_MODE_STATE = false;
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getNormalMode()).commit();
-            }
-        });
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return rootView;
     }
