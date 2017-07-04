@@ -160,7 +160,7 @@ public class CustomizedHandler extends Handler {
 
     private void checkAccess(){
         DialogMaker dm = new DialogMaker();
-        com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+        DialogMaker.Callback okay = new DialogMaker.Callback() {
             @Override
             public void callbackMethod() {
                 if(wv.resultOfsafety.equals(wv.SHOW_SAFETY_EXPOSED)){
@@ -175,7 +175,7 @@ public class CustomizedHandler extends Handler {
                 return ;
             }
         };
-        com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+        DialogMaker.Callback cancel = new DialogMaker.Callback() {
             @Override
             public void callbackMethod() {
             }
@@ -188,12 +188,12 @@ public class CustomizedHandler extends Handler {
         DialogMaker dm = new DialogMaker();
 
         if(permissionDangerousSite == true && customizedWebViewManager.SECURITY_MODE_STATE == true){ //접근할 수 없도록 설정
-            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+            DialogMaker.Callback okay = new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
                 }
             };
-            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+            DialogMaker.Callback cancel = new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
                 }
@@ -201,14 +201,14 @@ public class CustomizedHandler extends Handler {
             dm.setValue("사이트의 보안 수준이 "+wv.resultOfsafety+"입니다. 접근할 수 없습니다.", "확인", "",cancel, null);
 
         }else{ //접근할 수 있도록 설정
-            com.example.denky.ageis.Callback okay = new com.example.denky.ageis.Callback() {
+            DialogMaker.Callback okay = new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
                     wv.loadUrl(wv.weburi);
                     lockBtn.setImageResource(R.drawable.lockwarning);
                 }
             };
-            com.example.denky.ageis.Callback cancel = new com.example.denky.ageis.Callback() {
+            DialogMaker.Callback cancel = new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
                 }

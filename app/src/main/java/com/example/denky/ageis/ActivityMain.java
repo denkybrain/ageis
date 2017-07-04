@@ -71,14 +71,14 @@ public class ActivityMain extends AppCompatActivity{
         final int permissonCheck_writeStorage= ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
         if(permissonCheck_readStorage==PackageManager.PERMISSION_DENIED || permissonCheck_writeStorage==PackageManager.PERMISSION_DENIED){
             DialogMaker maker=new DialogMaker();
-            Callback shutdown=new Callback() {
+            DialogMaker.Callback shutdown=new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
                     finish();
                 }
             };
 
-            Callback agree=new Callback(){
+           DialogMaker.Callback agree=new DialogMaker.Callback(){
                 @Override
                 public void callbackMethod() {
                     //storage read permission

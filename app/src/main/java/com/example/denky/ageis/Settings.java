@@ -11,6 +11,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 /**
@@ -43,7 +45,12 @@ public class Settings{
             permissionFileDownload=false;
             permissionAppCache=true;
             homeUri="http://denkybrain.cafe24.com/ageis/main.php";
-            favoriteSiteList=new HashMap<>();
+            favoriteSiteList=new HashMap<String, String>();
+
+            //Test Code
+            favoriteSiteList.put("네이버", "www.naver.com");
+            favoriteSiteList.put("다음", "www.daum.net");
+            //
 
             useVulnerabilityFindAlgorithm=true;
             permissionDangerousSite =false;

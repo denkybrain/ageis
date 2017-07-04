@@ -153,10 +153,10 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
             public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
                     DialogMaker maker=new DialogMaker();
-                    Callback shutdown=new Callback() {
+                    DialogMaker.Callback shutdown=new DialogMaker.Callback() {
                         @Override
                         public void callbackMethod() {
-                            System.exit(0);
+                            getActivity().finish();
                         }
                     };
                     maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);

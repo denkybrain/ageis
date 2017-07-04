@@ -53,7 +53,7 @@ public class ActivitySetting extends AppCompatActivity {
     @Override
     public void onBackPressed() { //뒤로가기 버튼 누르면
         DialogMaker maker=new DialogMaker();
-        Callback callback_positive=new Callback() {
+        DialogMaker.Callback callback_positive=new DialogMaker.Callback() {
             @Override
             public void callbackMethod() {
                 useJavaScript=cb1.isChecked();
@@ -68,7 +68,7 @@ public class ActivitySetting extends AppCompatActivity {
                 finish();
             }
         };
-        Callback callback_negative=new Callback() {
+        DialogMaker.Callback callback_negative=new DialogMaker.Callback() {
             @Override
             public void callbackMethod() {
                 finish();

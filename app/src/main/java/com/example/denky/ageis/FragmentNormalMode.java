@@ -2,6 +2,7 @@ package com.example.denky.ageis;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -174,10 +176,10 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
             public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(THIS_ACTIVITY, READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED || ContextCompat.checkSelfPermission(THIS_ACTIVITY, WRITE_EXTERNAL_STORAGE)==PackageManager.PERMISSION_DENIED){
                     DialogMaker maker=new DialogMaker();
-                    Callback shutdown=new Callback() {
+                    DialogMaker.Callback shutdown=new DialogMaker.Callback() {
                         @Override
                         public void callbackMethod() {
-                            System.exit(0);
+                            getActivity().finish();
                         }
                     };
                     maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
@@ -203,7 +205,55 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                         case R.id.extendWindowBtn :
                             invisibleUniverseBar();
                             break;
+                        case R.id.favoriteSite_normal:
 
+                            final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<String>(getContext(), R.layout.favorite_site_list);
+                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
+                            Toast.makeText(getContext(), String.valueOf(siteListAdapter.getCount()), Toast.LENGTH_SHORT).show();
+
+                            final DialogMaker favoriteSiteListDialog=new DialogMaker();
+
+                            DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
+                                @Override
+                                public void callbackMethod() {
+                                    favoriteSiteListDialog.dismiss();
+                                }
+                            };
+                            final DialogMaker.Callback addThisSite=new DialogMaker.Callback() {
+                                @Override
+                                public void callbackMethod() {
+                                    //현재 사이트를 즐겨찾기에 추가
+                                    //다이얼로그 하나 더 띄워서 처리
+                                }
+                            };
+
+                            //If clicking element of list, go to seleted URI.
+                            DialogInterface.OnClickListener listListener=new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    /*
+                                    Set<String> keySet=Settings.favoriteSiteList.keySet();
+
+                                    String key[]=(String[])keySet.toArray();
+
+                                    final String value[]=new String[Settings.favoriteSiteList.size()];
+                                    for(int i=0; i<key.length; i++){
+                                        value[i]=Settings.favoriteSiteList.get(key[i]);
+                                    }
+
+                                    String selectedSiteLink=value[which];
+                                    wv.goToURL(selectedSiteLink);
+                                    */
+                                    String key=siteListAdapter.getItem(which);
+                                    wv.goToURL(Settings.favoriteSiteList.get(key));
+                                }
+                            };
+
+                            //Adapter가 제대로 반영이 안되고 있음.
+                            //Why?
+                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, siteListAdapter, listListener);
+                            favoriteSiteListDialog.show(getActivity().getSupportFragmentManager(), "Favorite Site List Dialog");
+                            break;
                     }
                 }
 
@@ -214,6 +264,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         settingBtn.setOnClickListener(cl);
         screenshotBtn.setOnClickListener(cl);
         extendBtn.setOnClickListener(cl);
+        favoriteSiteIcon.setOnClickListener(cl);
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
         return rootView;

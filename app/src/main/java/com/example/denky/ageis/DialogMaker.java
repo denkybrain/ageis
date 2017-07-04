@@ -3,23 +3,32 @@ package com.example.denky.ageis;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+
+import java.util.Set;
 
 /**
  * Created by WINDOWS7 on 2017-05-31.
  */
 
-interface Callback{
-    void callbackMethod();
-}
-
 public class DialogMaker extends DialogFragment {
+    public interface Callback{
+        void callbackMethod();
+    }
+
     private String message="";
     private String positiveMsg="";
     private String negativeMsg="";
     private Callback callback_positive=null;
     private Callback callback_negative=null;
+
+    private ArrayAdapter<String> arrayAdapter=null;
+    private DialogInterface.OnClickListener listListener=null;
 
     //Before using this class as instance, must call this method.
     public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative){
@@ -29,6 +38,13 @@ public class DialogMaker extends DialogFragment {
         this.callback_positive=callback_positive;
         this.callback_negative=callback_negative;
     }
+
+    public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, ArrayAdapter<String> arrayAdapter, DialogInterface.OnClickListener listListener){
+        this.setValue(message, positiveMsg, negativeMsg, callback_positive, callback_negative);
+        this.arrayAdapter=arrayAdapter;
+        this.listListener=listListener;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
@@ -48,6 +64,11 @@ public class DialogMaker extends DialogFragment {
                         }
                     }
                 });
+
+        if(arrayAdapter!=null && listListener!=null){
+            builder.setAdapter(arrayAdapter, listListener);
+        }
+
         // Create the AlertDialog object and return it
         return builder.create();
     }

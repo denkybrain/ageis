@@ -35,9 +35,11 @@ public class HomepageChangeDialog extends Activity{
             @Override
             public void onClick(View v) {
                 Settings.homeUri=homeUriInfo.getText().toString();
+                /*
                 if(Settings.homeUri.substring(0, 3).equals("http")==false){
                     Settings.homeUri="http://"+Settings.homeUri;
                 }
+                */
                 Settings.saveSettings();
                 finish();
             }
