@@ -55,12 +55,12 @@ public class CustomizedWebViewManager {
     }
 
     public void controlHidebar(int t, int oldt){        //Log.d("widae", "controlHideBar function on");
-      if(t == 0 && oldt > 0){ // 보이게 함
-           if(!SECURITY_MODE_STATE)
-                   fragmentNormalMode.visibleUniverseBar();
-          else
-                   fragmentSecurityMode.visibleUniverseBar();
-       }
+        if(t == 0 && oldt > 0){ // 보이게 함
+            if(!SECURITY_MODE_STATE)
+                fragmentNormalMode.visibleUniverseBar();
+            else
+                fragmentSecurityMode.visibleUniverseBar();
+        }
     }
 
     public void setSecurityWebView(CustomizedWebView securityWebView) {
