@@ -40,6 +40,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.TIME_OF_ANIMATION;
 import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
@@ -61,7 +62,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private CustomizedWebViewManager customizedWebViewManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     public LinearLayout bar;
-    final private int TIME_OF_ANIMATION = 500;
     private boolean ANIMATION_DONE = true;
 
     private ImageView favoriteSiteIcon;
@@ -129,7 +129,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
     private void initializedWv(){
         uri.setHint(URL_NORMAL_MODE_HINT);
-        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager, handler);
         wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(customizedWebChromeClient);

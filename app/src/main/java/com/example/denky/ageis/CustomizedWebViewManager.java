@@ -11,6 +11,7 @@ import static com.example.denky.ageis.ReferenceString.MAIN_URL;
  */
 
 public class CustomizedWebViewManager {
+    //새 창 띄우기와 뒤로가기 기능을 위한 클래스
     private CustomizedWebView normalWebView;
     private CustomizedWebView securityWebView;
     private static Fragment normalMode;
@@ -72,7 +73,6 @@ public class CustomizedWebViewManager {
     }
 
     public void goToUrlNormalMode(String url){
-
         NORMAL_MODE_LAST_VIEW = url;
         focusOnUrlBar = false;
     }
