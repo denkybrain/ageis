@@ -40,6 +40,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
     private boolean isVisibleBar=true;
@@ -126,8 +127,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         DEVICE_HEIGHT = height;
     }
 
-
     private void initializedWv(){
+        uri.setHint(URL_NORMAL_MODE_HINT);
         CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
         wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
@@ -141,7 +142,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         wvWeb.setWebView();
         progressBar.setVisibility(View.INVISIBLE);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
-
     }
 
     public boolean isVisibleBar() {

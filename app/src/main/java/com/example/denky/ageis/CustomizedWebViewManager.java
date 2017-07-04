@@ -55,12 +55,12 @@ public class CustomizedWebViewManager {
     }
 
     public void controlHidebar(int t, int oldt){        //Log.d("widae", "controlHideBar function on");
-      if(t == 0 && oldt > 0){ // 보이게 함
-           if(!SECURITY_MODE_STATE)
-                   fragmentNormalMode.visibleUniverseBar();
-          else
-                   fragmentSecurityMode.visibleUniverseBar();
-       }
+        if(t == 0 && oldt > 0){ // 보이게 함
+            if(!SECURITY_MODE_STATE)
+                fragmentNormalMode.visibleUniverseBar();
+            else
+                fragmentSecurityMode.visibleUniverseBar();
+        }
     }
 
     public void setSecurityWebView(CustomizedWebView securityWebView) {
@@ -85,7 +85,7 @@ public class CustomizedWebViewManager {
         return securityMode;
     }
 
-    public int backPress(){
+    public int backPress(){ //뒤로가기 버튼
         try {
             CustomizedWebView wv;
             if (SECURITY_MODE_STATE)
@@ -96,9 +96,9 @@ public class CustomizedWebViewManager {
             int backUrl = webBackForwardList.getCurrentIndex();
             if (wv.getUrl().equals(MAIN_URL) || backUrl == 0) {//현재가 초기 페이지면 앱을 종료
                 if (SECURITY_MODE_STATE == true) { //시큐리티 모드면 웹뷰의 기록을 파괴하고 어플 종료
-                    wv.clearHistory();
-                    wv.clearCache(true);
                 }
+                wv.clearHistory();
+                wv.clearCache(true);//일반모드에서도 캐쉬를 정리함
                 return 0; //앱을 종료한다
             } else { //현재가 초기 페이지가 아니라 로딩 페이지면 앱을 종료하지않고 뒤로감
                 if(backUrl!= 0){

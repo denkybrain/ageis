@@ -84,7 +84,6 @@
 
             <EditText
                 android:textColorHint="@color/grey"
-                android:hint="Search or Input URL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/uri_normal"

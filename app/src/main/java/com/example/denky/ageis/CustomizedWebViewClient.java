@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import static com.example.denky.ageis.ReferenceString.HOME_PAGE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
 import static com.example.denky.ageis.Settings.autoClearUrl;
 
@@ -34,11 +35,9 @@ class CustomizedWebViewClient extends WebViewClient {
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         //새로 페이지를 읽는 중이면 스크롤바 이벤트에서 제외시킴
         if(customizedWebViewManager.SECURITY_MODE_STATE )//시큐리티 모드면
-           customizedWebViewManager.setSTATE_LOADING_SECURITY(true);
+            customizedWebViewManager.setSTATE_LOADING_SECURITY(true);
         else
             customizedWebViewManager.setSTATE_LOADING_NORMAL(true); //로딩중이면
-
-        parseUri(wv.getUrl());
         progressBar.setVisibility(View.VISIBLE);
         return super.shouldOverrideUrlLoading(view, url);
     }
@@ -62,7 +61,7 @@ class CustomizedWebViewClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon){
         setWebView(); //페이지가 시작될때마다 웹뷰 설정 리로드
-        parseUri(wv.getUrl());
+        parseUri(url);
         if(!url.equals(MAIN_URL))
             progressBar.setVisibility(View.VISIBLE);
         super.onPageStarted(view, url, favicon);
@@ -75,7 +74,7 @@ class CustomizedWebViewClient extends WebViewClient {
 
     private void parseUri(String wvUri){
         if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
-            if(wvUri.equals(MAIN_URL)){ //초기 화면이면 uri창을 비움
+            if(wvUri.equals(MAIN_URL) || wvUri.equals(HOME_PAGE)){ //초기 화면이면 uri창을 비움
                 wv.setUri("");
                 return ;//초기화면이면 비우고 함수 종료
             }

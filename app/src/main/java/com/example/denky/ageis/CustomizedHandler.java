@@ -55,7 +55,7 @@ public class CustomizedHandler extends Handler {
     }
 
     CustomizedHandler(CustomizedWebView wv, FragmentActivity activity, ProcessContext processContext, ImageView lockBtn
-    ,CustomizedWebViewManager customizedWebViewManager                      ){
+            ,CustomizedWebViewManager customizedWebViewManager                      ){
         this.wv = wv;
         this.activity =activity;
         this.processContext = processContext;
@@ -76,7 +76,7 @@ public class CustomizedHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
         Toast Img_toast;
-       // Log.d("widae", msg.what+"");
+        // Log.d("widae", msg.what+"");
         switch (msg.what) {
             case IMG_DOWNLOAD_START  :
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "이미지 다운로드 시작", Toast.LENGTH_SHORT);
@@ -113,9 +113,9 @@ public class CustomizedHandler extends Handler {
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
                 Img_toast.show();
                 break;
-            case  SCREENSHOT_CAPTURE : //스크린샷
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
-                Img_toast.show();
+            case  SCREENSHOT_CAPTURE : //스크린샷 캡쳐 시작
+                //Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
+                //Img_toast.show();
                 break;
             case SCREENSHOT_SAVED: //화면 저장
                 Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);

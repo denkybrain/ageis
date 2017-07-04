@@ -23,6 +23,7 @@ import java.util.Date;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.GOOGLE_SEARCH_URL;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.SAVE_FOLDER;
 import static com.example.denky.ageis.ReferenceString.URL_HASHMAP;
 import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
 
@@ -30,7 +31,6 @@ import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
  * Created by denky on 2017-06-08.
  */
 public class CustomizedWebView extends WebView {
-    private final String SAVE_FOLDER = "/ageis_screenshot";
     private WebView wv = this;
     public String weburi;
     private EditText uri;
