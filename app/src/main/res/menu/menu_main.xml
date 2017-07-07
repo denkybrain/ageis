@@ -4,17 +4,28 @@
     >
     <item
         android:icon="@drawable/screenwhite"
-        android:title="capture screen"
+        android:title="Capture screen"
         android:id="@+id/menu_capture">
     </item>
     <item
         android:icon="@drawable/extendwindowwhite"
-        android:title="extend screen"
+        android:title="Extend screen"
         android:id="@+id/menu_extend">
     </item>
+
+    <item
+        android:title="Quick Security Mode"
+        android:id="@+id/menu_security_mode">
+    </item>
+
+    <item
+        android:title="Set homepage"
+        android:id="@+id/menu_setHomepage">
+    </item>
+
     <item
         android:icon="@drawable/setting2"
-        android:title="detail setting"
+        android:title="Detail setting"
         android:id="@+id/menu_detailSetting">
     </item>
 </menu>
