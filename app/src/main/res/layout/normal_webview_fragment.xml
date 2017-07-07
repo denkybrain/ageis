@@ -34,32 +34,11 @@
                 android:layout_marginLeft="5dp"
                 android:layout_alignParentLeft="true"
                 />
-            <ImageView
 
-                android:id="@+id/extendWindowBtn"
-                android:src="@drawable/extendwindow"
-
-                android:layout_marginTop="8dp"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginRight="105dp"
-                android:layout_alignParentRight="true"
-                />
             <ImageView
                 android:id="@+id/favoriteSite_normal"
                 android:src="@drawable/favorite_site_icon"
 
-                android:layout_marginTop="8dp"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:padding="3dp"
-                android:layout_marginRight="140dp"
-                android:layout_alignParentRight="true"
-                />
-
-            <ImageView
-                android:id="@+id/screenBtn_normal"
-                android:src="@drawable/screenbtn"
                 android:layout_marginTop="8dp"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
@@ -79,6 +58,7 @@
 
             <ImageView
                 android:id="@+id/settingBtn_normal"
+                android:layout_marginRight="2dp"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_marginTop="8dp"

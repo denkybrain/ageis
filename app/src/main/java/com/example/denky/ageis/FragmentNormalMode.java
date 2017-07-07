@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -44,7 +45,6 @@ import static com.example.denky.ageis.ReferenceString.TIME_OF_ANIMATION;
 import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
-    private boolean isVisibleBar=true;
     private Activity THIS_ACTIVITY ;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private CustomizedWebView  wv;
@@ -53,7 +53,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
+    private ImageView homeBtn , lockBtn, settingBtn, favortieSiteBtn;
     private ProcessContext processContext;
     DisplayMetrics displayMetrics = new DisplayMetrics();
     private CustomizedHandler handler;
@@ -63,8 +63,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private SwipeRefreshLayout swipeRefreshLayout;
     public LinearLayout bar;
     private boolean ANIMATION_DONE = true;
-
-    private ImageView favoriteSiteIcon;
+    private PopupMenu.OnMenuItemClickListener menuItemClickListener;
 
     @Override
     public void onAttach(Context context){
@@ -86,14 +85,11 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_normal);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_normal);
-        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
-        screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_normal);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
+        favortieSiteBtn=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
 
-        favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
-
-        favoriteSiteIcon.setOnClickListener(new View.OnClickListener() {
+        favortieSiteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 /*
@@ -143,9 +139,25 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar.setVisibility(View.INVISIBLE);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
     }
-
-    public boolean isVisibleBar() {
-        return isVisibleBar;
+    private void initializeSettingPopup(){
+        menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch(menuItem.getItemId()){
+                    case R.id.menu_capture :
+                        wv.onSavePageAllScreenShot();
+                        break;
+                    case R.id.menu_extend :
+                        invisibleUniverseBar();
+                        break;
+                    case R.id.menu_detailSetting :
+                        Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
+                        startActivity(appSetting);
+                        break;
+                }
+                return false;
+            }
+        };
     }
 
     @Nullable
@@ -155,6 +167,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
         initializeValues(); //변수들 초기화
         initializedWv(); //웹뷰 초기화
+        initializeSettingPopup();
+
         if(customizedWebViewManager.focusOnUrlBar == false) {
             Log.d("widae","클리어 포커스!");
             uri.clearFocus();
@@ -196,14 +210,10 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getSecurityMode()).commit();
                             break;
                         case R.id.settingBtn_normal :
-                            Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
-                            startActivity(appSetting);
-                            break;
-                        case R.id.screenBtn_normal :
-                            wv.onSavePageAllScreenShot();
-                            break;
-                        case R.id.extendWindowBtn :
-                            invisibleUniverseBar();
+                            PopupMenu popupMenu = new PopupMenu(getActivity(),v);
+                            getActivity().getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
+                            popupMenu.setOnMenuItemClickListener(menuItemClickListener);
+                            popupMenu.show();
                             break;
                         case R.id.favoriteSite_normal:
 
@@ -262,14 +272,14 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        screenshotBtn.setOnClickListener(cl);
-        extendBtn.setOnClickListener(cl);
-        favoriteSiteIcon.setOnClickListener(cl);
+        favortieSiteBtn.setOnClickListener(cl);
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
         return rootView;
     }
+    private void openPopup(){
 
+    }
     //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
     public void visibleUniverseBar(){
             ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();

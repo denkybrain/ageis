@@ -55,6 +55,7 @@ public class ActivityMain extends AppCompatActivity{
             }
         }
 
+
         //Set Fragment
         final FragmentManager manager=getSupportFragmentManager();
         final FragmentTransaction transaction=manager.beginTransaction();
