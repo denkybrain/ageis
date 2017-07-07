@@ -44,6 +44,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.TIME_OF_ANIMATION;
 import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
@@ -70,7 +71,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private SwipeRefreshLayout swipeRefreshLayout;
     public LinearLayout bar;
     private boolean ANIMATION_DONE = true;
-    private final int TIME_OF_ANIMATION = 500;
 
 
     @Override
@@ -115,7 +115,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         /* */
     }
     private void initializedWv(){
-        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager,handler);
         wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(customizedWebChromeClient);

@@ -46,6 +46,8 @@ public class CustomizedHandler extends Handler {
     public final int ACCESS_DENY = 98;
     public final int ACCESS_CHECK = 99;
 
+    public final int PERMISSION_DENY_NEW_WINDOW = 80;//퍼미션 요청은 80번대
+
     public String getLastDownloadFile() {
         return lastDownloadFile;
     }
@@ -73,18 +75,21 @@ public class CustomizedHandler extends Handler {
         this.processContext = processContext;
     }
 
+    private void sendToast(String text, int length){
+        Toast info_toast;
+        info_toast = Toast.makeText(activity.getApplicationContext(), text, length);
+        info_toast.show();
+    }
+
     @Override
     public void handleMessage(Message msg) {
-        Toast Img_toast;
         // Log.d("widae", msg.what+"");
         switch (msg.what) {
             case IMG_DOWNLOAD_START  :
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "이미지 다운로드 시작", Toast.LENGTH_SHORT);
-                Img_toast.show();
+                sendToast("이미지 다운로드 시작", Toast.LENGTH_SHORT);
                 break;
             case IMG_DOWNLOAD_FINISHED :
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "이미지 다운로드 완료", Toast.LENGTH_LONG);
-                Img_toast.show();
+                sendToast("이미지 다운로드 완료", Toast.LENGTH_LONG);
                 break;
             case ANCHOR_SHARE : //주소 공유
                 Intent intent_text = new Intent(Intent.ACTION_SEND);
@@ -103,30 +108,26 @@ public class CustomizedHandler extends Handler {
                 activity.startActivity(Intent.createChooser(intent, "이 사진을 공유합니다"));
                 break;
             case IMG_ALREADY_EXIST :
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "이미 파일이 존재합니다", Toast.LENGTH_LONG);
-                Img_toast.show();
+                sendToast("이미 파일이 존재합니다", Toast.LENGTH_LONG);
                 break;
             case ANCHOR_COPY : //주소 복사
                 //Log.d("widae", "주소가 클립보드에 복사되었습니다.");
                 ClipboardManager clipBoard = (ClipboardManager)activity.getSystemService(Context.CLIPBOARD_SERVICE);
                 clipBoard.setPrimaryClip(ClipData.newPlainText("url",processContext.getUrl()));
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "주소가 복사되었습니다", Toast.LENGTH_LONG);
-                Img_toast.show();
+                sendToast("주소가 복사되었습니다", Toast.LENGTH_LONG);
                 break;
             case  SCREENSHOT_CAPTURE : //스크린샷 캡쳐 시작
                 //Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 캡쳐하고있습니다", Toast.LENGTH_SHORT);
                 //Img_toast.show();
                 break;
             case SCREENSHOT_SAVED: //화면 저장
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "화면을 저장하였습니다", Toast.LENGTH_LONG);
-                Img_toast.show();
+                sendToast("화면을 저장하였습니다", Toast.LENGTH_LONG);
                 break;
             case MEDIA_SCAN :
                 mediaScan();
                 break;
             case IMG_DOWNLOAD_FAILED :
-                Img_toast = Toast.makeText(activity.getApplicationContext(), "이미지 다운로드 실패", Toast.LENGTH_LONG);
-                Img_toast.show();
+                sendToast("이미지 다운로드 실패", Toast.LENGTH_LONG);
                 break;
             case ACCESS_CHECK ://접근 허가요청
                 // Log.d("widae", "access warning : " +wv.resultOfsafety);
@@ -139,6 +140,9 @@ public class CustomizedHandler extends Handler {
             case ACCESS_SAFE ://안전접근
                 //Log.d("widae", "access warning : " +wv.resultOfsafety);
                 safeAccess();
+                break;
+            case PERMISSION_DENY_NEW_WINDOW :
+                sendToast("새 창 띄우기 권한이 없습니다", Toast.LENGTH_SHORT);
                 break;
 
         }
