@@ -27,11 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-<<<<<<< HEAD
-=======
-import android.widget.ListView;
 import android.widget.PopupMenu;
->>>>>>> origin/master
 import android.widget.ProgressBar;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -87,9 +83,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
         favortieSiteBtn=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
 
-<<<<<<< HEAD
-        favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
-=======
+        //favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
         favortieSiteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,7 +100,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                 */
             }
         });
->>>>>>> origin/master
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
