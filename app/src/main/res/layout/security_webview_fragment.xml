@@ -32,22 +32,15 @@
                 android:layout_marginLeft="5dp"
                 android:layout_alignParentLeft="true"
                 />
+
             <ImageView
-                android:id="@+id/screenBtn_security"
+                android:id="@+id/favoriteSite_security"
+                android:src="@drawable/favorite_site_icon_security"
+
                 android:layout_marginTop="8dp"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/screenwhite"
                 android:layout_marginRight="70dp"
-                android:layout_alignParentRight="true"
-                />
-            <ImageView
-                android:id="@+id/extendWindowBtn"
-                android:layout_marginTop="8dp"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/extendwindowwhite"
-                android:layout_marginRight="105dp"
                 android:layout_alignParentRight="true"
                 />
             <ImageView
@@ -61,6 +54,7 @@
                 />
 
             <ImageView
+                android:layout_marginRight="2dp"
                 android:id="@+id/settingBtn_security"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
@@ -81,8 +75,8 @@
                 android:textSize="16dp"
                 android:textColor="@color/white"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/extendWindowBtn"
-                android:layout_toStartOf="@+id/extendWindowBtn"
+                android:layout_toLeftOf="@+id/favoriteSite_security"
+                android:layout_toStartOf="@+id/favoriteSite_security"
                 android:selectAllOnFocus="true"
                 android:elevation="2dp" />
 
