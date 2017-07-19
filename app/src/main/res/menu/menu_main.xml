@@ -23,9 +23,16 @@
         android:id="@+id/menu_setHomepage">
     </item>
 
+
+
     <item
         android:icon="@drawable/setting2"
         android:title="Detail setting"
         android:id="@+id/menu_detailSetting">
+    </item>
+
+    <item
+        android:title="App Close"
+        android:id="@+id/appShutDown">
     </item>
 </menu>

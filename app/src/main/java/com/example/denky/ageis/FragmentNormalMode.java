@@ -2,7 +2,6 @@ package com.example.denky.ageis;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -23,10 +22,12 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 
@@ -149,6 +150,9 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                         Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
                         startActivity(appSetting);
                         break;
+                    case R.id.appShutDown:
+                        getActivity().finish();
+                        break;
                 }
                 return false;
             }
@@ -191,7 +195,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             getActivity().finish();
                         }
                     };
-                    maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
+                    maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료", shutdown, shutdown);
                     maker.show(getActivity().getSupportFragmentManager(), "TAG");
                 }else{
                     switch (v.getId()){
@@ -211,25 +215,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             popupMenu.show();
                             break;
                         case R.id.favoriteSite_normal:
-                            final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<>(getContext(), R.layout.favorite_site_list, R.id.siteInfo);
-                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
-
-                            //Test Code
-                            /*
-                            CharSequence listElement[]=new CharSequence[Settings.favoriteSiteList.keySet().size()];
-                            Iterator<String> iterator=Settings.favoriteSiteList.keySet().iterator();
-                            int index=0;
-                            while(iterator.hasNext()==true){
-                                listElement[index]=iterator.next();
-                                index++;
-                            }
-                            */
-
-                            //Text Code
-                            //Toast.makeText(getContext(), String.valueOf(siteListAdapter.getItem(0)), Toast.LENGTH_SHORT).show();
-
                             final DialogMaker favoriteSiteListDialog=new DialogMaker();
-
                             DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
                                 @Override
                                 public void callbackMethod() {
@@ -239,7 +225,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             final DialogMaker.Callback addThisSite=new DialogMaker.Callback() {
                                 @Override
                                 public void callbackMethod() {
-                                    //여기서 uri값 받아와야 함
                                     final LayoutInflater inflater=getActivity().getLayoutInflater();
                                     final View inflatedView=inflater.inflate(R.layout.add_to_favorite_site_dialog, null);
                                     final EditText _uriInfo=(EditText)inflatedView.findViewById(R.id.addedUri);
@@ -249,42 +234,40 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                     DialogMaker.Callback add=new DialogMaker.Callback() {
                                         @Override
                                         public void callbackMethod() {
+                                            final DialogMaker resultMessage=new DialogMaker();
+                                            DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
+                                                @Override
+                                                public void callbackMethod() {
+                                                    resultMessage.dismiss();
+                                                }
+                                            };
+
                                             EditText _siteName=(EditText)inflatedView.findViewById(R.id.siteName);
                                             String siteName=_siteName.getText().toString();
-
                                             String uriInfo=_uriInfo.getText().toString();
 
                                             if(siteName.equals("") || uriInfo.equals("")){
-                                                final DialogMaker blankAlert=new DialogMaker();
-                                                blankAlert.setValue("사이트 이름과 주소를 확인해주세요.", null, null, null, null);
-                                                blankAlert.show(getActivity().getSupportFragmentManager(), "Save Error");
+                                                //SiteName or URI is blank
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("사이트 이름과 주소를 확인해주세요.", "확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Save Error");
                                                 return;
                                             }
 
                                             if(Settings.favoriteSiteList.get(siteName)==null){
+                                                //Successfully Save
                                                 Settings.favoriteSiteList.put(siteName, uriInfo);
-                                                final DialogMaker successSave=new DialogMaker();
-                                                DialogMaker.Callback ok=new DialogMaker.Callback() {
-                                                    @Override
-                                                    public void callbackMethod() {
-                                                        successSave.dismiss();
-                                                        addThisSiteDialog.dismiss();
-                                                    }
-                                                };
-                                                successSave.setValue("저장되었습니다.", "확인", null, ok, null);
-                                                successSave.show(getActivity().getSupportFragmentManager(), "Sucessfully Save!");
+                                                Settings.saveSettings();
+
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("저장되었습니다.", "확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Successfully Save!");
 
                                             }else{
                                                 //If site name is duplicated.
-                                                final DialogMaker duplicatedAlert=new DialogMaker();
-                                                DialogMaker.Callback ok=new DialogMaker.Callback() {
-                                                    @Override
-                                                    public void callbackMethod() {
-                                                        duplicatedAlert.dismiss();
-                                                    }
-                                                };
-                                                duplicatedAlert.setValue("사이트 이름이 중복됩니다.","확인", null, ok, null);
-                                                duplicatedAlert.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("사이트 이름이 중복됩니다.","확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
                                             }
                                         }
                                     };
@@ -294,30 +277,33 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                             addThisSiteDialog.dismiss();
                                         }
                                     };
+                                    addThisSiteDialog.setCancelable(false);
                                     addThisSiteDialog.setValue("즐겨찾기에 추가", "추가", "취소", add, cancel, inflatedView);
                                     addThisSiteDialog.show(getActivity().getSupportFragmentManager(), "ADD TO FAVORITE SITE LIST");
+
+
+                                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                                 }
                             };
 
-                            //If clicking element of list, go to seleted URI.
-                            DialogInterface.OnClickListener listListener=new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String key=siteListAdapter.getItem(which);
-                                    wv.goToURL(Settings.favoriteSiteList.get(key));
+                            final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
 
+                            View inflatedFavoriteSiteListView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
+                            ListView favoriteSiteList=(ListView)inflatedFavoriteSiteListView.findViewById(R.id.favoriteSiteList);
+                            favoriteSiteList.setAdapter(siteListAdapter);
+                            favoriteSiteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    String key=siteListAdapter.getItem(position);
+                                    wv.goToURL(Settings.favoriteSiteList.get(key));
                                     favoriteSiteListDialog.dismiss();
                                 }
-                            };
-
-                            //Adapter에 반영 잘 됨
-                            //근데 왜 안되지?
-                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, siteListAdapter, listListener);
-
-                            //Test Code
-                            //favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, listElement, listListener);
-
+                            });
+                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, inflatedFavoriteSiteListView);
                             favoriteSiteListDialog.show(getActivity().getSupportFragmentManager(), "Favorite Site List Dialog");
+
                             break;
                     }
                 }

@@ -5,21 +5,22 @@ package com.example.denky.ageis;
  */
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.Toast;
+
+import java.io.File;
 
 import static com.example.denky.ageis.Settings.autoClearUrl;
 import static com.example.denky.ageis.Settings.permissionAppCache;
 import static com.example.denky.ageis.Settings.permissionAutoRemoveHistory;
+import static com.example.denky.ageis.Settings.permissionDangerousSite;
 import static com.example.denky.ageis.Settings.permissionFileDownload;
 import static com.example.denky.ageis.Settings.permissionStartNewWindow;
 import static com.example.denky.ageis.Settings.useJavaScript;
-import static com.example.denky.ageis.Settings.permissionDangerousSite;
 import static com.example.denky.ageis.Settings.useVulnerabilityFindAlgorithm;
 
 public class ActivitySetting extends AppCompatActivity {
@@ -95,9 +96,6 @@ public class ActivitySetting extends AppCompatActivity {
                 Intent intent=new Intent(getApplicationContext(), HomepageChangeDialog.class);
                 startActivity(intent);
                 break;
-            case R.id.manageFavoriteSite:
-                //즐겨찾기 사이트 띄움
-                break;
             case R.id.webvulnearableToolOn :
                 useVulnerabilityFindAlgorithm = cb5.isChecked();
                 if(useVulnerabilityFindAlgorithm == false) {
@@ -112,13 +110,48 @@ public class ActivitySetting extends AppCompatActivity {
                 permissionAutoRemoveHistory = cb7.isChecked();
                 break;
             case R.id.settingInit:
-                Settings.restoreSetting();
-                finish();
+                final DialogMaker areYouReallyInit=new DialogMaker();
+                DialogMaker.Callback ok=new DialogMaker.Callback() {
+                    @Override
+                    public void callbackMethod() {
+                        Settings.restoreSetting();
+                        areYouReallyInit.dismiss();
+                        finish();
+                    }
+                };
+                DialogMaker.Callback no=new DialogMaker.Callback() {
+                    @Override
+                    public void callbackMethod() {
+                        areYouReallyInit.dismiss();
+                    }
+                };
+                areYouReallyInit.setValue("정말로 초기화 하시겠습니까?\n\n (설정값과 즐겨찾기가 모두 초기화됩니다.)\n", "예", "아니오", ok, no);
+                areYouReallyInit.show(getSupportFragmentManager(), "Init Settings");
                 break;
             case R.id.clearUrlOn :
                 autoClearUrl = cb8.isChecked();
                 break;
-
+            case R.id.mediaScanning:
+                final DialogMaker mediaScanningDialog=new DialogMaker();
+                mediaScanningDialog.setValue("\n미디어 스캐닝을 시작하시겠습니까?\n\n(주의! 시간이 오래 걸릴 수 있습니다.)\n", "예", "아니오",
+                        new DialogMaker.Callback() {
+                            @Override
+                            public void callbackMethod() {
+                                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+                                Uri uri = Uri.fromFile(file);
+                                Intent scanFileIntent = new Intent(
+                                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+                                sendBroadcast(scanFileIntent);
+                                finish();
+                            }
+                        }, new DialogMaker.Callback() {
+                            @Override
+                            public void callbackMethod() {
+                                mediaScanningDialog.dismiss();
+                            }
+                        });
+                mediaScanningDialog.show(getSupportFragmentManager(), "Media Scanning...");
+                break;
         }
     }
 }

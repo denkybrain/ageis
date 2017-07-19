@@ -26,8 +26,6 @@ public class DialogMaker extends DialogFragment {
     private ArrayAdapter<String> arrayAdapter=null;
     private DialogInterface.OnClickListener listListener=null;
 
-    private CharSequence listElement[]=null;
-
     private View childView=null;
 
     //Before using this class as instance, must call this method.
@@ -39,21 +37,9 @@ public class DialogMaker extends DialogFragment {
         this.callback_negative=callback_negative;
     }
 
-    public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, ArrayAdapter<String> arrayAdapter, DialogInterface.OnClickListener listListener){
-        this.setValue(message, positiveMsg, negativeMsg, callback_positive, callback_negative);
-        this.arrayAdapter=arrayAdapter;
-        this.listListener=listListener;
-    }
-
     public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, View childView){
         this.setValue(message, positiveMsg, negativeMsg, callback_positive, callback_negative);
         this.childView=childView;
-    }
-
-    public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, CharSequence listElement[], DialogInterface.OnClickListener listListener){
-        this.setValue(message, positiveMsg, negativeMsg, callback_positive, callback_negative);
-        this.listElement=listElement;
-        this.listListener=listListener;
     }
 
     @Override
@@ -82,10 +68,6 @@ public class DialogMaker extends DialogFragment {
 
         if(childView!=null){
             builder.setView(childView);
-        }
-
-        if(listElement!=null && listListener!=null){
-            builder.setItems(listElement, listListener);
         }
 
         // Create the AlertDialog object and return it

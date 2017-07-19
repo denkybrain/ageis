@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 /**
@@ -50,6 +47,7 @@ public class Settings{
             //Test Code
             favoriteSiteList.put("네이버", "www.naver.com");
             favoriteSiteList.put("다음", "www.daum.net");
+            favoriteSiteList.put("구글", "www.google.com");
             //
 
             useVulnerabilityFindAlgorithm=true;
@@ -109,7 +107,8 @@ public class Settings{
                 Log.i(TAG, "Setting File is not existing");
                 //make Output Stream (when not existing setting file)
                 outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
-                outputSettings.writeObject(new SetInfo());
+                SetInfo setInfo=new SetInfo();
+                outputSettings.writeObject(setInfo);
                 outputSettings.close();
                 Log.i(TAG, "Success writing new object");
             }else{
@@ -148,7 +147,6 @@ public class Settings{
     }
 
     public static void saveSettings(){
-        ////////////////////////////Saving////////////////////////////////
         SetInfo info=new SetInfo();
 
         info.useJavaScript=useJavaScript;
@@ -159,6 +157,8 @@ public class Settings{
         info.useVulnerabilityFindAlgorithm=useVulnerabilityFindAlgorithm;
         info.permissionDangerousSite = permissionDangerousSite;
         info.permissionAutoRemoveHistory=permissionAutoRemoveHistory;
+        info.favoriteSiteList=favoriteSiteList;
+
         try {
             outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
             outputSettings.writeObject(info);
@@ -166,6 +166,5 @@ public class Settings{
         } catch (IOException e) {
             Log.i(TAG, "Can't save settings");
         }
-        //////////////////////////////////////////////////////////////////
     }
 }
