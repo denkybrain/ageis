@@ -75,12 +75,12 @@ public class Settings{
     private static ObjectInputStream inputSettings=null;
     private static ObjectOutputStream outputSettings=null;
 
-    private static String filePath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis"+File.separator+".Settings.set";
+    private static String filePath=Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis"+File.separator+".AgeisAppSettings.set";
 
     //This class is never instantiated at other class
     private Settings(){}
 
-    public static void restoreSetting(){
+    public static void resetSetting(){
         try {
             SetInfo newSetInfo=new SetInfo();
             outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
@@ -91,37 +91,51 @@ public class Settings{
         }
         loadSettings();
     }
+    public static void resetSetting_exceptFavoriteSiteList(){
+        try {
+            HashMap<String, String> temp=favoriteSiteList;
+
+            SetInfo newSetInfo=new SetInfo();
+            newSetInfo.favoriteSiteList=temp;
+            outputSettings=new ObjectOutputStream(new FileOutputStream(filePath));
+            outputSettings.writeObject(newSetInfo);
+            outputSettings.close();
+        } catch (IOException e) {
+            Log.i(TAG, "Can't restore Setting File");
+        }
+        loadSettings();
+    }
 
     public static boolean loadSettings(){
-        String sdPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        sdPath+= File.separator+"Ageis";
-
-        File folder= new File(sdPath);
-        if(folder.exists()==false){
-            folder.mkdirs();
-        }
-
         File settingFile=new File(filePath);
+
+        File dir=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Ageis");
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        
         try{
             if(settingFile.exists()==false){
                 Log.i(TAG, "Setting File is not existing");
                 //make Output Stream (when not existing setting file)
-                outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
-                SetInfo setInfo=new SetInfo();
-                outputSettings.writeObject(setInfo);
-                outputSettings.close();
+                resetSetting();
                 Log.i(TAG, "Success writing new object");
             }else{
-                Log.i(TAG, "Setting File is already exist");
-                //make Output Stream (when already existing setting file)
-                //outputSettings=new ObjectOutputStream(new FileOutputStream(settingFile));
+                Log.i(TAG, "Setting File is exist");
             }
 
             //make Input Stream
             inputSettings=new ObjectInputStream(new FileInputStream(settingFile));
 
             //Read Setting file
-            SetInfo info=(SetInfo)inputSettings.readObject();
+            SetInfo info=null;
+            Object readObject=inputSettings.readObject();
+            if(readObject instanceof  SetInfo){
+                info=(SetInfo)readObject;
+            }else{
+                Log.i(TAG, "Fail to read object in file");
+                return false;
+            }
             Log.i(TAG, "Success Reading");
 
             if(info!=null){
@@ -136,14 +150,16 @@ public class Settings{
                 favoriteSiteList=info.favoriteSiteList;
             }else{
                 Log.i(TAG, "Fail to read object in file");
+                return false;
             }
-
             inputSettings.close();
+            Log.i(TAG, "Successfully Read");
         }catch(Exception e) {
             Log.i(TAG, "Exception Occur");
             return false;
         }
-    return true;
+        Log.i("List Counter", String.valueOf(favoriteSiteList.size()));
+        return true;
     }
 
     public static void saveSettings(){

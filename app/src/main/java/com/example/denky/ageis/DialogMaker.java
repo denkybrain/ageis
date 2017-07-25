@@ -44,21 +44,14 @@ public class DialogMaker extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(message)
                 .setPositiveButton(positiveMsg, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if(callback_positive!=null){
-                            callback_positive.callbackMethod();
-                        }
                     }
                 })
                 .setNegativeButton(negativeMsg, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if(callback_negative!=null){
-                            callback_negative.callbackMethod();
-                        }
                     }
                 });
 
@@ -71,6 +64,31 @@ public class DialogMaker extends DialogFragment {
         }
 
         // Create the AlertDialog object and return it
-        return builder.create();
+        final AlertDialog dialog=builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface d) {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        //Prevent to close dialog when positive button is clicked.
+                        if(callback_positive!=null){
+                            callback_positive.callbackMethod();
+                        }
+                    }
+                });
+                dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Prevent to close dialog when negative button is clicked.
+                        if(callback_negative!=null){
+                            callback_negative.callbackMethod();
+                        }
+                    }
+                });
+            }
+        });
+        return dialog;
     }
+
 }

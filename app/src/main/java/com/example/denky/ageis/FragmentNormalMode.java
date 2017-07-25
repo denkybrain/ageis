@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -83,24 +84,6 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
         favortieSiteBtn=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
-
-        //favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
-        favortieSiteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*
-                favoriteSiteIcon.requestFocus();
-                Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
-
-                String linkList[]=new String[Settings.favoriteSiteList.size()];
-                Iterator<String> key=Settings.favoriteSiteList.keySet().iterator();
-
-                for(int i=0; i<Settings.favoriteSiteList.size(); i++){
-                    linkList[i]=new String(Settings.favoriteSiteList.get(key.next()));
-                }
-                */
-            }
-        });
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -215,8 +198,16 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             popupMenu.show();
                             break;
                         case R.id.favoriteSite_normal:
+                            //Hiding Keyboard
+                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                            if(imm.isAcceptingText()){
+                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            }
+                            uri.clearFocus();
+
+                            Settings.loadSettings();
                             final DialogMaker favoriteSiteListDialog=new DialogMaker();
-                            DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
+                            final DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
                                 @Override
                                 public void callbackMethod() {
                                     favoriteSiteListDialog.dismiss();
@@ -246,6 +237,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                             String siteName=_siteName.getText().toString();
                                             String uriInfo=_uriInfo.getText().toString();
 
+                                            //Error Check Start
                                             if(siteName.equals("") || uriInfo.equals("")){
                                                 //SiteName or URI is blank
                                                 resultMessage.setCancelable(false);
@@ -253,8 +245,14 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                                 resultMessage.show(getActivity().getSupportFragmentManager(), "Save Error");
                                                 return;
                                             }
-
-                                            if(Settings.favoriteSiteList.get(siteName)==null){
+                                            if(Settings.favoriteSiteList.get(siteName)!=null){
+                                                //If site name is duplicated.
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("사이트 이름이 중복됩니다.","확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
+                                            }
+                                            //Error Check End
+                                            else{
                                                 //Successfully Save
                                                 Settings.favoriteSiteList.put(siteName, uriInfo);
                                                 Settings.saveSettings();
@@ -263,17 +261,25 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                                 resultMessage.setValue("저장되었습니다.", "확인", null, closeDialog, null);
                                                 resultMessage.show(getActivity().getSupportFragmentManager(), "Successfully Save!");
 
-                                            }else{
-                                                //If site name is duplicated.
-                                                resultMessage.setCancelable(false);
-                                                resultMessage.setValue("사이트 이름이 중복됩니다.","확인", null, closeDialog, null);
-                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
+                                                //Hiding Keyboard
+                                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                                                addThisSiteDialog.dismiss();
+                                                favoriteSiteListDialog.dismiss();
                                             }
                                         }
                                     };
                                     DialogMaker.Callback cancel=new DialogMaker.Callback() {
                                         @Override
                                         public void callbackMethod() {
+                                            //Hiding Keyboard
+                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                                            if(imm.isAcceptingText()){
+                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                                Toast.makeText(getContext(), "Hide KeyPad", Toast.LENGTH_SHORT).show();
+                                            }
+
                                             addThisSiteDialog.dismiss();
                                         }
                                     };
@@ -281,17 +287,19 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                     addThisSiteDialog.setValue("즐겨찾기에 추가", "추가", "취소", add, cancel, inflatedView);
                                     addThisSiteDialog.show(getActivity().getSupportFragmentManager(), "ADD TO FAVORITE SITE LIST");
 
-
+                                    //Open keyboard
                                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                                    if(imm.isAcceptingText()==false){
+                                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                                    }
                                 }
                             };
 
                             final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
                             siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
 
-                            View inflatedFavoriteSiteListView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
-                            ListView favoriteSiteList=(ListView)inflatedFavoriteSiteListView.findViewById(R.id.favoriteSiteList);
+                            final View inflatedFavoriteSiteListView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
+                            final ListView favoriteSiteList=(ListView)inflatedFavoriteSiteListView.findViewById(R.id.favoriteSiteList);
                             favoriteSiteList.setAdapter(siteListAdapter);
                             favoriteSiteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
@@ -301,9 +309,43 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                     favoriteSiteListDialog.dismiss();
                                 }
                             });
+                            favoriteSiteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                    final int POSITION=position;
+                                    final DialogMaker deleteThisSite=new DialogMaker();
+                                    final DialogMaker.Callback delete=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            ViewGroup parent=(ViewGroup)(inflatedFavoriteSiteListView.getParent());
+                                            parent.removeView(inflatedFavoriteSiteListView);
+
+                                            Settings.favoriteSiteList.remove(siteListAdapter.getItem(POSITION));
+                                            Settings.saveSettings();
+
+                                            siteListAdapter.clear();
+                                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
+                                            View newInflatedView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
+                                            ((ListView)newInflatedView.findViewById(R.id.favoriteSiteList)).setAdapter(siteListAdapter);
+                                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, newInflatedView);
+
+                                            deleteThisSite.dismiss();
+                                        }
+                                    };
+                                    DialogMaker.Callback cancel=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            deleteThisSite.dismiss();
+                                        }
+                                    };
+                                    deleteThisSite.setValue("이 사이트를 즐겨찾기 목록에서 삭제하시겠습니까?", "삭제", "취소", delete, cancel);
+                                    deleteThisSite.setCancelable(false);
+                                    deleteThisSite.show(getActivity().getSupportFragmentManager(), "");
+                                    return true;
+                                }
+                            });
                             favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, inflatedFavoriteSiteListView);
                             favoriteSiteListDialog.show(getActivity().getSupportFragmentManager(), "Favorite Site List Dialog");
-
                             break;
                     }
                 }
@@ -315,8 +357,11 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         favortieSiteBtn.setOnClickListener(cl);
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
+
         return rootView;
     }
+
+
     private void openPopup(){
 
     }

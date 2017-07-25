@@ -16,8 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -71,7 +69,8 @@ public class ActivityMain extends AppCompatActivity{
         final int permissonCheck_readStorage= ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
         final int permissonCheck_writeStorage= ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
         if(permissonCheck_readStorage==PackageManager.PERMISSION_DENIED || permissonCheck_writeStorage==PackageManager.PERMISSION_DENIED){
-            DialogMaker maker=new DialogMaker();
+            final DialogMaker maker=new DialogMaker();
+            maker.setCancelable(false);
             DialogMaker.Callback shutdown=new DialogMaker.Callback() {
                 @Override
                 public void callbackMethod() {
@@ -82,6 +81,8 @@ public class ActivityMain extends AppCompatActivity{
            DialogMaker.Callback agree=new DialogMaker.Callback(){
                 @Override
                 public void callbackMethod() {
+                    maker.dismiss();
+
                     //storage read permission
                     if(permissonCheck_readStorage == PackageManager.PERMISSION_GRANTED){
                         Log.i("Permission","Read Permission is exist");

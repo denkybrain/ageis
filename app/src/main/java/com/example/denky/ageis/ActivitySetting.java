@@ -114,7 +114,7 @@ public class ActivitySetting extends AppCompatActivity {
                 DialogMaker.Callback ok=new DialogMaker.Callback() {
                     @Override
                     public void callbackMethod() {
-                        Settings.restoreSetting();
+                        Settings.resetSetting_exceptFavoriteSiteList();
                         areYouReallyInit.dismiss();
                         finish();
                     }
@@ -125,7 +125,7 @@ public class ActivitySetting extends AppCompatActivity {
                         areYouReallyInit.dismiss();
                     }
                 };
-                areYouReallyInit.setValue("정말로 초기화 하시겠습니까?\n\n (설정값과 즐겨찾기가 모두 초기화됩니다.)\n", "예", "아니오", ok, no);
+                areYouReallyInit.setValue("정말로 초기화 하시겠습니까?\n\n (주의! 모든 설정값이 초기화됩니다)\n", "예", "아니오", ok, no);
                 areYouReallyInit.show(getSupportFragmentManager(), "Init Settings");
                 break;
             case R.id.clearUrlOn :
@@ -133,14 +133,13 @@ public class ActivitySetting extends AppCompatActivity {
                 break;
             case R.id.mediaScanning:
                 final DialogMaker mediaScanningDialog=new DialogMaker();
-                mediaScanningDialog.setValue("\n미디어 스캐닝을 시작하시겠습니까?\n\n(주의! 시간이 오래 걸릴 수 있습니다.)\n", "예", "아니오",
+                mediaScanningDialog.setValue("미디어 스캐닝을 시작하시겠습니까?\n\n(주의! 시간이 오래 걸릴 수 있습니다.)\n", "예", "아니오",
                         new DialogMaker.Callback() {
                             @Override
                             public void callbackMethod() {
                                 File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
                                 Uri uri = Uri.fromFile(file);
-                                Intent scanFileIntent = new Intent(
-                                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
+                                Intent scanFileIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
                                 sendBroadcast(scanFileIntent);
                                 finish();
                             }
@@ -152,6 +151,29 @@ public class ActivitySetting extends AppCompatActivity {
                         });
                 mediaScanningDialog.show(getSupportFragmentManager(), "Media Scanning...");
                 break;
+            case R.id.appReset:
+                DialogMaker appResetCheck=new DialogMaker();
+                DialogMaker.Callback reset=new DialogMaker.Callback() {
+                    @Override
+                    public void callbackMethod() {
+                        File appInfoFolder=new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"Ageis");
+                        if(appInfoFolder.exists() && appInfoFolder.isDirectory()){
+                            appInfoFolder.delete();
+                        }
+                        Settings.resetSetting();
+                        finish();
+                    }
+                };
+                appResetCheck.setValue("앱 초기화를 진행하시겠습니까?\n\n(주의! 다운로드 파일을 포함한 모든 앱 정보가 초기화됩니다.\n", "예", "아니오", reset, null);
+                appResetCheck.show(getSupportFragmentManager(), "App Reset");
+                break;
         }
+    }
+
+    @Override
+    public void sendBroadcast(Intent intent) {
+        //프로그레스 다이얼로그 띄우기
+        super.sendBroadcast(intent);
+        //프로그레스 다이얼로그 종료
     }
 }
