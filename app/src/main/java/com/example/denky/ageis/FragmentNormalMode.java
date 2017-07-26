@@ -2,7 +2,6 @@ package com.example.denky.ageis;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,31 +18,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import java.util.Iterator;
-import java.util.Set;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.TIME_OF_ANIMATION;
 import static com.example.denky.ageis.ReferenceString.URL_NORMAL_MODE_HINT;
 
 public class FragmentNormalMode extends Fragment implements View.OnLongClickListener{
-    private boolean isVisibleBar=true;
     private Activity THIS_ACTIVITY ;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private CustomizedWebView  wv;
@@ -52,7 +49,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
+    private ImageView homeBtn , lockBtn, settingBtn, favortieSiteBtn;
     private ProcessContext processContext;
     DisplayMetrics displayMetrics = new DisplayMetrics();
     private CustomizedHandler handler;
@@ -61,10 +58,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
     private CustomizedWebViewManager customizedWebViewManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     public LinearLayout bar;
-    final private int TIME_OF_ANIMATION = 500;
     private boolean ANIMATION_DONE = true;
-
-    private ImageView favoriteSiteIcon;
+    private PopupMenu.OnMenuItemClickListener menuItemClickListener;
 
     @Override
     public void onAttach(Context context){
@@ -86,29 +81,9 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         wv.constructor(weburi, uri, handler,customizedWebViewManager);    //public void constructor(String weburi, EditText editText) 맘대로 만든 생성자
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_normal);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_normal);
-        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_normal);
-        screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_normal);
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutNormal);
-
-        favoriteSiteIcon=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
-
-        favoriteSiteIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*
-                favoriteSiteIcon.requestFocus();
-                Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
-
-                String linkList[]=new String[Settings.favoriteSiteList.size()];
-                Iterator<String> key=Settings.favoriteSiteList.keySet().iterator();
-
-                for(int i=0; i<Settings.favoriteSiteList.size(); i++){
-                    linkList[i]=new String(Settings.favoriteSiteList.get(key.next()));
-                }
-                */
-            }
-        });
+        favortieSiteBtn=(ImageView)rootView.findViewById(R.id.favoriteSite_normal);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -129,7 +104,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
     private void initializedWv(){
         uri.setHint(URL_NORMAL_MODE_HINT);
-        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager, handler);
         wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(customizedWebChromeClient);
@@ -143,9 +118,28 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         progressBar.setVisibility(View.INVISIBLE);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
     }
-
-    public boolean isVisibleBar() {
-        return isVisibleBar;
+    private void initializeSettingPopup(){
+        menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch(menuItem.getItemId()){
+                    case R.id.menu_capture :
+                        wv.onSavePageAllScreenShot();
+                        break;
+                    case R.id.menu_extend :
+                        invisibleUniverseBar();
+                        break;
+                    case R.id.menu_detailSetting :
+                        Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
+                        startActivity(appSetting);
+                        break;
+                    case R.id.appShutDown:
+                        getActivity().finish();
+                        break;
+                }
+                return false;
+            }
+        };
     }
 
     @Nullable
@@ -155,6 +149,8 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
 
         initializeValues(); //변수들 초기화
         initializedWv(); //웹뷰 초기화
+        initializeSettingPopup();
+
         if(customizedWebViewManager.focusOnUrlBar == false) {
             Log.d("widae","클리어 포커스!");
             uri.clearFocus();
@@ -182,7 +178,7 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             getActivity().finish();
                         }
                     };
-                    maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료",shutdown, shutdown);
+                    maker.setValue("모든 권한을 취득하지 않았기 때문에 기능을 사용할 수 없습니다. \n\n앱을 재시작하고 권한에 동의해주세요.", "", "앱 종료", shutdown, shutdown);
                     maker.show(getActivity().getSupportFragmentManager(), "TAG");
                 }else{
                     switch (v.getId()){
@@ -196,24 +192,22 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, customizedWebViewManager.getSecurityMode()).commit();
                             break;
                         case R.id.settingBtn_normal :
-                            Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
-                            startActivity(appSetting);
-                            break;
-                        case R.id.screenBtn_normal :
-                            wv.onSavePageAllScreenShot();
-                            break;
-                        case R.id.extendWindowBtn :
-                            invisibleUniverseBar();
+                            PopupMenu popupMenu = new PopupMenu(getActivity(),v);
+                            getActivity().getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
+                            popupMenu.setOnMenuItemClickListener(menuItemClickListener);
+                            popupMenu.show();
                             break;
                         case R.id.favoriteSite_normal:
+                            //Hiding Keyboard
+                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                            if(imm.isAcceptingText()){
+                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                            }
+                            uri.clearFocus();
 
-                            final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<String>(getContext(), R.layout.favorite_site_list);
-                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
-                            Toast.makeText(getContext(), String.valueOf(siteListAdapter.getCount()), Toast.LENGTH_SHORT).show();
-
+                            Settings.loadSettings();
                             final DialogMaker favoriteSiteListDialog=new DialogMaker();
-
-                            DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
+                            final DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
                                 @Override
                                 public void callbackMethod() {
                                     favoriteSiteListDialog.dismiss();
@@ -222,54 +216,155 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                             final DialogMaker.Callback addThisSite=new DialogMaker.Callback() {
                                 @Override
                                 public void callbackMethod() {
-                                    //현재 사이트를 즐겨찾기에 추가
-                                    //다이얼로그 하나 더 띄워서 처리
-                                }
-                            };
+                                    final LayoutInflater inflater=getActivity().getLayoutInflater();
+                                    final View inflatedView=inflater.inflate(R.layout.add_to_favorite_site_dialog, null);
+                                    final EditText _uriInfo=(EditText)inflatedView.findViewById(R.id.addedUri);
+                                    _uriInfo.setText(wv.getUriTextString());
 
-                            //If clicking element of list, go to seleted URI.
-                            DialogInterface.OnClickListener listListener=new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    /*
-                                    Set<String> keySet=Settings.favoriteSiteList.keySet();
+                                    final DialogMaker addThisSiteDialog=new DialogMaker();
+                                    DialogMaker.Callback add=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            final DialogMaker resultMessage=new DialogMaker();
+                                            DialogMaker.Callback closeDialog=new DialogMaker.Callback() {
+                                                @Override
+                                                public void callbackMethod() {
+                                                    resultMessage.dismiss();
+                                                }
+                                            };
 
-                                    String key[]=(String[])keySet.toArray();
+                                            EditText _siteName=(EditText)inflatedView.findViewById(R.id.siteName);
+                                            String siteName=_siteName.getText().toString();
+                                            String uriInfo=_uriInfo.getText().toString();
 
-                                    final String value[]=new String[Settings.favoriteSiteList.size()];
-                                    for(int i=0; i<key.length; i++){
-                                        value[i]=Settings.favoriteSiteList.get(key[i]);
+                                            //Error Check Start
+                                            if(siteName.equals("") || uriInfo.equals("")){
+                                                //SiteName or URI is blank
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("사이트 이름과 주소를 확인해주세요.", "확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Save Error");
+                                                return;
+                                            }
+                                            if(Settings.favoriteSiteList.get(siteName)!=null){
+                                                //If site name is duplicated.
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("사이트 이름이 중복됩니다.","확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
+                                            }
+                                            //Error Check End
+                                            else{
+                                                //Successfully Save
+                                                Settings.favoriteSiteList.put(siteName, uriInfo);
+                                                Settings.saveSettings();
+
+                                                resultMessage.setCancelable(false);
+                                                resultMessage.setValue("저장되었습니다.", "확인", null, closeDialog, null);
+                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Successfully Save!");
+
+                                                //Hiding Keyboard
+                                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                                                addThisSiteDialog.dismiss();
+                                                favoriteSiteListDialog.dismiss();
+                                            }
+                                        }
+                                    };
+                                    DialogMaker.Callback cancel=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            //Hiding Keyboard
+                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
+                                            if(imm.isAcceptingText()){
+                                                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                                                Toast.makeText(getContext(), "Hide KeyPad", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            addThisSiteDialog.dismiss();
+                                        }
+                                    };
+                                    addThisSiteDialog.setCancelable(false);
+                                    addThisSiteDialog.setValue("즐겨찾기에 추가", "추가", "취소", add, cancel, inflatedView);
+                                    addThisSiteDialog.show(getActivity().getSupportFragmentManager(), "ADD TO FAVORITE SITE LIST");
+
+                                    //Open keyboard
+                                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    if(imm.isAcceptingText()==false){
+                                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                                     }
-
-                                    String selectedSiteLink=value[which];
-                                    wv.goToURL(selectedSiteLink);
-                                    */
-                                    String key=siteListAdapter.getItem(which);
-                                    wv.goToURL(Settings.favoriteSiteList.get(key));
                                 }
                             };
 
-                            //Adapter가 제대로 반영이 안되고 있음.
-                            //Why?
-                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, siteListAdapter, listListener);
+                            final ArrayAdapter<String> siteListAdapter=new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
+
+                            final View inflatedFavoriteSiteListView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
+                            final ListView favoriteSiteList=(ListView)inflatedFavoriteSiteListView.findViewById(R.id.favoriteSiteList);
+                            favoriteSiteList.setAdapter(siteListAdapter);
+                            favoriteSiteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    String key=siteListAdapter.getItem(position);
+                                    wv.goToURL(Settings.favoriteSiteList.get(key));
+                                    favoriteSiteListDialog.dismiss();
+                                }
+                            });
+                            favoriteSiteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                                    final int POSITION=position;
+                                    final DialogMaker deleteThisSite=new DialogMaker();
+                                    final DialogMaker.Callback delete=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            ViewGroup parent=(ViewGroup)(inflatedFavoriteSiteListView.getParent());
+                                            parent.removeView(inflatedFavoriteSiteListView);
+
+                                            Settings.favoriteSiteList.remove(siteListAdapter.getItem(POSITION));
+                                            Settings.saveSettings();
+
+                                            siteListAdapter.clear();
+                                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
+                                            View newInflatedView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
+                                            ((ListView)newInflatedView.findViewById(R.id.favoriteSiteList)).setAdapter(siteListAdapter);
+                                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, newInflatedView);
+
+                                            deleteThisSite.dismiss();
+                                        }
+                                    };
+                                    DialogMaker.Callback cancel=new DialogMaker.Callback() {
+                                        @Override
+                                        public void callbackMethod() {
+                                            deleteThisSite.dismiss();
+                                        }
+                                    };
+                                    deleteThisSite.setValue("이 사이트를 즐겨찾기 목록에서 삭제하시겠습니까?", "삭제", "취소", delete, cancel);
+                                    deleteThisSite.setCancelable(false);
+                                    deleteThisSite.show(getActivity().getSupportFragmentManager(), "");
+                                    return true;
+                                }
+                            });
+                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, inflatedFavoriteSiteListView);
                             favoriteSiteListDialog.show(getActivity().getSupportFragmentManager(), "Favorite Site List Dialog");
                             break;
                     }
                 }
-
             }
         };
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        screenshotBtn.setOnClickListener(cl);
-        extendBtn.setOnClickListener(cl);
-        favoriteSiteIcon.setOnClickListener(cl);
+        favortieSiteBtn.setOnClickListener(cl);
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
+
         return rootView;
     }
 
+
+    private void openPopup(){
+
+    }
     //bar animation over.///////////////////////////////////////////////////////////////////////////////////////////
     public void visibleUniverseBar(){
             ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) bar.getLayoutParams();

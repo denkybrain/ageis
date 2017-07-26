@@ -8,23 +8,32 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
+import static com.example.denky.ageis.Settings.permissionStartNewWindow;
+
 /**
  * Created by denky on 2017-06-20.
  */
 
 public class CustomizedWebChromeClient extends WebChromeClient {
+    //Progress bar 설정, 새 창 띄우기 클래스
     ProgressBar progressBar;
     CustomizedWebViewManager customizedWebViewManager;
     Activity activity;
-    CustomizedWebChromeClient(ProgressBar progressBar, CustomizedWebViewManager customizedWebViewManager) {
+    CustomizedHandler handler;
+    CustomizedWebChromeClient(ProgressBar progressBar, CustomizedWebViewManager customizedWebViewManager, CustomizedHandler handler) {
         this.progressBar = progressBar;
         this.customizedWebViewManager = customizedWebViewManager;
         this.activity = customizedWebViewManager.getActivity();
+        this.handler = handler;
     }
-    //Progress bar 설정, 새 창 띄우기 위함
 
     @Override
     public boolean onCreateWindow(WebView wv, boolean isDialog, boolean isUserGesture, Message resultMsg){
+        if(!permissionStartNewWindow) //새창띄우기가 false면 함수 종료
+        {
+            handler.sendMsgQuick(handler.PERMISSION_DENY_NEW_WINDOW);
+            return false;
+        }
         wv.requestFocusNodeHref(resultMsg);
         String url = resultMsg.getData().getString("url");
         Intent intent = new Intent(activity.getApplicationContext(), ActivityMain.class);

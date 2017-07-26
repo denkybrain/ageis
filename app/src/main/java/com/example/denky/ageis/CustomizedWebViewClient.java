@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 
 import static com.example.denky.ageis.ReferenceString.HOME_PAGE;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.WEBVIEW_RESOLUTION;
 import static com.example.denky.ageis.Settings.autoClearUrl;
 
 /**
@@ -18,6 +19,7 @@ import static com.example.denky.ageis.Settings.autoClearUrl;
  */
 
 class CustomizedWebViewClient extends WebViewClient {
+    //웹뷰 세팅 내용 적용하고 웹뷰 내부 환경 변경 시 작동
     CustomizedWebView wv;
     WebSettings wvSettings;
     ProgressBar progressBar;
@@ -43,12 +45,14 @@ class CustomizedWebViewClient extends WebViewClient {
     }
 
     public void setWebView(){
+        wvSettings.setTextZoom(WEBVIEW_RESOLUTION);//웹뷰 컨텐츠 해상도 설정
+        wvSettings.setUseWideViewPort(true);
         wvSettings.setJavaScriptEnabled(Settings.useJavaScript);
         wvSettings.setJavaScriptCanOpenWindowsAutomatically(Settings.useJavaScript);
         wvSettings.setSupportMultipleWindows(true);
-        wvSettings.setJavaScriptCanOpenWindowsAutomatically (Settings.permissionStartNewWindow);
+        wvSettings.setJavaScriptCanOpenWindowsAutomatically(Settings.permissionStartNewWindow);
         wvSettings.setAppCacheEnabled(Settings.permissionAppCache);
-        //   wvSettings.setBuiltInZoomControls(true);
+        wvSettings.setAllowFileAccess(Settings.permissionFileDownload);
         wvSettings.setSupportZoom(true);
         if(Settings.permissionAppCache == false)
             wvSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -67,13 +71,10 @@ class CustomizedWebViewClient extends WebViewClient {
         super.onPageStarted(view, url, favicon);
     }
 
-    @Override
-    public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
-        super.doUpdateVisitedHistory(view, url, isReload);
-    }
-
     private void parseUri(String wvUri){
-        if(customizedWebViewManager.SECURITY_MODE_STATE == false) {
+        if(customizedWebViewManager.SECURITY_MODE_STATE == false
+                || (customizedWebViewManager.SECURITY_MODE_STATE==true && autoClearUrl == false)
+                ) {
             if(wvUri.equals(MAIN_URL) || wvUri.equals(HOME_PAGE)){ //초기 화면이면 uri창을 비움
                 wv.setUri("");
                 return ;//초기화면이면 비우고 함수 종료

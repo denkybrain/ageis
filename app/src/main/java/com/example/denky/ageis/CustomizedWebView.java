@@ -48,7 +48,6 @@ public class CustomizedWebView extends WebView {
     public String resultOfsafety;
     private CustomizedWebViewManager customizedWebViewManager;
 
-
     public void constructor(String weburi, EditText editText, CustomizedHandler handler
             ,CustomizedWebViewManager cwvm){
         this.weburi = weburi;

@@ -1,10 +1,5 @@
 package com.example.denky.ageis;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.view.ContextMenu;
 import android.webkit.WebView;
 
@@ -25,7 +20,8 @@ public class ProcessContext {
     private String url="";
     private ContextMenu contextMenu;
     private final String TITLE_HYPERLINK ="하이퍼링크";
-    private final String ITEM_IMG_DOWNLOAD = "이미지 다운로드(secure)";
+    private final String ITEM_IMG_DOWNLOAD = "이미지 다운로드";
+    private final String ITEM_IMAG_DOWNLOAD_HIDDEN="숨김 파일로 이미지 다운로드";
     private final String ITEM_IMG_SHARE = "공유하기";
     private final String TITLE_IMG = "이미지";
     private final String ITEM_GO_TO_URL = "주소로 이동하기";
@@ -111,19 +107,21 @@ public class ProcessContext {
                // Log.d("widae", "Anchor Link:"+url);
                 break;
             case WebView.HitTestResult.IMAGE_TYPE: //이미지 타입이면
-                menuBtnVolume = 2;
+                menuBtnVolume = 3;
                 typeOfLongClickedItem = 2;
                 setContextTitle(TITLE_IMG);
                 setContextfirstMenu(ITEM_IMG_DOWNLOAD);
-                setContextsecondMenu(ITEM_IMG_SHARE);
+                setContextsecondMenu(ITEM_IMAG_DOWNLOAD_HIDDEN);
+                setContextthirdMenu(ITEM_IMG_SHARE);
                // Log.d("widae", "Image Link:"+url);
                 break;
             case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
-                menuBtnVolume = 2;
-                typeOfLongClickedItem = 2;
+                menuBtnVolume = 3;
+                typeOfLongClickedItem = 3;
                 setContextTitle(TITLE_IMG);
                 setContextfirstMenu(ITEM_IMG_DOWNLOAD);
-                setContextsecondMenu(ITEM_IMG_SHARE);
+                setContextsecondMenu(ITEM_IMAG_DOWNLOAD_HIDDEN);
+                setContextthirdMenu(ITEM_IMG_SHARE);
                // Log.d("widae", "Image Anchor Link:"+url);
                 break;
             default:
@@ -132,13 +130,15 @@ public class ProcessContext {
                 break;
         }
     }
-    private void imgDownload(boolean share){
+    private void imgDownload(boolean share, boolean isHidden){
         ImageDownload downloader = new ImageDownload();
         downloader.handler = this.handler;
         downloader.processContext = this;
         downloader.share = share;
+        downloader.isHidden=isHidden;
         downloader.execute(this.url);
-        }
+    }
+
     public void onContextItemSelected(int itemId) {
         switch(typeOfLongClickedItem) {
             case 1 : // anchor tag
@@ -157,10 +157,13 @@ public class ProcessContext {
             case 2 :// img tag
                 switch (itemId){
                     case 1 : //save img
-                       imgDownload(IMG_SHARE_OFF);
+                       imgDownload(IMG_SHARE_OFF, false);
                         break;
-                    case 2 : //share img
-                        imgDownload(IMG_SHARE_ON);
+                    case 2 : //save img as hidden file
+                        imgDownload(IMG_SHARE_OFF, true);
+                        break;
+                    case 3: //share img
+                        imgDownload(IMG_SHARE_ON, false);
                         break;
                 }
                 break;
@@ -168,15 +171,18 @@ public class ProcessContext {
                 url = url.substring(0, this.url.indexOf('?')); //url 파싱해야함
                 switch (itemId){
                     case 1 : //save img
-                      imgDownload(IMG_SHARE_ON);
+                        imgDownload(IMG_SHARE_OFF, false);
                         break;
-                    case 2 : //share img
-                        imgDownload(IMG_SHARE_OFF);
+                    case 2 : //save img as hidden file
+                        imgDownload(IMG_SHARE_OFF, true);
+                        break;
+                    case 3: //share img
+                        imgDownload(IMG_SHARE_ON, false);
                         break;
                 }
                 break;
             default: //anchor, img, anchor-img 중 아무것도 아니면 함수 종료
-                    return;
+                return;
         }
 
     }

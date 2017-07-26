@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.denky.ageis.ReferenceString.DEVICE_HEIGHT;
 import static com.example.denky.ageis.ReferenceString.MAIN_URL;
+import static com.example.denky.ageis.ReferenceString.TIME_OF_ANIMATION;
 import static com.example.denky.ageis.Settings.permissionDangerousSite;
 
 /**
@@ -51,7 +53,6 @@ import static com.example.denky.ageis.Settings.permissionDangerousSite;
  */
 
 public class FragmentSecurityMode extends Fragment implements View.OnLongClickListener{
-    private boolean isVisibleBar=true;
     private Activity THIS_ACTIVITY ;
     private EditText uri; //요즘은 URL가 아니라 URI, uniform resource identifier라고 부름
     private CustomizedWebView  wv;
@@ -60,7 +61,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private String weburi ="";
     public ProgressBar progressBar;
     private InputMethodManager imm; //엔터키 입력 매니지를 위한 객체
-    private ImageView homeBtn , lockBtn, settingBtn,  screenshotBtn, extendBtn;
+    private ImageView homeBtn , lockBtn, settingBtn, favoriteSiteBtn;
     private ProcessContext processContext;
     private CustomizedWebViewClient wvWeb;
     DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -70,8 +71,8 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private SwipeRefreshLayout swipeRefreshLayout;
     public LinearLayout bar;
     private boolean ANIMATION_DONE = true;
-    private final int TIME_OF_ANIMATION = 500;
 
+    private PopupMenu.OnMenuItemClickListener menuItemClickListener;
 
     @Override
     public void onAttach(Context context){
@@ -83,7 +84,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
     private void initializeValues(){
         THIS_ACTIVITY=getActivity();
         lockBtn = (ImageView)rootView.findViewById(R.id.lockBtn_security);
-        extendBtn = (ImageView)rootView.findViewById(R.id.extendWindowBtn);
         ReferenceString.initializeHashMap(); //URL맵을 초기화함(put해서 넣음)
         imm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
         uri = (EditText) rootView.findViewById(R.id.uri_security);
@@ -93,7 +93,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         homeBtn = (ImageView)rootView.findViewById(R.id.homeBtn_security);
         settingBtn = (ImageView)rootView.findViewById(R.id.settingBtn_security);
         progressBar = (ProgressBar)rootView.findViewById(R.id.progressBar_security);
-        screenshotBtn = (ImageView)rootView.findViewById(R.id.screenBtn_security);
         wvSettings = wv.getSettings();
         swipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayoutSecurity);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -115,7 +114,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         /* */
     }
     private void initializedWv(){
-        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager);
+        CustomizedWebChromeClient customizedWebChromeClient = new CustomizedWebChromeClient(progressBar, customizedWebViewManager,handler);
         wvWeb = new CustomizedWebViewClient(wv, wvSettings, progressBar, customizedWebViewManager);
         wv.setWebViewClient(wvWeb);
         wv.setWebChromeClient(customizedWebChromeClient);
@@ -129,6 +128,26 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         progressBar.setVisibility(View.INVISIBLE);
         wv.setLayerType(View.LAYER_TYPE_HARDWARE, null); //웹뷰 성능향상
     }
+    private void initializeSettingPopup(){
+        menuItemClickListener = new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch(menuItem.getItemId()){
+                    case R.id.menu_capture :
+                        wv.onSavePageAllScreenShot();
+                        break;
+                    case R.id.menu_extend :
+                        invisibleUniverseBar();
+                        break;
+                    case R.id.menu_detailSetting :
+                        Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
+                        startActivity(appSetting);
+                        break;
+                }
+                return false;
+            }
+        };
+    }
 
     @Nullable
     @Override
@@ -136,6 +155,7 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         rootView=(ViewGroup)inflater.inflate(R.layout.security_webview_fragment, container, false);
         initializeValues(); //변수 초기화
         initializedWv(); //웹뷰 초기화
+        initializeSettingPopup();
         wv.goToURL(customizedWebViewManager.SECURITY_MODE_LAST_VIEW); //처음 화면 로딩
         uri.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -175,14 +195,10 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
                             break;
 
                         case R.id.settingBtn_security :
-                            Intent appSetting = new Intent(getActivity(), ActivitySetting.class);
-                            startActivity(appSetting);
-                            break;
-                        case R.id.screenBtn_security :
-                            wv.onSavePageAllScreenShot();
-                            break;
-                        case R.id.extendWindowBtn :
-                            invisibleUniverseBar();
+                            PopupMenu popupMenu = new PopupMenu(getActivity(),v);
+                            getActivity().getMenuInflater().inflate(R.menu.menu_main, popupMenu.getMenu());
+                            popupMenu.setOnMenuItemClickListener(menuItemClickListener);
+                            popupMenu.show();
                             break;
                     }
                 }
@@ -191,8 +207,6 @@ public class FragmentSecurityMode extends Fragment implements View.OnLongClickLi
         lockBtn.setOnClickListener(cl);
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
-        screenshotBtn.setOnClickListener(cl);
-        extendBtn.setOnClickListener(cl);
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_security);
 

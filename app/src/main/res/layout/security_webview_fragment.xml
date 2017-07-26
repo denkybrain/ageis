@@ -26,44 +26,38 @@
             <ImageView
                 android:id="@+id/homeBtn_security"
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:src="@drawable/home2"
                 android:layout_marginLeft="5dp"
                 android:layout_alignParentLeft="true"
                 />
+
             <ImageView
-                android:id="@+id/screenBtn_security"
+                android:id="@+id/favoriteSite_security"
+                android:src="@drawable/favorite_site_icon_security"
+
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/screenwhite"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginRight="70dp"
-                android:layout_alignParentRight="true"
-                />
-            <ImageView
-                android:id="@+id/extendWindowBtn"
-                android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/extendwindowwhite"
-                android:layout_marginRight="105dp"
                 android:layout_alignParentRight="true"
                 />
             <ImageView
                 android:id="@+id/lockBtn_security"
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:src="@drawable/lockwhite"
                 android:layout_marginRight="35dp"
                 android:layout_alignParentRight="true"
                 />
 
             <ImageView
+                android:layout_marginRight="2dp"
                 android:id="@+id/settingBtn_security"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginTop="8dp"
                 android:src="@drawable/setting2"
                 android:layout_alignParentRight="true"/>
@@ -78,11 +72,11 @@
                 android:inputType="text"
                 android:layout_marginLeft="35dp"
                 android:paddingLeft="10dp"
-                android:textSize="18dp"
+                android:textSize="16dp"
                 android:textColor="@color/white"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/extendWindowBtn"
-                android:layout_toStartOf="@+id/extendWindowBtn"
+                android:layout_toLeftOf="@+id/favoriteSite_security"
+                android:layout_toStartOf="@+id/favoriteSite_security"
                 android:selectAllOnFocus="true"
                 android:elevation="2dp" />
 
@@ -110,14 +104,14 @@
             android:layout_height="match_parent"
             android:id="@+id/swipeRefreshLayoutSecurity">
 
-    <com.example.denky.ageis.CustomizedWebView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_below="@id/universe_security"
-        android:layout_height="match_parent"
-        android:id="@+id/wv_security" >
-        </com.example.denky.ageis.CustomizedWebView>
+            <com.example.denky.ageis.CustomizedWebView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_below="@id/universe_security"
+                android:layout_height="match_parent"
+                android:id="@+id/wv_security" >
+            </com.example.denky.ageis.CustomizedWebView>
         </android.support.v4.widget.SwipeRefreshLayout>
-        </RelativeLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

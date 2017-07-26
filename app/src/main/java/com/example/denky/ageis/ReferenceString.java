@@ -46,5 +46,7 @@ public abstract class ReferenceString {
         URL_HASHMAP.put("컴응", "http://www.cafe.daum.net/cris.lecture/");
     }
     //changable values
+    public static int WEBVIEW_RESOLUTION = 100;
+    public static int NUMBERS_OF_NORMAL_MODE_WINDOWS = 0;
     public static boolean ANIMATION_DONE = true;
 }

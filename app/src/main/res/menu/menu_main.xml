@@ -1,61 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-
     >
-    <!--
     <item
-        android:title="배경색 변경" >
-        <menu>
-            <item
-                android:title="빨간색"
-                android:id="@+id/mnuRed"/>
-            <item
-                android:title="파란색"
-                android:id="@+id/mnuBlue"/>
-            <item
-                android:title="노란색"
-                android:id="@+id/mnuYellow"/>
-        </menu>
-    </item>
-    -->
-    <item
-        android:title="새로고침"
-        android:id="@+id/menu_renew">
-    </item>
-    <item
-        android:title="화면캡쳐"
+        android:icon="@drawable/screenwhite"
+        android:title="Capture screen"
         android:id="@+id/menu_capture">
     </item>
     <item
-        android:title="갤러리"
-        android:id="@+id/menu_gallery">
+        android:icon="@drawable/extendwindowwhite"
+        android:title="Extend screen"
+        android:id="@+id/menu_extend">
     </item>
-    <item
-        android:title="설정"
-        android:id="@+id/menu_setting">
-    </item>
-<!--
-    <item
-        android:checkable="true"
-        android:checked="true"
-        android:id="@+id/item_title"
-        android:title="제목 보이기"></item>
--->
-    <!--
-    <item
-        android:checkable="true"
-        android:title="그림 2배 확대"
-        android:id="@+id/item_expansion"></item>
 
-    <group android:checkableBehavior="single">
-        <item
-            android:checked="true"
-            android:id="@+id/chicken"
-            android:title="치킨선택"></item>
-        <item
-            android:title="스파게티"
-            android:id="@+id/spaghetti"></item>
-    </group>
-    -->
+    <item
+        android:title="Quick Security Mode"
+        android:id="@+id/menu_security_mode">
+    </item>
+
+    <item
+        android:title="Set homepage"
+        android:id="@+id/menu_setHomepage">
+    </item>
+
+
+
+    <item
+        android:icon="@drawable/setting2"
+        android:title="Detail setting"
+        android:id="@+id/menu_detailSetting">
+    </item>
+
+    <item
+        android:title="App Close"
+        android:id="@+id/appShutDown">
+    </item>
 </menu>

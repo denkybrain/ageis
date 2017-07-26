@@ -28,56 +28,39 @@
             <ImageView
                 android:id="@+id/homeBtn_normal"
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:src="@drawable/home"
                 android:layout_marginLeft="5dp"
                 android:layout_alignParentLeft="true"
                 />
-            <ImageView
-                android:id="@+id/screenBtn_normal"
-                android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/screenbtn"
-                android:layout_marginRight="105dp"
-                android:layout_alignParentRight="true"
-                />
-            <ImageView
-                android:id="@+id/extendWindowBtn"
-                android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/extendwindow"
-                android:layout_marginRight="140dp"
-                android:layout_alignParentRight="true"
-                />
 
             <ImageView
-                android:id="@+id/lockBtn_normal"
+                android:id="@+id/favoriteSite_normal"
+                android:src="@drawable/favorite_site_icon"
+
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/lock"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginRight="70dp"
                 android:layout_alignParentRight="true"
                 />
 
             <ImageView
-                android:id="@+id/favoriteSite_normal"
-                android:paddingBottom="2dp"
+                android:id="@+id/lockBtn_normal"
+                android:src="@drawable/lock"
                 android:layout_marginTop="8dp"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/favorite_site_icon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginRight="35dp"
                 android:layout_alignParentRight="true"
                 />
 
             <ImageView
                 android:id="@+id/settingBtn_normal"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_marginRight="2dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginTop="8dp"
                 android:src="@drawable/setting"
                 android:layout_alignParentRight="true"/>
@@ -90,12 +73,12 @@
                 android:imeOptions="actionGo"
                 android:inputType="text"
                 android:layout_marginLeft="35dp"
+                android:textSize="16dp"
                 android:paddingLeft="10dp"
-                android:textSize="18dp"
                 android:textColor="@color/black"
                 android:layout_alignParentTop="true"
-                android:layout_toLeftOf="@+id/extendWindowBtn"
-                android:layout_toStartOf="@+id/extendWindowBtn"
+                android:layout_toLeftOf="@+id/favoriteSite_normal"
+                android:layout_toStartOf="@+id/favoriteSite_normal"
                 android:selectAllOnFocus="true"
                 />
 
@@ -112,28 +95,28 @@
             />
     </LinearLayout>
 
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_below="@id/universe_normal"
-    >
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/swipeRefreshLayoutNormal">
+        android:layout_below="@id/universe_normal"
+        >
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/swipeRefreshLayoutNormal">
 
-    <com.example.denky.ageis.CustomizedWebView
+            <com.example.denky.ageis.CustomizedWebView
 
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/wv_normal" >
-    </com.example.denky.ageis.CustomizedWebView>
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/wv_normal" >
+            </com.example.denky.ageis.CustomizedWebView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

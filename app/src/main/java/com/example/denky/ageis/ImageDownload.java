@@ -1,11 +1,10 @@
 package com.example.denky.ageis;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -22,10 +21,13 @@ import java.util.Locale;
 public class ImageDownload extends AsyncTask<String, Void, Void> {
     private String fileName;
     private final String SAVE_FOLDER = File.separator+"Ageis"+File.separator+"Ageis_download";
+    private final String SAVE_HIDDEN_FOLDER= File.separator+"Ageis"+File.separator+".Ageis_hidden_download";
     public CustomizedHandler handler;
+    public boolean isHidden=false;
     public ProcessContext processContext; //processContext 객체에 접근가능함
+
     public boolean share = false;
-    private String TAG="Image Download";
+    private final String TAG="Image Download";
 
     private void sendMsg(int msgType){
         Message msg = handler.obtainMessage();
@@ -36,12 +38,20 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... params) {
         //다운로드 경로를 지정
-        String savePath = Environment.getExternalStorageDirectory().toString() + SAVE_FOLDER;
+        String savePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        if(isHidden){
+            savePath=savePath.concat(SAVE_HIDDEN_FOLDER);
+        }else{
+            savePath=savePath.concat(SAVE_FOLDER);
+        }
         File dir = new File(savePath);
         //상위 디렉토리가 존재하지 않을 경우 생성
         if (!dir.exists()) {
             dir.mkdirs();
+            Log.i("Download", "Directory is not exist. now created!");
         }
+        Log.i("Download", "Path= "+savePath);
         //파일 이름 :날짜_시간
 
         Date day = new Date();
@@ -51,7 +61,8 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
         String fileUrl = params[0];
         Log.i(TAG, "File Url >> "+fileUrl);
         //다운로드 폴더에 동일한 파일명이 존재하는지 확인
-        String localPath = savePath + "/" + fileName + ".jpg";
+        String localPath= savePath + "/" + fileName + ".jpg";
+
         Log.d(TAG, "이미지 다운 접근! from : "+fileUrl);
 
         sendMsg(0); //이미지 다운 시작
@@ -64,6 +75,7 @@ public class ImageDownload extends AsyncTask<String, Void, Void> {
             //입력 스트림을 구한다
             InputStream is = conn.getInputStream();
             File file = new File(localPath);
+            Log.i("Save Path", localPath);
             //파일 저장 스트림 생성
             FileOutputStream fos = new FileOutputStream(file);
             int read;
