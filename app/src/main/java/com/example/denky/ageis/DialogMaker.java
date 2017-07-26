@@ -29,17 +29,21 @@ public class DialogMaker extends DialogFragment {
     private View childView=null;
 
     //Before using this class as instance, must call this method.
-    public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative){
+    public DialogMaker setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative){
         this.message=message;
         this.positiveMsg=positiveMsg;
         this.negativeMsg=negativeMsg;
         this.callback_positive=callback_positive;
         this.callback_negative=callback_negative;
+
+        return this;
     }
 
-    public void setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, View childView){
+    public DialogMaker setValue(String message, String positiveMsg, String negativeMsg, Callback callback_positive, Callback callback_negative, View childView){
         this.setValue(message, positiveMsg, negativeMsg, callback_positive, callback_negative);
         this.childView=childView;
+
+        return this;
     }
 
     @Override
@@ -88,6 +92,7 @@ public class DialogMaker extends DialogFragment {
                 });
             }
         });
+
         return dialog;
     }
 

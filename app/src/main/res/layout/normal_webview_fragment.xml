@@ -38,7 +38,6 @@
             <ImageView
                 android:id="@+id/favoriteSite_normal"
                 android:src="@drawable/favorite_site_icon"
-
                 android:layout_marginTop="8dp"
                 android:layout_width="28dp"
                 android:layout_height="28dp"

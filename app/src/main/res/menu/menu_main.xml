@@ -4,35 +4,24 @@
     >
     <item
         android:icon="@drawable/screenwhite"
-        android:title="Capture screen"
+        android:title="화면 캡쳐"
         android:id="@+id/menu_capture">
     </item>
     <item
         android:icon="@drawable/extendwindowwhite"
-        android:title="Extend screen"
+        android:title="URL 바 숨김"
         android:id="@+id/menu_extend">
     </item>
-
-    <item
-        android:title="Quick Security Mode"
-        android:id="@+id/menu_security_mode">
-    </item>
-
-    <item
-        android:title="Set homepage"
-        android:id="@+id/menu_setHomepage">
-    </item>
-
 
 
     <item
         android:icon="@drawable/setting2"
-        android:title="Detail setting"
+        android:title="세부 설정"
         android:id="@+id/menu_detailSetting">
     </item>
 
     <item
-        android:title="App Close"
+        android:title="앱 종료"
         android:id="@+id/appShutDown">
     </item>
 </menu>

@@ -1,6 +1,7 @@
 package com.example.denky.ageis;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,11 +26,13 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -250,46 +253,45 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                                 resultMessage.setCancelable(false);
                                                 resultMessage.setValue("사이트 이름이 중복됩니다.","확인", null, closeDialog, null);
                                                 resultMessage.show(getActivity().getSupportFragmentManager(), "Site Name is Duplicated!");
+                                                return;
                                             }
-                                            //Error Check End
-                                            else{
-                                                //Successfully Save
-                                                Settings.favoriteSiteList.put(siteName, uriInfo);
-                                                Settings.saveSettings();
 
-                                                resultMessage.setCancelable(false);
-                                                resultMessage.setValue("저장되었습니다.", "확인", null, closeDialog, null);
-                                                resultMessage.show(getActivity().getSupportFragmentManager(), "Successfully Save!");
+                                            //Successfully Save
+                                            Settings.favoriteSiteList.put(siteName, uriInfo);
+                                            Settings.saveSettings();
 
-                                                //Hiding Keyboard
+                                            resultMessage.setCancelable(false);
+                                            resultMessage.setValue("저장되었습니다.", "확인", null, closeDialog, null);
+                                            resultMessage.show(getActivity().getSupportFragmentManager(), "Successfully Save!");
+
+                                            //Hiding Keyboard
+                                            if(isOpenKeyboard()){
                                                 InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
                                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-
-                                                addThisSiteDialog.dismiss();
-                                                favoriteSiteListDialog.dismiss();
                                             }
+
+                                            addThisSiteDialog.dismiss();
+                                            favoriteSiteListDialog.dismiss();
                                         }
                                     };
                                     DialogMaker.Callback cancel=new DialogMaker.Callback() {
                                         @Override
                                         public void callbackMethod() {
                                             //Hiding Keyboard
-                                            InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
-                                            if(imm.isAcceptingText()){
+                                            if(isOpenKeyboard()){
+                                                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService( Context.INPUT_METHOD_SERVICE);
                                                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
-                                                Toast.makeText(getContext(), "Hide KeyPad", Toast.LENGTH_SHORT).show();
                                             }
 
                                             addThisSiteDialog.dismiss();
                                         }
                                     };
-                                    addThisSiteDialog.setCancelable(false);
                                     addThisSiteDialog.setValue("즐겨찾기에 추가", "추가", "취소", add, cancel, inflatedView);
                                     addThisSiteDialog.show(getActivity().getSupportFragmentManager(), "ADD TO FAVORITE SITE LIST");
 
                                     //Open keyboard
-                                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    if(imm.isAcceptingText()==false){
+                                    if(!isOpenKeyboard()){
+                                        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                                         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                                     }
                                 }
@@ -323,13 +325,15 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                                             Settings.favoriteSiteList.remove(siteListAdapter.getItem(POSITION));
                                             Settings.saveSettings();
 
-                                            siteListAdapter.clear();
-                                            siteListAdapter.addAll(Settings.favoriteSiteList.keySet());
-                                            View newInflatedView=getActivity().getLayoutInflater().inflate(R.layout.favorite_site_list, null);
-                                            ((ListView)newInflatedView.findViewById(R.id.favoriteSiteList)).setAdapter(siteListAdapter);
-                                            favoriteSiteListDialog.setValue("즐겨찾기 목록", "이 사이트 저장", "닫기", addThisSite, closeDialog, newInflatedView);
-
+                                            final DialogMaker completeDelete=new DialogMaker();
+                                            completeDelete.setValue("삭제되었습니다.", "확인", "", new DialogMaker.Callback() {
+                                                @Override
+                                                public void callbackMethod() {
+                                                    completeDelete.dismiss();
+                                                }
+                                            }, null).show(getActivity().getSupportFragmentManager(), "");
                                             deleteThisSite.dismiss();
+                                            favoriteSiteListDialog.dismiss();
                                         }
                                     };
                                     DialogMaker.Callback cancel=new DialogMaker.Callback() {
@@ -355,6 +359,32 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
         homeBtn.setOnClickListener(cl);
         settingBtn.setOnClickListener(cl);
         favortieSiteBtn.setOnClickListener(cl);
+
+        View.OnLongClickListener longClickListener=new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                switch (v.getId()) {
+                    case R.id.homeBtn_normal :
+                        Toast.makeText(getContext(), "설정한 홈 페이지로 이동합니다", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.lockBtn_normal :
+                        Toast.makeText(getContext(), "시큐리티 모드로 전환합니다", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.settingBtn_normal :
+                        Toast.makeText(getContext(), "세부 설정을 할 수 있습니다", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.favoriteSite_normal:
+                        Toast.makeText(getContext(), "즐겨찾기 목록을 표시합니다", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        };
+        lockBtn.setOnLongClickListener(longClickListener);
+        homeBtn.setOnLongClickListener(longClickListener);
+        settingBtn.setOnLongClickListener(longClickListener);
+        favortieSiteBtn.setOnLongClickListener(longClickListener);
+
 
         bar=(LinearLayout)rootView.findViewById(R.id.universe_normal);
 
@@ -443,6 +473,17 @@ public class FragmentNormalMode extends Fragment implements View.OnLongClickList
                 menu.add(0,2,100,processContext.getContextsecondMenu());
                 menu.add(0,3,100,processContext.getContextthirdMenu());
                 break;
+        }
+    }
+
+    private boolean isOpenKeyboard(){
+        FrameLayout rootContainer=(FrameLayout)getActivity().findViewById(R.id.container);
+        RelativeLayout fragmentContainer=(RelativeLayout) getActivity().findViewById(R.id.normalWebView);
+
+        if(rootContainer.getHeight()-fragmentContainer.getHeight()> 100){
+            return true;
+        }else{
+            return false;
         }
     }
 
